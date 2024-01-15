@@ -41,10 +41,9 @@ public class PIDDisplay extends SubsystemBase{
     double SValue;
     double VValue;
 
-    public PIDDisplay(){
+    public static void Init() {
         PIDTab.add(PIDList).withPosition(0, 0).withSize(4, 1);
         PIDList.setDefaultOption("Default PID", defaultPID);
-
     }
 
     @Override

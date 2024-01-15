@@ -6,11 +6,11 @@ package frc.robot.Commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
 
-public class JoystickDrive extends CommandBase {
+public class JoystickDrive extends Command {
   Drivetrain drivetrain;
   Joystick controller;
 

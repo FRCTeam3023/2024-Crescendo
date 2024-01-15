@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,8 +55,8 @@ public class Drivetrain extends SubsystemBase {
     new Rotation2d(), 
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
-    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9,0.9,0.9) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.9,0.9,0.9) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -185,7 +186,7 @@ public class Drivetrain extends SubsystemBase {
    * @return Gyro angle
    */
   public Rotation2d getChassisAngle(){
-    return Rotation2d.fromDegrees(gyro.getAngle());
+    return Rotation2d.fromDegrees(gyro.getAngle(IMUAxis.kZ));
   }
 
   /** Calibrates gyro - will take significant time so put in beginning of code */

@@ -21,12 +21,10 @@ public class RobotContainer {
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
 
-  private static final PIDDisplay pidDisplay = new PIDDisplay();
-
-
   public RobotContainer() {
     configureBindings();
     drivetrain.setDefaultCommand(joystickDrive);
+    PIDDisplay.Init();
   }
 
   private void configureBindings() {

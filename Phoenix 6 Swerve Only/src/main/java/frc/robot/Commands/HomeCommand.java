@@ -1,13 +1,13 @@
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drivetrain;
 
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD lic
 
-public class HomeCommand extends CommandBase {
+public class HomeCommand extends Command {
   Drivetrain drivetrain;
   /** Creates a new HomeCommand. */
   public HomeCommand(Drivetrain drivetrain) {

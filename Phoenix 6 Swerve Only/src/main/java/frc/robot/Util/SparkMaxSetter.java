@@ -6,16 +6,16 @@ package frc.robot.Util;
 
 import java.util.List;
 
-import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkPIDController;
 
 import frc.robot.Util.PIDDisplay.PIDSetter;
 
 /** Add your docs here. */
 public class SparkMaxSetter implements PIDSetter {
 
-    private List<SparkMaxPIDController> motors;
+    private List<SparkPIDController> motors;
     
-    public SparkMaxSetter(List<SparkMaxPIDController> motors){
+    public SparkMaxSetter(List<SparkPIDController> motors){
         this.motors = motors;
     }
 
@@ -33,7 +33,7 @@ public class SparkMaxSetter implements PIDSetter {
 
     @Override
     public double[] getPID() {
-        SparkMaxPIDController motor = motors.get(0);
+        SparkPIDController motor = motors.get(0);
         double p = motor.getP();
         double i = motor.getI();
         double d = motor.getD();

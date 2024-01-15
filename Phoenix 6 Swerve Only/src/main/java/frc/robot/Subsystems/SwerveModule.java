@@ -16,8 +16,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,7 +40,7 @@ public class SwerveModule {
     private DigitalInput hallEffectSensor;
     public int moduleID;
     private RelativeEncoder turnEncoder;
-    private SparkMaxPIDController turnPIDController;
+    private SparkPIDController turnPIDController;
 
     private Gains turnGains = new Gains(.6, 1);
 
@@ -59,7 +59,7 @@ public class SwerveModule {
 
     private static List<TalonFXConfigurator> driveConfigurators = new ArrayList<>();
     private static TalonFXConfiguration talonFXConfig; //Reflects the latest constructor call
-    private static List<SparkMaxPIDController> turnPIDControllers = new ArrayList<SparkMaxPIDController>();
+    private static List<SparkPIDController> turnPIDControllers = new ArrayList<SparkPIDController>();
 
      /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
     private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
@@ -314,7 +314,7 @@ public class SwerveModule {
      * Resets the encoder position for both motors
      */
     public void zeroEncoders() {
-        driveMotor.setRotorPosition(0);
+        driveMotor.setPosition(0);
         turnEncoder.setPosition(0);
     }
 
@@ -338,7 +338,7 @@ public class SwerveModule {
     /**
      * Returns a list of all swerve turn motor PIDs
      */
-    public static List<SparkMaxPIDController> getTurnPIDControllers() {
+    public static List<SparkPIDController> getTurnPIDControllers() {
         return turnPIDControllers;
     }
 
