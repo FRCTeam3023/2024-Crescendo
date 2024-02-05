@@ -72,4 +72,8 @@ public class Constants {
         public static final Pose3d TARGET_7_POSE = new Pose3d(1,2.75, Units.inchesToMeters(18.13), new Rotation3d());
         public static final Pose3d TARGET_8_POSE = new Pose3d(1 , 1.06, Units.inchesToMeters(18.13), new Rotation3d());
     }   
+
+    public static class ArmConstants {
+        public static final double PIVOT_GEARING = 10;
+    }
 }

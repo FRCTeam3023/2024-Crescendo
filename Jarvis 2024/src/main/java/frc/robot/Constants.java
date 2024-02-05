@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -78,5 +79,9 @@ public class Constants {
     public static class ArmConstants{
         public static final InvertedValue pivotInverted = InvertedValue.Clockwise_Positive;
         public static final double pivotGearRatio = 50;
+        public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
+        public static final double pivotFeedForward = 0.5;
+        //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
+        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromDegrees(45);
     }
 }
