@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,6 +14,10 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  AddressableLED m_led = new AddressableLED(1);
+
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(42);
 
   @Override
   public void robotInit() {
@@ -52,10 +58,36 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+        // PWM port 9
+    // Must be a PWM header, not MXP or DIO
+    
+
+    // Reuse buffer
+    
+    // Length is expensive to set, so only set it once, then just update data
+    
+    m_led.setLength(m_ledBuffer.getLength());
+
+    // Set the data
+    m_led.setData(m_ledBuffer);
+    m_led.start();
+
+    
+   
+   m_led.setData(m_ledBuffer);
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+        m_led.setData(m_ledBuffer);
+
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Sets the specified LED to the RGB values for red
+      m_ledBuffer.setRGB(i, 255, 0, 0);
+   }
+  }
 
   @Override
   public void teleopExit() {}
