@@ -44,7 +44,6 @@ public class Arm extends SubsystemBase {
   private final Gains shooterGains = new Gains(0,0,1);
 
   private final TalonSRX intakeMotor = new TalonSRX(13);
-  private final Gains intakeGains = new Gains(0, 0, 0, 0, 0);
 
   private final TalonFX pivotMotor = new TalonFX(10);
   private final Gains pivotGains = new Gains(0, 0, 0, 0, 12);
@@ -92,30 +91,25 @@ public class Arm extends SubsystemBase {
     leftEncoder.setVelocityConversionFactor(0.5);
     rightEncoder.setVelocityConversionFactor(0.5);
 
-    TalonSRXConfiguration intakeConfiguration = new TalonSRXConfiguration();
-
-    intakeConfiguration.peakOutputForward = intakeGains.peakOutput;
-    intakeConfiguration.peakOutputReverse = intakeGains.peakOutput;
-
-    intakeConfiguration.slot0.kP = intakeGains.P;
-    intakeConfiguration.slot0.kI = intakeGains.D;
-    intakeConfiguration.slot0.kD = intakeGains.S;
-    intakeConfiguration.slot0.kF = intakeGains.V;
-
-    intakeMotor.configAllSettings(intakeConfiguration);
+    
   }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
 
+  /**
+   * Closed loop control of the shooting wheels' RPM
+   * @param rpm target rpm
+   */
   public void setShooterRPM(double rpm){
     leftPID.setReference(rpm, ControlType.kVelocity);
     rightPID.setReference(rpm, ControlType.kVelocity);
   }
 
-  public void setIntakeVelocity(double velocity) {
-    intakeMotor.set(ControlMode.Velocity, velocity);
+
+  public void setIntakeSpeed(double speed) {
+    intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 
   public void setShooterDutyCycle(double speed){
