@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -21,6 +23,8 @@ public class Robot extends TimedRobot {
 
     CANSparkMax leftMotor = new CANSparkMax(20, MotorType.kBrushless);
     CANSparkMax rightMotor = new CANSparkMax(21, MotorType.kBrushless);
+
+    TalonSRX intakeMotor = new TalonSRX(13);
   
 
   @Override
@@ -42,6 +46,8 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     leftMotor.set(0);
     rightMotor.set(0);
+
+    intakeMotor.set(ControlMode.PercentOutput, 0);
   }
 
   @Override
@@ -72,7 +78,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     leftMotor.set(joystick.getRawAxis(1));
-    rightMotor.set(-joystick.getRawAxis(1));
+    rightMotor.set(joystick.getRawAxis(1));
+
+    intakeMotor.set(ControlMode.PercentOutput, joystick.getRawAxis(5));
   }
 
   @Override
