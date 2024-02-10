@@ -16,7 +16,8 @@ import edu.wpi.first.math.util.Units;
 /** Add your docs here. */
 public class Constants {
     /** Width between robot wheels in meters */ 
-    public static final double ROBOT_WHEEL_BASE = Units.inchesToMeters(21.5);
+    public static final double ROBOT_WHEEL_BASE_WIDTH = Units.inchesToMeters(21.5);
+    public static final double ROBOT_WHEEL_BASE_LENGTH = Units.inchesToMeters(23.5);
     public static final double MAX_DRIVE_SPEED = 1;
     public static final double MAX_ANGULAR_SPEED = 3;
     public static final double DRIVE_TOLERANCE_PERCENT = 0.03;

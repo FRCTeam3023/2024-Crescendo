@@ -41,10 +41,10 @@ public class Drivetrain extends SubsystemBase {
   private static final SwerveModule backRight = new SwerveModule(4, 4, 8, ModuleConstants.MODULE4_OFFSET, InvertedValue.CounterClockwise_Positive, 3); // Module 4
 
   //module positions
-  private static final Translation2d frontLeftLocation = new Translation2d(Constants.ROBOT_WHEEL_BASE/2 , Constants.ROBOT_WHEEL_BASE/2);
-  private static final Translation2d frontRightLocation = new Translation2d(Constants.ROBOT_WHEEL_BASE/2, -Constants.ROBOT_WHEEL_BASE/2);
-  private static final Translation2d backLeftLocation = new Translation2d(-Constants.ROBOT_WHEEL_BASE/2,Constants.ROBOT_WHEEL_BASE/2);
-  private static final Translation2d backRightLocation = new Translation2d(-Constants.ROBOT_WHEEL_BASE/2, -Constants.ROBOT_WHEEL_BASE/2);
+  private static final Translation2d frontLeftLocation = new Translation2d(Constants.ROBOT_WHEEL_BASE_LENGTH/2 , Constants.ROBOT_WHEEL_BASE_WIDTH/2);
+  private static final Translation2d frontRightLocation = new Translation2d(Constants.ROBOT_WHEEL_BASE_LENGTH/2, -Constants.ROBOT_WHEEL_BASE_WIDTH/2);
+  private static final Translation2d backLeftLocation = new Translation2d(-Constants.ROBOT_WHEEL_BASE_LENGTH/2,Constants.ROBOT_WHEEL_BASE_WIDTH/2);
+  private static final Translation2d backRightLocation = new Translation2d(-Constants.ROBOT_WHEEL_BASE_LENGTH/2, -Constants.ROBOT_WHEEL_BASE_WIDTH/2);
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);

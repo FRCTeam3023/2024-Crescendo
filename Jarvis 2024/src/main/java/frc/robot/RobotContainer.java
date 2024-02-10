@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Commands.ArmControl;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.JoystickDrive;
+import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Util.PIDDisplay;
 
@@ -18,17 +20,20 @@ public class RobotContainer {
   private static final Joystick controller = new Joystick(0);
 
   private static final Drivetrain drivetrain = new Drivetrain();
+  private static final Arm arm = new Arm();
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
+  private static final ArmControl armControl = new ArmControl(arm, controller);
 
   public RobotContainer() {
     configureBindings();
     drivetrain.setDefaultCommand(joystickDrive);
+    arm.setDefaultCommand(armControl);
     PIDDisplay.Init();
   }
 
   private void configureBindings() {
-    new JoystickButton(controller, 1).whileTrue(homeCommand);
+    new JoystickButton(controller, 3).whileTrue(homeCommand);
   }
 
   public Command getAutonomousCommand() {
