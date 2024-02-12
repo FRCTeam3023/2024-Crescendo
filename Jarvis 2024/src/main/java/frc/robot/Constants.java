@@ -83,6 +83,9 @@ public class Constants {
         public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
         public static final double pivotFeedForward = 0.5;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
-        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromDegrees(45);
+        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromRadians(0.77);
+        public static final double pivotHeight = 2.6;
+        public static final double pivotLength = 11.7;
+        public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
     }
 }

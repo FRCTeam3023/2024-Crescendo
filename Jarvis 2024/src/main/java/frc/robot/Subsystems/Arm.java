@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.fasterxml.jackson.databind.util.RootNameLookup;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
@@ -29,6 +30,8 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
@@ -117,6 +120,7 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
   }
 
   /**
@@ -188,14 +192,54 @@ public class Arm extends SubsystemBase {
     pivotMotor.setControl(new DutyCycleOut(speed));
   }
 
-
-  //Can use projectile motion physics if this doesn't work - I already have an equation for the angle
   //Face the shooter output towards the target point
   public void faceTarget(Pose3d target, Pose2d robotPose) {
-    double xDistance = target.getX() - robotPose.getX();
-    double yDistance = target.getY() - robotPose.getY();
-    double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
-    double targetAngle = Constants.ArmConstants.launcherAngleWithPivot.getDegrees() - Math.atan(target.getZ() / groundDistance);
-    setPivotAngle(Rotation2d.fromRadians(targetAngle), true);
+    // double xDistance = target.getX() - robotPose.getX();
+    // double yDistance = target.getY() - robotPose.getY();
+    // double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
+    // double targetAngle = Constants.ArmConstants.launcherAngleWithPivot.getDegrees() - Math.atan(target.getZ() / groundDistance);
+    Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
+    Rotation2d newtonApproximation = newtonApproximation(relativeTarget, robotPose.getRotation());
+    System.out.println(newtonApproximation.getRadians());
+    setPivotAngle(newtonApproximation, true);
+  }
+
+  //Solve for the correct angle using an approximation 
+  //Newton's method is fast, but may not always converge; we might have to use a less efficient method if issues arise
+  private Rotation2d newtonApproximation(Pose3d relativeTarget, Rotation2d heading) {
+    Rotation2d last = Rotation2d.fromDegrees(180); //Initial guess
+    for (int i = 0; i < Constants.ArmConstants.pivotApproximationPrecision; i++) {
+      Rotation2d evaluation = evaluateAngle(relativeTarget, heading, last);
+      Rotation2d derivative = evaluateAngleDerivative(relativeTarget, heading, last);
+      last = last.minus(Rotation2d.fromRadians(evaluation.getRadians() / derivative.getRadians()));
+    }
+    return last;
+  }
+
+  private Rotation2d evaluateAngle(Pose3d relativeTarget, Rotation2d heading, Rotation2d theta) {
+    //Precompute repeated variables
+    double lcosTheta = Constants.ArmConstants.pivotLength * theta.getCos();
+
+    double xDistance = relativeTarget.getX() - lcosTheta * heading.getSin();
+    double yDistance = relativeTarget.getY() - lcosTheta * heading.getCos();
+    double zDistance = relativeTarget.getZ() - Constants.ArmConstants.pivotLength * theta.getSin() - Constants.ArmConstants.pivotHeight;
+    double groundDistance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+
+    return Rotation2d.fromRadians(Constants.ArmConstants.launcherAngleWithPivot.getRadians() - theta.getRadians() - Math.atan2(zDistance, groundDistance));
+  }
+
+  private Rotation2d evaluateAngleDerivative(Pose3d relativeTarget, Rotation2d heading, Rotation2d theta) {
+    //Precompute repeated variables
+    double lcosTheta = Constants.ArmConstants.pivotLength * theta.getCos();
+    double lsinTheta = Constants.ArmConstants.pivotLength * theta.getSin();
+    double cosHeading = heading.getCos();
+    double sinHeading = heading.getSin();
+    double zDistance = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight;
+    double groundDistanceSquared = Math.pow(relativeTarget.getX() - lcosTheta * sinHeading,2) + Math.pow(relativeTarget.getY() - lcosTheta * cosHeading,2);
+
+    double numerator = lcosTheta * groundDistanceSquared + lsinTheta * zDistance * (relativeTarget.getX() * sinHeading + relativeTarget.getY() * cosHeading - lcosTheta);
+    double denominator = (zDistance * zDistance + groundDistanceSquared) * Math.sqrt(groundDistanceSquared);
+
+    return Rotation2d.fromRadians(numerator / denominator - 1);
   }
 }
