@@ -78,7 +78,7 @@ public class Constants {
     } 
     
     public static class ArmConstants{
-        public static final InvertedValue pivotInverted = InvertedValue.Clockwise_Positive;
+        public static final InvertedValue pivotInverted = InvertedValue.CounterClockwise_Positive;
         public static final double pivotGearRatio = 50;
         public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
         public static final double pivotFeedForward = 0.5;

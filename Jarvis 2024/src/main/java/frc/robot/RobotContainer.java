@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.ArmControl;
 import frc.robot.Commands.HomeCommand;
@@ -24,16 +26,18 @@ public class RobotContainer {
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
   private static final ArmControl armControl = new ArmControl(arm, controller);
+  private static final PIDDisplay pid = new PIDDisplay();
 
   public RobotContainer() {
     configureBindings();
     drivetrain.setDefaultCommand(joystickDrive);
     arm.setDefaultCommand(armControl);
-    PIDDisplay.Init();
   }
 
   private void configureBindings() {
     new JoystickButton(controller, 3).whileTrue(homeCommand);
+
+    // new JoystickButton(controller, 5).whileTrue(new InstantCommand( () -> arm.setIntakeSpeed(1)));
   }
 
   public Command getAutonomousCommand() {

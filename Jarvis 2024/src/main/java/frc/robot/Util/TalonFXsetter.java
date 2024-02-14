@@ -34,6 +34,7 @@ public class TalonFXsetter implements PIDSetter {
         
 
         configurators.forEach(configurator -> configurator.apply(slot0Configs));
+
     }
 
     @Override

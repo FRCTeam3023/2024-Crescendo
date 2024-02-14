@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase {
 
   private final TalonFX pivotMotor = new TalonFX(10);
   private final CANcoder pivotSensor = new CANcoder(9);
-  private final Gains pivotGains = new Gains(0, 0, 0, 0, 12);
+  private final Gains pivotGains = new Gains(1, 0, 0, 0, 12);
   
   /** Creates a new Arm. */
   public Arm() {
@@ -73,9 +73,9 @@ public class Arm extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 1;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 10;
-    pivotConfiguration.MotionMagic.MotionMagicJerk = 50;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 10;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 50;
+    pivotConfiguration.MotionMagic.MotionMagicJerk = 500;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
     pivotConfiguration.Slot0.kD = pivotGains.D;
@@ -131,7 +131,6 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
-    System.out.println(getLocalAngle());
   }
 
   /**

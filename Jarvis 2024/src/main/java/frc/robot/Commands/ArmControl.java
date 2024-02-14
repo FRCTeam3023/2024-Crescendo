@@ -50,9 +50,13 @@ public class ArmControl extends Command {
       arm.setPivotDutyCycle(-.1);
     }else if(armJoystick.getRawButton(4)){
       arm.setPivotDutyCycle(.1);
+    }else if(armJoystick.getRawButton(2)){
+      arm.setPivotAngle(Rotation2d.fromDegrees(30), false);
     }else{
       arm.setPivotDutyCycle(0);
     }
+
+
   }
 
   // Called once the command ends or is interrupted.
