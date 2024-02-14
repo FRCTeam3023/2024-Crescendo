@@ -6,34 +6,23 @@ package frc.robot.Subsystems;
 
 import java.util.List;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.fasterxml.jackson.databind.util.RootNameLookup;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
@@ -41,28 +30,19 @@ import frc.robot.Util.Gains;
 import frc.robot.Util.PIDDisplay;
 import frc.robot.Util.TalonFXsetter;
 
-public class Arm extends SubsystemBase {
-
-  private final CANSparkMax leftShooterMotor = new CANSparkMax(11, MotorType.kBrushless);
-  private SparkPIDController leftPID;
-  private RelativeEncoder leftEncoder;
-
-
-  private final CANSparkMax rightShooterMotor = new CANSparkMax(12, MotorType.kBrushless);  
-  private SparkPIDController rightPID;
-  private RelativeEncoder rightEncoder;
-
-
-  private final Gains shooterGains = new Gains(0,0,1);
-
-  private final TalonSRX intakeMotor = new TalonSRX(13);
-
+public class Pivot extends SubsystemBase {
   private final TalonFX pivotMotor = new TalonFX(10);
   private final CANcoder pivotSensor = new CANcoder(9);
+  private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
   private final Gains pivotGains = new Gains(1, 0, 0, 0, 12);
+
+
+  private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+
+  private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(1, 1).getEntry();
+  private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(1, 2).getEntry();
   
-  /** Creates a new Arm. */
-  public Arm() {
+  public Pivot() {
 
     //basic configuration for the pivot motor
     TalonFXConfiguration pivotConfiguration = new TalonFXConfiguration();
@@ -73,8 +53,8 @@ public class Arm extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 10;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 50;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 1.5;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 10;
     pivotConfiguration.MotionMagic.MotionMagicJerk = 500;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
@@ -93,63 +73,22 @@ public class Arm extends SubsystemBase {
 
     //---------------------------------------------------------------------------------------------------
 
-    CANcoderConfiguration sensorConfig = new CANcoderConfiguration();
-    sensorConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    sensorConfig.MagnetSensor.MagnetOffset = -ArmConstants.PIVOT_SENSOR_OFFSET.getRadians() / (Math.PI * 2);
-    pivotSensor.getConfigurator().apply(sensorConfig);
-
-    //-----------------------------------------------------------------------------------------
-
-
-    leftPID = leftShooterMotor.getPIDController();
-    leftEncoder = leftShooterMotor.getEncoder();
-
-    rightPID = rightShooterMotor.getPIDController();
-    rightEncoder = rightShooterMotor.getEncoder();
-
-    leftPID.setP(shooterGains.P);
-    leftPID.setFF(shooterGains.F);
-    leftPID.setOutputRange(-shooterGains.peakOutput,shooterGains.peakOutput);
-
-    rightPID = leftPID;
-
-    leftShooterMotor.setInverted(false);
-    rightShooterMotor.setInverted(true);
-
-    leftEncoder.setVelocityConversionFactor(0.5);
-    rightEncoder.setVelocityConversionFactor(0.5);
-
-    leftShooterMotor.enableVoltageCompensation(12);
-    rightShooterMotor.enableVoltageCompensation(12);
+    pivotEncoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    pivotEncoderConfig.MagnetSensor.MagnetOffset = ArmConstants.PIVOT_SENSOR_OFFSET;
+    pivotSensor.getConfigurator().apply(pivotEncoderConfig);
 
 
 
     PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
-    
+
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
-  }
-
-  /**
-   * Closed loop control of the shooting wheels' RPM
-   * @param rpm target rpm
-   */
-  public void setShooterRPM(double rpm){
-    leftPID.setReference(rpm, ControlType.kVelocity);
-    rightPID.setReference(rpm, ControlType.kVelocity);
-  }
-
-
-  public void setIntakeSpeed(double speed) {
-    intakeMotor.set(ControlMode.PercentOutput, speed);
-  }
-
-  public void setShooterDutyCycle(double speed){
-    leftShooterMotor.set(speed);
-    rightShooterMotor.set(speed); 
+    angleEntry.setDouble(getLocalAngle().getDegrees());
+    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
   }
 
   //Convert world angle with ground to local angle with pivot's starting position
@@ -175,6 +114,11 @@ public class Arm extends SubsystemBase {
    */
   public Rotation2d getGlobalAngle(){
     return globalizeAngle(getLocalAngle());
+  }
+
+  public void resetAngleOffset(){
+    pivotEncoderConfig.MagnetSensor.MagnetOffset = pivotEncoderConfig.MagnetSensor.MagnetOffset + (-getLocalAngle().getRadians() / (Math.PI * 2));
+    pivotSensor.getConfigurator().apply(pivotEncoderConfig);
   }
 
   /**

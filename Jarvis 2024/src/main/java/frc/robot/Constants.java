@@ -79,7 +79,7 @@ public class Constants {
     
     public static class ArmConstants{
         public static final InvertedValue pivotInverted = InvertedValue.CounterClockwise_Positive;
-        public static final double pivotGearRatio = 50;
+        public static final double pivotGearRatio = 30 * (72/24) * (72/24);
         public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
         public static final double pivotFeedForward = 0.5;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
@@ -89,6 +89,6 @@ public class Constants {
         public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
 
 
-        public static final Rotation2d PIVOT_SENSOR_OFFSET = Rotation2d.fromDegrees(33);
+        public static final double PIVOT_SENSOR_OFFSET = -.16428;
     }
 }
