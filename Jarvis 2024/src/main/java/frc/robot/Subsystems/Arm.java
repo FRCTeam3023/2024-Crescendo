@@ -4,6 +4,8 @@
 
 package frc.robot.Subsystems;
 
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
@@ -36,6 +38,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Util.Gains;
+import frc.robot.Util.PIDDisplay;
+import frc.robot.Util.TalonFXsetter;
 
 public class Arm extends SubsystemBase {
 
@@ -91,6 +95,8 @@ public class Arm extends SubsystemBase {
 
     CANcoderConfiguration sensorConfig = new CANcoderConfiguration();
     sensorConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    sensorConfig.MagnetSensor.MagnetOffset = -ArmConstants.PIVOT_SENSOR_OFFSET.getRadians() / (Math.PI * 2);
+    pivotSensor.getConfigurator().apply(sensorConfig);
 
     //-----------------------------------------------------------------------------------------
 
@@ -115,12 +121,17 @@ public class Arm extends SubsystemBase {
 
     leftShooterMotor.enableVoltageCompensation(12);
     rightShooterMotor.enableVoltageCompensation(12);
+
+
+
+    PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
     
   }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
+    // faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
+    System.out.println(getLocalAngle());
   }
 
   /**

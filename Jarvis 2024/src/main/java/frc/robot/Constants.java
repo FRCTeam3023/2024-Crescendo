@@ -87,5 +87,8 @@ public class Constants {
         public static final double pivotHeight = 2.6;
         public static final double pivotLength = 11.7;
         public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
+
+
+        public static final Rotation2d PIVOT_SENSOR_OFFSET = Rotation2d.fromDegrees(33);
     }
 }

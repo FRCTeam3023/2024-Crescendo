@@ -47,9 +47,9 @@ public class ArmControl extends Command {
     }
 
     if(armJoystick.getRawButton(1)){
-      arm.setPivotDutyCycle(-.5);
-    }else if(armJoystick.getRawButton(3)){
-      arm.setPivotDutyCycle(.5);
+      arm.setPivotDutyCycle(-.1);
+    }else if(armJoystick.getRawButton(4)){
+      arm.setPivotDutyCycle(.1);
     }else{
       arm.setPivotDutyCycle(0);
     }
