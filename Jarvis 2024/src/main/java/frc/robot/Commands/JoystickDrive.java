@@ -28,14 +28,33 @@ public class JoystickDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xInputRight = -applyDeadband(controller.getRawAxis(4), Constants.DRIVE_TOLERANCE_PERCENT);
-    double yInputRight = -applyDeadband(controller.getRawAxis(5), Constants.DRIVE_TOLERANCE_PERCENT);
+    // double xInputRight = -applyDeadband(controller.getRawAxis(4), Constants.DRIVE_TOLERANCE_PERCENT);
+    // double yInputRight = -applyDeadband(controller.getRawAxis(5), Constants.DRIVE_TOLERANCE_PERCENT);
 
-    xInputRight = Math.signum(xInputRight) * xInputRight * xInputRight;
-    yInputRight = Math.signum(yInputRight) * yInputRight * yInputRight;
+    // xInputRight = Math.signum(xInputRight) * xInputRight * xInputRight;
+    // yInputRight = Math.signum(yInputRight) * yInputRight * yInputRight;
 
-    double xSpeed = yInputRight * Constants.MAX_DRIVE_SPEED;
-    double ySpeed = xInputRight * Constants.MAX_DRIVE_SPEED;
+    // double xSpeed = yInputRight * Constants.MAX_DRIVE_SPEED;
+    // double ySpeed = xInputRight * Constants.MAX_DRIVE_SPEED;
+
+    // double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
+    // double rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;
+
+    // drivetrain.drive(new ChassisSpeeds(xSpeed,ySpeed,rotationSpeed), true);
+
+
+
+    double xInputRight = controller.getRawAxis(4);
+    double yInputRight = controller.getRawAxis(5);
+
+    double r = Math.sqrt((xInputRight*xInputRight) + (yInputRight * yInputRight));
+    double theta = Math.atan2(yInputRight, xInputRight);
+
+
+    double processedMagnitude = Constants.MAX_DRIVE_SPEED * applyDeadband(r, Constants.DRIVE_TOLERANCE_PERCENT);
+
+    double xSpeed = -Math.sin(theta) * processedMagnitude;
+    double ySpeed = -Math.cos(theta) * processedMagnitude;
 
     double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
     double rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;

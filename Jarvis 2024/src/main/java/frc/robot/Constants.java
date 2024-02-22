@@ -18,9 +18,9 @@ public class Constants {
     /** Width between robot wheels in meters */ 
     public static final double ROBOT_WHEEL_BASE_WIDTH = Units.inchesToMeters(21.5);
     public static final double ROBOT_WHEEL_BASE_LENGTH = Units.inchesToMeters(23.5);
-    public static final double MAX_DRIVE_SPEED = 1;
+    public static final double MAX_DRIVE_SPEED = 2;
     public static final double MAX_ANGULAR_SPEED = 3;
-    public static final double DRIVE_TOLERANCE_PERCENT = 0.03;
+    public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
     public class ModuleConstants{
         /** Overall max speed of the module in m/s */
@@ -52,8 +52,8 @@ public class Constants {
         public final static double CAM_PITCH = 15; //degrees
         public final static Transform3d CAMERA_TO_ROBOT = 
             new Transform3d(
-                new Translation3d(0, Units.inchesToMeters(5.5), -Units.inchesToMeters(11.75)), 
-                new Rotation3d(Units.degreesToRadians(CAM_PITCH),0,0)
+                new Translation3d(-Units.inchesToMeters(-13.5), 0, -Units.inchesToMeters(14.5)), 
+                new Rotation3d(Units.degreesToRadians(CAM_PITCH),0, Math.PI)
             );
 
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
@@ -62,26 +62,31 @@ public class Constants {
 
         //All of the target April Tag poses on the field to determin where the robot is
         
-        public static final Pose3d TARGET_1_POSE = new Pose3d(15.54 , 1.06, Units.inchesToMeters(18.13), new Rotation3d(0,0,Math.PI));
-        public static final Pose3d TARGET_2_POSE = new Pose3d(15.54 , 2.75, Units.inchesToMeters(18.13), new Rotation3d(0,0,Math.PI));
-        public static final Pose3d TARGET_3_POSE = new Pose3d(15.54 , 4.42, Units.inchesToMeters(18.13), new Rotation3d(0,0,Math.PI));
-
-        public static final Pose3d TARGET_4_POSE = new Pose3d(16.21 , 6.72, Units.inchesToMeters(27.38), new Rotation3d(0,0,Math.PI));
-
+        public static final Pose3d TARGET_1_POSE = new Pose3d(15.08 , .25, 1.36, new Rotation3d(0,0,2*Math.PI/3));
+        public static final Pose3d TARGET_2_POSE = new Pose3d(16.19 , .88, 1.36, new Rotation3d(0,0,2*Math.PI/3));
+        public static final Pose3d TARGET_3_POSE = new Pose3d(16.58 , 4.98, 1.45, new Rotation3d(0,0,Math.PI));
+        public static final Pose3d TARGET_4_POSE = new Pose3d(16.58, 5.55, 1.45, new Rotation3d(0,0,Math.PI));
+        public static final Pose3d TARGET_5_POSE = new Pose3d(14.7,8.2,1.36, new Rotation3d(0,0,-Math.PI/4));
+        public static final Pose3d TARGET_6_POSE = new Pose3d(1.84 , 8.2, 1.36, new Rotation3d(0,0,-Math.PI/4));
+        public static final Pose3d TARGET_7_POSE = new Pose3d(-.04,5.55, 1.45, new Rotation3d());
+        public static final Pose3d TARGET_8_POSE = new Pose3d(-.04 , 4.98, 1.45, new Rotation3d());
+        public static final Pose3d TARGET_9_POSE = new Pose3d(.36,0.88,1.36, new Rotation3d(0,0,Math.PI/3));
+        public static final Pose3d TARGET_10_POSE = new Pose3d(1.46 , 0.25,1.36, new Rotation3d(0,0,Math.PI/3));
+        public static final Pose3d TARGET_11_POSE = new Pose3d(11.9,3.71,1.32, new Rotation3d(0,0,-Math.PI/3));
+        public static final Pose3d TARGET_12_POSE = new Pose3d(11.9,4.5,1.32, new Rotation3d(0,0,Math.PI/3));
+        public static final Pose3d TARGET_13_POSE = new Pose3d(11.22,4.11,1.32, new Rotation3d(0,0,Math.PI));
+        public static final Pose3d TARGET_14_POSE = new Pose3d(5.32,4.11,1.32, new Rotation3d(0,0,0));
+        public static final Pose3d TARGET_15_POSE = new Pose3d(4.64,4.5,1.32, new Rotation3d(0,0,2*Math.PI/3));
+        public static final Pose3d TARGET_16_POSE = new Pose3d(4.64,3.71,1.32, new Rotation3d(0,0,-Math.PI/1.5));
         
 
-        public static final Pose3d TARGET_5_POSE = new Pose3d(0.33 , 6.75, Units.inchesToMeters(27.38), new Rotation3d());
-
-        public static final Pose3d TARGET_6_POSE = new Pose3d(1 , 4.42, Units.inchesToMeters(18.13), new Rotation3d());
-        public static final Pose3d TARGET_7_POSE = new Pose3d(1,2.75, Units.inchesToMeters(18.13), new Rotation3d());
-        public static final Pose3d TARGET_8_POSE = new Pose3d(1 , 1.06, Units.inchesToMeters(18.13), new Rotation3d());
     } 
     
     public static class ArmConstants{
         public static final InvertedValue pivotInverted = InvertedValue.CounterClockwise_Positive;
         public static final double pivotGearRatio = 30 * (72/24) * (72/24);
         public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
-        public static final double pivotFeedForward = 0.5;
+        public static final double pivotFeedForward = 0;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
         public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromRadians(0.77);
         public static final double pivotHeight = 2.6;
@@ -89,6 +94,6 @@ public class Constants {
         public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
 
 
-        public static final double PIVOT_SENSOR_OFFSET = -.16428;
+        public static final double PIVOT_SENSOR_OFFSET = -.202;
     }
 }

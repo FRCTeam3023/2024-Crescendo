@@ -108,6 +108,9 @@ public class SwerveModule {
         driveConfiguration.Feedback.SensorToMechanismRatio = ModuleConstants.DRIVE_GEARING / Units.inchesToMeters(ModuleConstants.WHEEL_DIA * Math.PI);
         driveConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
+        driveConfiguration.Audio.BeepOnBoot = false;
+        driveConfiguration.Audio.BeepOnConfig = false;
+
         driveMotor.getConfigurator().apply(driveConfiguration);
 
         /*-------------------------------------------------------------------------------------------*/

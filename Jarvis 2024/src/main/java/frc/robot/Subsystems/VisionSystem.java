@@ -4,47 +4,56 @@
 
 package frc.robot.Subsystems;
 
+import org.photonvision.PhotonCamera;
+
 // import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PhotonConstants;
 
 public class VisionSystem extends SubsystemBase {
   /** Creates a new PhotonCamera. */
 
-  // private static final PhotonCamera photonCamera = new PhotonCamera("visionCamera");
+  private static final PhotonCamera photonCamera = new PhotonCamera("VisionCamera");
+
+  private static final ShuffleboardTab PhotonTab = Shuffleboard.getTab("PhotonVision");
+  private static final GenericEntry visionPoseEntry = PhotonTab.add("Vision Pose", new Pose2d().toString()).withPosition(0, 0).getEntry();
   private double previousPipelineTimestamp = 0;
 
   public VisionSystem() {}
 
   @Override
   public void periodic() {
-    // var pipelineResult = photonCamera.getLatestResult();
-    // var resultTimestamp = pipelineResult.getTimestampSeconds();
+    var pipelineResult = photonCamera.getLatestResult();
+    var resultTimestamp = pipelineResult.getTimestampSeconds();
 
-    // if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
-    //   previousPipelineTimestamp = resultTimestamp;
-    //   var target = pipelineResult.getBestTarget();
+    if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
+      previousPipelineTimestamp = resultTimestamp;
+      var target = pipelineResult.getBestTarget();
 
-    //   if (target.getPoseAmbiguity() <= .05) {
-    //     Transform3d camToTarget = target.getBestCameraToTarget();
-    //     Transform3d targetToCamera = camToTarget.inverse();
+      if (target.getPoseAmbiguity() <= .05) {
+        Transform3d camToTarget = target.getBestCameraToTarget();
+        Transform3d targetToCamera = camToTarget.inverse();
 
-    //     Pose3d targetPose = getSelectedTargetPose(target.getFiducialId());
-    //     Pose3d camPose = targetPose.transformBy(targetToCamera);
+        Pose3d targetPose = getSelectedTargetPose(target.getFiducialId());
+        Pose3d camPose = targetPose.transformBy(targetToCamera);
 
-    //     Pose2d visionMeasurement = camPose.transformBy(PhotonConstants.CAMERA_TO_ROBOT).toPose2d();
+        Pose2d visionMeasurement = camPose.transformBy(PhotonConstants.CAMERA_TO_ROBOT).toPose2d();
 
         
 
-    //     Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
+        Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
+        visionPoseEntry.setString(visionMeasurement.toString());
 
+      }
+    }
 
-    //   }
-    // }
   }
 
 
@@ -76,6 +85,31 @@ public class VisionSystem extends SubsystemBase {
       case 8:
         targetPose = PhotonConstants.TARGET_8_POSE;
         break;
+      case 9:
+        targetPose = PhotonConstants.TARGET_9_POSE;
+        break;
+      case 10:
+        targetPose = PhotonConstants.TARGET_10_POSE;
+        break;
+      case 11:
+        targetPose = PhotonConstants.TARGET_11_POSE;
+        break;
+      case 12:
+        targetPose = PhotonConstants.TARGET_12_POSE;
+        break;
+      case 13:
+        targetPose = PhotonConstants.TARGET_13_POSE;
+        break;
+      case 14:
+        targetPose = PhotonConstants.TARGET_14_POSE;
+        break;
+      case 15:
+        targetPose = PhotonConstants.TARGET_15_POSE;
+        break;
+      case 16:
+        targetPose= PhotonConstants.TARGET_16_POSE;
+        break;
+  
     
       default:
         targetPose = new Pose3d();

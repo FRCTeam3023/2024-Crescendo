@@ -5,6 +5,10 @@
 package frc.robot.Subsystems;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -16,8 +20,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.ADIS16470_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -63,17 +70,43 @@ public class Drivetrain extends SubsystemBase {
   private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
   /** Shuffleboard entry to display robot heading */
   private static GenericEntry headingEntry = telemTab.add("Robot Heading", 0).withPosition(9, 0).getEntry();
+  private static GenericEntry poseEntry = telemTab.add("Pose", new Pose2d().toString()).withPosition(9, 1).getEntry();
+
 
   public Drivetrain() {
+    gyro.configCalTime(CalibrationTime._32ms);
     //recalibrate gyro and initialize starting pose
     calibrateGyro();
-    setPose(new Pose2d()); //autonomous will reset this when starting 
+
+
+    AutoBuilder.configureHolonomic(
+      this::getPose,
+      this::setPose, 
+      this::getChassisSpeeds , 
+      this::driveRobotRelative, 
+      new HolonomicPathFollowerConfig(
+        new PIDConstants(4), 
+        new PIDConstants(4),
+        ModuleConstants.MAX_SPEED, 
+        Units.inchesToMeters(16.5), 
+        new ReplanningConfig()),
+      () -> {
+          var alliance = DriverStation.getAlliance();
+          if(alliance.isPresent()){
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+      this
+    );
 
     TalonFXsetter swerveDriveMotors = new TalonFXsetter(SwerveModule.getDriveConfigurators(), SwerveModule.getTalonFXConfig());
     SparkMaxSetter swerveTurnMotors = new SparkMaxSetter(SwerveModule.getTurnPIDControllers());
     
     PIDDisplay.PIDList.addOption("Swerve Drive Motors", swerveDriveMotors);
     PIDDisplay.PIDList.addOption("Swerve Turn Motors", swerveTurnMotors);
+
+
   }
 
   @Override
@@ -81,6 +114,7 @@ public class Drivetrain extends SubsystemBase {
     headingEntry.setDouble(getPose().getRotation().getDegrees());
 
     poseEstimator.update(getChassisAngle(), getModulePositions());
+    poseEntry.setString(getPose().toString());
   }
 
 
@@ -102,6 +136,10 @@ public class Drivetrain extends SubsystemBase {
     SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
 
     setModuleStates(moduleStates);
+  }
+
+  public void driveRobotRelative(ChassisSpeeds chassisSpeeds){
+    drive(chassisSpeeds, false);
   }
 
   /** Sets drivetrain to 0 speeds */
@@ -187,6 +225,14 @@ public class Drivetrain extends SubsystemBase {
    */
   public Rotation2d getChassisAngle(){
     return Rotation2d.fromDegrees(gyro.getAngle(IMUAxis.kZ));
+  }
+
+  /**
+   * Returns robot relative speeds
+   * @return chassis speeds
+   */
+  public ChassisSpeeds getChassisSpeeds(){
+    return kinematics.toChassisSpeeds(frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState());
   }
 
   /** Calibrates gyro - will take significant time so put in beginning of code */

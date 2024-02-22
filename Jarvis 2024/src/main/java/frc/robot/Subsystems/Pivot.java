@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -34,14 +35,17 @@ public class Pivot extends SubsystemBase {
   private final TalonFX pivotMotor = new TalonFX(10);
   private final CANcoder pivotSensor = new CANcoder(9);
   private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
-  private final Gains pivotGains = new Gains(1, 0, 0, 0, 12);
+  private final Gains pivotGains = new Gains(25, 0, 0, 0, 6);
 
+  public static Rotation2d holdPosition = new Rotation2d();
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
   private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(1, 1).getEntry();
   private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(1, 2).getEntry();
-  
+  private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(1, 3).getEntry();
+  private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(1, 4).getEntry();
+
   public Pivot() {
 
     //basic configuration for the pivot motor
@@ -53,14 +57,17 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 1.5;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 10;
-    pivotConfiguration.MotionMagic.MotionMagicJerk = 500;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = .75;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 1.5;
+    pivotConfiguration.MotionMagic.MotionMagicJerk = 50;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
     pivotConfiguration.Slot0.kD = pivotGains.D;
     pivotConfiguration.Slot0.kS = pivotGains.S;
     pivotConfiguration.Slot0.kD = pivotGains.V;
+
+    pivotConfiguration.Audio.BeepOnBoot = false;
+    pivotConfiguration.Audio.BeepOnConfig = false;
 
     //set feedback sensor as a remote CANcoder, resets the rotor sensor position every time it publishes values
     pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
@@ -81,6 +88,7 @@ public class Pivot extends SubsystemBase {
 
     PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
 
+    holdPosition = getLocalAngle();
   }
 
   @Override
@@ -89,6 +97,8 @@ public class Pivot extends SubsystemBase {
     // faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
     angleEntry.setDouble(getLocalAngle().getDegrees());
     angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
+    angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
+    targetAngle.setDouble(holdPosition.getDegrees());
   }
 
   //Convert world angle with ground to local angle with pivot's starting position
@@ -116,10 +126,11 @@ public class Pivot extends SubsystemBase {
     return globalizeAngle(getLocalAngle());
   }
 
-  public void resetAngleOffset(){
-    pivotEncoderConfig.MagnetSensor.MagnetOffset = pivotEncoderConfig.MagnetSensor.MagnetOffset + (-getLocalAngle().getRadians() / (Math.PI * 2));
-    pivotSensor.getConfigurator().apply(pivotEncoderConfig);
-  }
+  // public void resetAngleOffset(){
+
+  //   pivotEncoderConfig.MagnetSensor.MagnetOffset = pivotEncoderConfig.MagnetSensor.MagnetOffset + (-getLocalAngle().getRadians() / (Math.PI * 2));
+  //   pivotSensor.getConfigurator().apply(pivotEncoderConfig);
+  // }
 
   /**
    * Set the closed loop motion magic control target of the pivot joint, adjustable between global and local control.
@@ -136,14 +147,14 @@ public class Pivot extends SubsystemBase {
     }
 
 
-    pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians())
-    .withFeedForward(
-      Constants.ArmConstants.pivotFeedForward * Math.cos(globalAngle.getRadians())
-      ));
+    pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
+
   }
   
   public void setPivotDutyCycle(double speed){
     pivotMotor.setControl(new DutyCycleOut(speed));
+
+    holdPosition = getLocalAngle();
   }
 
   //Face the shooter output towards the target point

@@ -32,21 +32,17 @@ public class IntakeShooterControl extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(joystick.getRawButton(6)){
-      shooter.setShooterDutyCycle(1);
-    }else{
-      shooter.setShooterDutyCycle(0);
-    }
-
     if(joystick.getRawButton(5)){
       intake.setIntakeSpeed(1);
     }else{
       intake.setIntakeSpeed(0);  
     }
 
-    if(joystick.getPOV() == 180){
+    if(joystick.getRawButton(9)){
       intake.setIntakeSpeed(-.25);
       shooter.setShooterDutyCycle(-.25);
+    }else{
+      shooter.setShooterDutyCycle(0);
     }
 
   }
