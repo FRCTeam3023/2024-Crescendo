@@ -29,23 +29,51 @@ public class Autonomous {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
     SendableChooser<Command> autoChooser;
 
+
     Command exampleAuto; 
+    Command twoNoteAuto;
+    
 
     public Autonomous(Pivot pivot, Shooter shooter, Intake intake){
-        NamedCommands.registerCommand("Intake", new RunCommand(() -> intake.setIntakeSpeed(0.65), intake));
-        NamedCommands.registerCommand("Intake Stop", new InstantCommand(() -> intake.setIntakeSpeed(0)));
-        NamedCommands.registerCommand("Prep Shooter", new SequentialCommandGroup(
+        Command intakeCommand = new RunCommand(() -> intake.setIntakeSpeed(0.65), intake);
+        Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
+        Command prepShooterCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
                 new WaitCommand(.15),
                 new RunCommand(() -> intake.setIntakeSpeed(-.25))
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
-        ));
-        NamedCommands.registerCommand("Shoot",new RunCommand(() -> shooter.setShooterDutyCycle(1), shooter));
+        );
+        Command shootCommand = new RunCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+        Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
+
+        Command shootSequenceCommand = new ParallelRaceGroup(
+            new SequentialCommandGroup(
+                prepShooterCommand,
+                shootCommand
+            ),
+            new SequentialCommandGroup(
+                new WaitCommand(2),
+                intakeCommand
+            ),
+            new WaitCommand(3.5)
+        );
+        
+
+
+        NamedCommands.registerCommand("Intake", intakeCommand);
+        NamedCommands.registerCommand("Intake Stop", intakeStopCommand);
+        NamedCommands.registerCommand("Prep Shooter", prepShooterCommand);
+        NamedCommands.registerCommand("Shoot", shootCommand);
+        NamedCommands.registerCommand("Shoot Sequence", shootSequenceCommand);
+        NamedCommands.registerCommand("Shooter Stop", shootStopCommand);
+
         NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> pivot.setPivotAngle(new Rotation2d(), false), pivot));
         NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(12), false), pivot));
+        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(115), false), pivot));
 
         exampleAuto = new PathPlannerAuto("Test Auto");
+        twoNoteAuto = new PathPlannerAuto("2 Note Center");
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add(autoChooser).withPosition(0, 0);
     }

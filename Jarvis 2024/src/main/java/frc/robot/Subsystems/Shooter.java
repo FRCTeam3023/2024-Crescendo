@@ -11,6 +11,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Util.Gains;
 
@@ -24,6 +27,9 @@ public class Shooter extends SubsystemBase {
   private final CANSparkMax rightShooterMotor = new CANSparkMax(12, MotorType.kBrushless);  
   private SparkPIDController rightPID;
   private RelativeEncoder rightEncoder;
+
+  private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+  private static final GenericEntry speedEntry = armTab.add("RPM", 0).withPosition(2, 1).getEntry();
 
 
   private final Gains shooterGains = new Gains(0,0,1);  
@@ -56,6 +62,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    speedEntry.setDouble(leftEncoder.getVelocity());
   }
 
 

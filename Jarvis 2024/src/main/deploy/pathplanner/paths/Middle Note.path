@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.8995614596079393,
-        "y": 5.679755724704031
+        "x": 1.3633965729469937,
+        "y": 5.555088802485298
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8995614596079395,
-        "y": 5.679755724704031
+        "x": 2.3633965729469937,
+        "y": 5.555088802485298
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.8995614596079393,
-        "y": 2.6115165497092763
+        "x": 2.7250346808385935,
+        "y": 5.555088802485298
       },
       "prevControl": {
-        "x": 0.8995614596079393,
-        "y": 2.6115165497092763
+        "x": 2.7725601708625502,
+        "y": 5.460037822437386
+      },
+      "nextControl": {
+        "x": 2.67569996678455,
+        "y": 5.653758230593384
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.3633965729469937,
+        "y": 5.555088802485298
+      },
+      "prevControl": {
+        "x": 2.182887606368559,
+        "y": 5.555088802485298
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,12 +48,18 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake 2 seconds",
-      "waypointRelativePos": 0.45,
+      "name": "Start Intake",
+      "waypointRelativePos": 0.05,
       "command": {
-        "type": "race",
+        "type": "parallel",
         "data": {
           "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Pivot Pickup"
+              }
+            },
             {
               "type": "named",
               "data": {
@@ -45,9 +67,9 @@
               }
             },
             {
-              "type": "wait",
+              "type": "named",
               "data": {
-                "waitTime": 2.0
+                "name": "Shooter Stop"
               }
             }
           ]
@@ -55,22 +77,22 @@
       }
     },
     {
-      "name": "Shoot 1 second",
-      "waypointRelativePos": 0.15,
+      "name": "New Event Marker",
+      "waypointRelativePos": 1.4,
       "command": {
-        "type": "race",
+        "type": "sequential",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "Intake Stop"
               }
             },
             {
-              "type": "wait",
+              "type": "named",
               "data": {
-                "waitTime": 1.0
+                "name": "Pivot Speaker"
               }
             }
           ]

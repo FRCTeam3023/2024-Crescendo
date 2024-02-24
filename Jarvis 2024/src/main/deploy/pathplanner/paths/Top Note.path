@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3633965729469937,
-        "y": 5.555088802485298
+        "x": 1.343662687325376,
+        "y": 5.574822688106915
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3633965729469937,
-        "y": 5.555088802485298
+        "x": 2.343662687325377,
+        "y": 5.574822688106915
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.7250346808385935,
-        "y": 5.555088802485298
+        "x": 2.60221165235483,
+        "y": 6.9679477447399965
       },
       "prevControl": {
-        "x": 2.7725601708625502,
-        "y": 5.460037822437386
+        "x": 1.571658036326057,
+        "y": 7.284140331476098
       },
       "nextControl": {
-        "x": 2.67569996678455,
-        "y": 5.653758230593384
+        "x": 2.965103772208873,
+        "y": 6.856605844330233
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.3633965729469937,
-        "y": 5.555088802485298
+        "x": 1.343662687325376,
+        "y": 5.574822688106915
       },
       "prevControl": {
-        "x": 2.182887606368559,
-        "y": 5.555088802485298
+        "x": 2.2119536546765417,
+        "y": 6.137238428323012
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,8 +48,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.05,
+      "name": "Prep Intake",
+      "waypointRelativePos": 0.15,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,13 +57,13 @@
             {
               "type": "named",
               "data": {
-                "name": "Pivot Pickup"
+                "name": "Intake"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "Pivot Pickup"
               }
             }
           ]
@@ -71,10 +71,10 @@
       }
     },
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.4,
+      "name": "Stop Intake",
+      "waypointRelativePos": 1.35,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {

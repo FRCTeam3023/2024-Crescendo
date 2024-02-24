@@ -37,6 +37,8 @@ public class Pivot extends SubsystemBase {
   private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
   private final Gains pivotGains = new Gains(25, 0, 0, 0, 6);
 
+  private final TalonFX climberMotor = new TalonFX(14);
+
   public static Rotation2d holdPosition = new Rotation2d();
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
@@ -138,17 +140,17 @@ public class Pivot extends SubsystemBase {
    * @param isGlobal if angle being passed in is global or local
    */
   public void setPivotAngle(Rotation2d angle, boolean isGlobal) {
-    Rotation2d globalAngle;
-    if(isGlobal){
-      globalAngle = angle;
-      angle = localizeAngle(angle);
-    }else{
-      globalAngle = globalizeAngle(angle);
-    }
+    if (isGlobal) angle = localizeAngle(angle);
 
+    // if(isGlobal){
+    //   globalAngle = angle;
+    //   angle = localizeAngle(angle);
+    // }else{
+    //   globalAngle = globalizeAngle(angle);
+    // }
 
+    angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.pivotMax.getRadians()));
     pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
-
   }
   
   public void setPivotDutyCycle(double speed){
@@ -157,8 +159,9 @@ public class Pivot extends SubsystemBase {
     holdPosition = getLocalAngle();
   }
 
-  //Face the shooter output towards the target point
-  public void faceTarget(Pose3d target, Pose2d robotPose) {
+  //Face the shooter output towards the target point variable defined in this class
+  public void faceTarget(Pose2d robotPose) {
+    Pose3d target = Constants.speakerPose;
     // double xDistance = target.getX() - robotPose.getX();
     // double yDistance = target.getY() - robotPose.getY();
     // double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
@@ -167,6 +170,7 @@ public class Pivot extends SubsystemBase {
     Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
     System.out.println(newtonApproximation.getRadians());
     setPivotAngle(newtonApproximation, true);
+    System.out.println(newtonApproximation.getRadians());
   }
 
   private Rotation2d newtonApproximation(Pose3d relativeTarget) {
@@ -196,5 +200,10 @@ public class Pivot extends SubsystemBase {
     double numerator = groundDistance * lcosTheta - totalHeight * lsinTheta;
     double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
     return numerator / denominator - 1;
+  }
+
+
+  public void setClimberOutput(double speed){
+    climberMotor.set(speed);
   }
 }
