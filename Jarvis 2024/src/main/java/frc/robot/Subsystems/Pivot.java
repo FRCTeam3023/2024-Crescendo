@@ -167,48 +167,39 @@ public class Pivot extends SubsystemBase {
     // double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
     // double targetAngle = Constants.ArmConstants.launcherAngleWithPivot.getDegrees() - Math.atan(target.getZ() / groundDistance);
     Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
-    Rotation2d newtonApproximation = newtonApproximation(relativeTarget, robotPose.getRotation());
+    Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
+    System.out.println(newtonApproximation.getRadians());
     setPivotAngle(newtonApproximation, true);
     System.out.println(newtonApproximation.getRadians());
   }
 
-  //Solve for the correct angle using an approximation 
-  //Newton's method is fast, but may not always converge; we might have to use a less efficient method if issues arise
-  private Rotation2d newtonApproximation(Pose3d relativeTarget, Rotation2d heading) {
-    Rotation2d last = Rotation2d.fromDegrees(180); //Initial guess
+  private Rotation2d newtonApproximation(Pose3d relativeTarget) {
+    //All measures are in radians for this function
+    double last = Math.PI / 4; //Initial guess
+
     for (int i = 0; i < Constants.ArmConstants.pivotApproximationPrecision; i++) {
-      Rotation2d evaluation = evaluateAngle(relativeTarget, heading, last);
-      Rotation2d derivative = evaluateAngleDerivative(relativeTarget, heading, last);
-      last = last.minus(Rotation2d.fromRadians(evaluation.getRadians() / derivative.getRadians()));
+      //Compute variables that appear more than once
+      double lsinTheta = Constants.ArmConstants.pivotLength * Math.sin(last);
+      double lcosTheta = Constants.ArmConstants.pivotLength * Math.cos(last);
+      double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
+      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight;
+
+      double evaluation = evaluateAngle(last, totalHeight, groundDistance);
+      double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
+      last = last - evaluation / derivative;
     }
-    return last;
+
+    return Rotation2d.fromRadians(last);
   }
 
-  private Rotation2d evaluateAngle(Pose3d relativeTarget, Rotation2d heading, Rotation2d theta) {
-    //Precompute repeated variables
-    double lcosTheta = Constants.ArmConstants.pivotLength * theta.getCos();
-
-    double xDistance = relativeTarget.getX() - lcosTheta * heading.getSin();
-    double yDistance = relativeTarget.getY() - lcosTheta * heading.getCos();
-    double zDistance = relativeTarget.getZ() - Constants.ArmConstants.pivotLength * theta.getSin() - Constants.ArmConstants.pivotHeight;
-    double groundDistance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
-
-    return Rotation2d.fromRadians(Constants.ArmConstants.launcherAngleWithPivot.getRadians() - theta.getRadians() - Math.atan2(zDistance, groundDistance));
+  private double evaluateAngle(double theta, double totalHeight, double groundDistance) {
+    return Constants.ArmConstants.launcherAngleWithPivot.getRadians() - theta - Math.atan2(totalHeight, groundDistance);
   }
 
-  private Rotation2d evaluateAngleDerivative(Pose3d relativeTarget, Rotation2d heading, Rotation2d theta) {
-    //Precompute repeated variables
-    double lcosTheta = Constants.ArmConstants.pivotLength * theta.getCos();
-    double lsinTheta = Constants.ArmConstants.pivotLength * theta.getSin();
-    double cosHeading = heading.getCos();
-    double sinHeading = heading.getSin();
-    double zDistance = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight;
-    double groundDistanceSquared = Math.pow(relativeTarget.getX() - lcosTheta * sinHeading,2) + Math.pow(relativeTarget.getY() - lcosTheta * cosHeading,2);
-
-    double numerator = lcosTheta * groundDistanceSquared + lsinTheta * zDistance * (relativeTarget.getX() * sinHeading + relativeTarget.getY() * cosHeading - lcosTheta);
-    double denominator = (zDistance * zDistance + groundDistanceSquared) * Math.sqrt(groundDistanceSquared);
-
-    return Rotation2d.fromRadians(numerator / denominator - 1);
+  private double evaluateAngleDerivative(double theta, double lsinTheta, double lcosTheta, double groundDistance, double totalHeight) {
+    double numerator = groundDistance * lcosTheta - totalHeight * lsinTheta;
+    double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
+    return numerator / denominator - 1;
   }
 
 
