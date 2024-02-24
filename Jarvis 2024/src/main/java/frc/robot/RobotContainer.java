@@ -6,7 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.IntakeShooterControl;
@@ -50,6 +53,7 @@ public class RobotContainer {
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
   private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller);
   private static final IntakeShooterControl intakeShooterControl = new IntakeShooterControl(intake, shooter, controller);
+  private static final AimPivot aimPivot = new AimPivot(pivot, drivetrain);
   private static final PIDDisplay pid = new PIDDisplay();
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
@@ -70,6 +74,7 @@ public class RobotContainer {
     new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> Pivot.holdPosition = new Rotation2d(), pivot));
     new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> Pivot.holdPosition = Rotation2d.fromDegrees(13), pivot));
     new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)), pivot));
+    new JoystickButton(controller2, 3).whileTrue(aimPivot);
 
     new JoystickButton(controller, 6).whileTrue(
         new StartEndCommand(() -> shooter.setShooterDutyCycle(1), () -> shooter.setShooterDutyCycle(0), shooter)

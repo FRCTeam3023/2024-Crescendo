@@ -22,6 +22,10 @@ public class Constants {
     public static final double MAX_ANGULAR_SPEED = 3;
     public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
+
+
+    public static final Pose3d speakerPose = new Pose3d(0,0,4, new Rotation3d());
+
     public class ModuleConstants{
         /** Overall max speed of the module in m/s */
         public static final double MAX_SPEED = 5;
@@ -88,12 +92,11 @@ public class Constants {
         public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
         public static final double pivotFeedForward = 0;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
-        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromRadians(0.77);
-        public static final double pivotHeight = 2.6;
-        public static final double pivotLength = 11.7;
+        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromDegrees(45);
+        public static final double pivotHeight = Units.inchesToMeters(16);
+        public static final double pivotLength = Units.inchesToMeters(19);
         public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
-
-
+        public static final Rotation2d pivotMax = Rotation2d.fromDegrees(115);
         public static final double PIVOT_SENSOR_OFFSET = -.202;
     }
 }
