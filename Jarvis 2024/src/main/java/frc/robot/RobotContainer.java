@@ -27,6 +27,7 @@ import frc.robot.Commands.JoystickDrive;
 import frc.robot.Commands.PivotHold;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.LED;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.VisionSystem;
@@ -38,11 +39,12 @@ public class RobotContainer {
   private static final Joystick controller2 = new Joystick(1);
 
   private static final Drivetrain drivetrain = new Drivetrain();
-  private static final VisionSystem visionSystem = new VisionSystem();
+  //private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
   private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
   private static final Autonomous autonomous = new Autonomous(pivot,shooter,intake);
+  private static final LED led = new LED();
 
 
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
@@ -72,7 +74,8 @@ public class RobotContainer {
         ),
       new SequentialCommandGroup(
         new WaitCommand(2),
-        intakeCommand
+        intakeCommand,
+        new InstantCommand(() -> Intake.noteLoaded = false)
       )
     );
         

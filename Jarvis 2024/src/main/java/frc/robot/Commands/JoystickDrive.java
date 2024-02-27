@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.LED;
+import frc.robot.Subsystems.Pivot;
 
 public class JoystickDrive extends Command {
   Drivetrain drivetrain;
@@ -68,6 +70,13 @@ public class JoystickDrive extends Command {
     if(controller.getRawButton(3)){
       Pose2d currentPose = drivetrain.getPose();
       Translation2d relativeTargetTranslation = currentPose.getTranslation().minus(Constants.speakerPose.toPose2d().getTranslation());
+
+      //Account for velocity
+      double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians()) * currentPose.getRotation().getSin();
+      double airTime = relativeTargetTranslation.getY() / horizontalSpeed;
+      relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
+        relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
+
       Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
       rotationSpeed = turnController.calculate(currentPose.getRotation().getRadians(), targetRotation.getRadians());
     }else{

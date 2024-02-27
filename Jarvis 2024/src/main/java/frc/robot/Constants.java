@@ -97,10 +97,12 @@ public class Constants {
         public static final double pivotFeedForward = 0;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
         public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromDegrees(45);
-        public static final double pivotHeight = Units.inchesToMeters(16);
-        public static final double pivotLength = Units.inchesToMeters(19);
+        public static final double pivotHeight = Units.inchesToMeters(16);//0.4064
+        public static final double pivotLength = Units.inchesToMeters(19);//0.4826 // 0.7476497326006278352758474891518 // d/0.390616919861084336400557186368 seconds
         public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
         public static final Rotation2d pivotMax = Rotation2d.fromDegrees(115);
         public static final double PIVOT_SENSOR_OFFSET = -.202;
+        public static final double NOTE_LAUNCH_SPEED = 5; //m/s
+        public static final double NOTE_RETRACTION_TIME = 0.5;
     }
 }

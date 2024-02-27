@@ -6,13 +6,19 @@ package frc.robot.Subsystems;
 
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
   AnalogOutput signalPin = new AnalogOutput(1);
+  SerialPort serialPort = new SerialPort(9600, Port.kOnboard);
   colors currentColor = null;
+  boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+
+  int iterations = 0;
 
   public LED() {
 
@@ -20,20 +26,35 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    if (DriverStation.getAlliance().get() == Alliance.Blue) setLEDColor(colors.BLUE);
-    if (DriverStation.getAlliance().get() == Alliance.Red) setLEDColor(colors.RED);
+    if (iterations > 30) {
+      System.out.println("Color: " + currentColor.name());
+      iterations = 0;
+    }
+    iterations++;
+    isRed = DriverStation.getAlliance().get() == Alliance.Red;
+    
+    setLEDColor(getColorState());
+  }
+
+  //Descending priority
+  public colors getColorState() {
+    if (Pivot.climbMode) return colors.YELLOW;
+    if (Intake.noteLoaded) return isRed ? colors.GREEN : colors.ORANGE;
+    return isRed ? colors.RED : colors.BLUE;
   }
 
   public void setLEDColor(colors color){
     if (color == currentColor) return;
     currentColor = color;
-  }
-}
 
-enum colors{
-  RED,
-  BLUE,
-  GREEN,
-  YELLOW
+    serialPort.writeString(color.name());
+  }
+
+  public enum colors{
+    RED,
+    BLUE,
+    GREEN,
+    ORANGE,
+    YELLOW
+  }
 }
