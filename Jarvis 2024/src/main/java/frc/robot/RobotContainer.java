@@ -52,7 +52,7 @@ public class RobotContainer {
   private static final AimPivot aimPivot = new AimPivot(pivot, drivetrain);
   private static final PIDDisplay pid = new PIDDisplay();
 
-  private static final Command intakeCommand = new RunCommand(() -> intake.setIntakeSpeed(1), intake);
+  private static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
   private static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
   private static final Command prepShooterCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
@@ -112,7 +112,7 @@ public class RobotContainer {
 
     
 
-    new JoystickButton(controller, 5).whileTrue(new StartEndCommand(() -> intake.setIntakeSpeed(1), () -> intake.setIntakeSpeed(0), intake));
+    new JoystickButton(controller, 5).whileTrue(intakeCommand).onFalse(intakeStopCommand);
 
     new JoystickButton(controller, 7).onTrue(new InstantCommand(
         () -> drivetrain.setPose(new Pose2d(drivetrain.getPose().getX(),drivetrain.getPose().getY(),new Rotation2d()))

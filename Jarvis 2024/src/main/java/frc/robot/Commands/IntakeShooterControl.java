@@ -44,7 +44,6 @@ public class IntakeShooterControl extends Command {
     }else{
       shooter.setShooterDutyCycle(0);
     }
-
   }
 
   // Called once the command ends or is interrupted.
