@@ -18,13 +18,17 @@ public class Constants {
     /** Width between robot wheels in meters */ 
     public static final double ROBOT_WHEEL_BASE_WIDTH = Units.inchesToMeters(21.5);
     public static final double ROBOT_WHEEL_BASE_LENGTH = Units.inchesToMeters(23.5);
-    public static final double MAX_DRIVE_SPEED = 2;
-    public static final double MAX_ANGULAR_SPEED = 3;
+    public static final double MAX_DRIVE_SPEED = 1.5;
+    public static final double FAST_DRIVE_SPEED = 3;
+    public static final double MAX_ANGULAR_SPEED = 2;
     public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
 
 
-    public static final Pose3d speakerPose = new Pose3d(0,0,4, new Rotation3d());
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58 , 4.98, Units.inchesToMeters(83), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d();
+
+    public static final Pose3d speakerPose = new Pose3d(Units.inchesToMeters(-54), 0, Units.inchesToMeters(83), new Rotation3d());
 
     public class ModuleConstants{
         /** Overall max speed of the module in m/s */

@@ -10,7 +10,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -33,6 +32,7 @@ import frc.robot.Util.TalonFXsetter;
 
 public class Pivot extends SubsystemBase {
   private final TalonFX pivotMotor = new TalonFX(10);
+  private TalonFXConfiguration pivotConfiguration;
   private final CANcoder pivotSensor = new CANcoder(9);
   private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
   private final Gains pivotGains = new Gains(25, 0, 0, 0, 6);
@@ -40,6 +40,7 @@ public class Pivot extends SubsystemBase {
   private final TalonFX climberMotor = new TalonFX(14);
 
   public static Rotation2d holdPosition = new Rotation2d();
+  public static boolean climbMode = false;
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
@@ -47,20 +48,22 @@ public class Pivot extends SubsystemBase {
   private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(1, 2).getEntry();
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(1, 3).getEntry();
   private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(1, 4).getEntry();
+  private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(2, 4).getEntry();
+
 
   public Pivot() {
 
     //basic configuration for the pivot motor
-    TalonFXConfiguration pivotConfiguration = new TalonFXConfiguration();
+    pivotConfiguration = new TalonFXConfiguration();
 
     pivotConfiguration.MotorOutput.Inverted = ArmConstants.pivotInverted;
-    pivotConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    pivotConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = .75;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 1.5;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 1;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 2;
     pivotConfiguration.MotionMagic.MotionMagicJerk = 50;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
@@ -91,6 +94,12 @@ public class Pivot extends SubsystemBase {
     PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
 
     holdPosition = getLocalAngle();
+
+
+    TalonFXConfiguration climberConfig = new TalonFXConfiguration();
+    climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    climberMotor.getConfigurator().apply(climberConfig);
   }
 
   @Override
@@ -105,11 +114,13 @@ public class Pivot extends SubsystemBase {
 
   //Convert world angle with ground to local angle with pivot's starting position
   public Rotation2d localizeAngle(Rotation2d angle) {
-    return Rotation2d.fromRadians(angle.getRadians() + Constants.ArmConstants.pivotInitializePosition.getRadians());
+    return angle.minus(ArmConstants.pivotInitializePosition);
+    // return Rotation2d.fromRadians(angle.getRadians() + Constants.ArmConstants.pivotInitializePosition.getRadians());
   }
   //Convert local angle with pivot's starting position to world angle with ground 
   public Rotation2d globalizeAngle(Rotation2d angle) {
-    return Rotation2d.fromRadians(angle.getRadians() - Constants.ArmConstants.pivotInitializePosition.getRadians());
+    // return Rotation2d.fromRadians(angle.getRadians() - Constants.ArmConstants.pivotInitializePosition.getRadians());
+    return angle.plus(ArmConstants.pivotInitializePosition);
   }
 
   /**
@@ -168,9 +179,8 @@ public class Pivot extends SubsystemBase {
     // double targetAngle = Constants.ArmConstants.launcherAngleWithPivot.getDegrees() - Math.atan(target.getZ() / groundDistance);
     Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
     Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
-    System.out.println(newtonApproximation.getRadians());
+    aimAngleEntry.setDouble(newtonApproximation.getDegrees());
     setPivotAngle(newtonApproximation, true);
-    System.out.println(newtonApproximation.getRadians());
   }
 
   private Rotation2d newtonApproximation(Pose3d relativeTarget) {
@@ -182,8 +192,7 @@ public class Pivot extends SubsystemBase {
       double lsinTheta = Constants.ArmConstants.pivotLength * Math.sin(last);
       double lcosTheta = Constants.ArmConstants.pivotLength * Math.cos(last);
       double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
-      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight;
-
+      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + Math.max(0, (groundDistance - 1)/6);
       double evaluation = evaluateAngle(last, totalHeight, groundDistance);
       double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
       last = last - evaluation / derivative;
@@ -200,6 +209,11 @@ public class Pivot extends SubsystemBase {
     double numerator = groundDistance * lcosTheta - totalHeight * lsinTheta;
     double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
     return numerator / denominator - 1;
+  }
+
+  public void setPivotNeutralMode(NeutralModeValue mode){
+    pivotConfiguration.MotorOutput.NeutralMode = mode;
+    pivotMotor.getConfigurator().apply(pivotConfiguration);
   }
 
 

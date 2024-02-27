@@ -4,7 +4,6 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Pivot;
@@ -30,7 +29,29 @@ public class PivotHold extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      pivot.setPivotAngle(Pivot.holdPosition, false);
+    double leftInput = joystick.getRawAxis(2);
+    double rightInput = joystick.getRawAxis(3);
+    if(leftInput > 0.05){
+      pivot.setClimberOutput(leftInput/5);
+      Pivot.holdPosition = pivot.getLocalAngle();
+      pivot.setPivotDutyCycle(0);
+      System.out.println(leftInput);
+      Pivot.climbMode = true;
+    }else if(rightInput > 0.05){
+      pivot.setClimberOutput(-rightInput / 5);
+      Pivot.holdPosition = pivot.getLocalAngle();
+      pivot.setPivotDutyCycle(0);
+      System.out.println(rightInput);
+      Pivot.climbMode = true;
+    }else{
+      if(Pivot.climbMode){
+        pivot.setClimberOutput(0);
+        pivot.setPivotDutyCycle(0);
+      }else{
+        pivot.setPivotAngle(Pivot.holdPosition, false);
+      }
+    }
+
   }
 
   // Called once the command ends or is interrupted.
