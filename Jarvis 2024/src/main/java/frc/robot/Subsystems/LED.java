@@ -63,8 +63,8 @@ public class LED extends SubsystemBase {
     RED(255, 0, 0),
     BLUE(0, 0, 255),
     GREEN(0, 0xFF, 0x00),
-    ORANGE(0xF0, 0xF0, 0x00),
-    YELLOW(0xF5, 0xF5, 0xF5);
+    ORANGE(255, 20, 0),
+    YELLOW(255, 80, 0);
 
     public byte r;
     public byte g;

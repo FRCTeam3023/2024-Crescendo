@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.Autonomous;
@@ -55,28 +56,25 @@ public class RobotContainer {
   private static final PIDDisplay pid = new PIDDisplay();
 
   private static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
+  private static final Command intakeNoSensorCommand = new InstantCommand(() -> intake.setIntakeSpeed(1));
   private static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
   private static final Command prepShooterCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
-                new WaitCommand(.25),
-                new RunCommand(() -> intake.setIntakeSpeed(-.25))
+                new RunCommand(() -> intake.setIntakeSpeed(-.25)),
+                new WaitUntilCommand(() -> !intake.senseNote())
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
         );
-  private static final Command shootCommand = new RunCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+  private static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
   private static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
 
   private static final Command shootSequenceCommand = 
-    new ParallelCommandGroup(
       new SequentialCommandGroup(
           prepShooterCommand,
-          shootCommand
-        ),
-      new SequentialCommandGroup(
-        new WaitCommand(2),
-        intakeCommand
-        // new InstantCommand(() -> Intake.noteLoaded = false)
-      )
+          shootCommand,
+          new WaitCommand(2),
+          intakeNoSensorCommand,
+          new InstantCommand(() -> Intake.noteLoaded = false)
     );
         
 
@@ -101,7 +99,7 @@ public class RobotContainer {
     new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 3).whileTrue(aimPivot);
 
-    new JoystickButton(controller, 6).whileTrue(shootSequenceCommand).onFalse(new ParallelCommandGroup(shootStopCommand,intakeStopCommand));
+    new JoystickButton(controller, 6).whileTrue(shootSequenceCommand).onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
 
 
       //   new StartEndCommand(() -> shooter.setShooterDutyCycle(1), () -> shooter.setShooterDutyCycle(0), shooter)
