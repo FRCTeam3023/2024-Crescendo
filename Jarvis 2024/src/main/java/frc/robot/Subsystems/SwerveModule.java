@@ -94,7 +94,7 @@ public class SwerveModule {
         driveConfiguration = new TalonFXConfiguration();
         driveConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveConfiguration.MotorOutput.Inverted = inverted;
-        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 8;
+        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 10;
 
         driveConfiguration.Slot0.kP = driveGains.P;
         driveConfiguration.Slot0.kI = driveGains.I;
