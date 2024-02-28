@@ -16,14 +16,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.HomeCommand;
-import frc.robot.Commands.IntakeShooterControl;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Commands.PivotHold;
 import frc.robot.Subsystems.Drivetrain;
@@ -40,7 +38,7 @@ public class RobotContainer {
   private static final Joystick controller2 = new Joystick(1);
 
   private static final Drivetrain drivetrain = new Drivetrain();
-  //private static final VisionSystem visionSystem = new VisionSystem();
+  private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
   private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
@@ -51,7 +49,6 @@ public class RobotContainer {
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
   private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller);
-  private static final IntakeShooterControl intakeShooterControl = new IntakeShooterControl(intake, shooter, controller);
   private static final AimPivot aimPivot = new AimPivot(pivot, drivetrain);
   private static final PIDDisplay pid = new PIDDisplay();
 

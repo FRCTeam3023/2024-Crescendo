@@ -6,9 +6,7 @@ package frc.robot.Subsystems;
 
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
@@ -37,12 +35,11 @@ public class LED extends SubsystemBase {
   }
 
   //Descending priority
-  public colors getColorState() {
-    if (Pivot.climbMode) return colors.YELLOW;
-    if (Intake.noteLoaded) return isRed ? colors.GREEN : colors.ORANGE;
-    return isRed ? colors.RED : colors.BLUE;
+  public COLORS getColorState() {
+    if (Pivot.climbMode) return COLORS.YELLOW;
+    if (Intake.noteLoaded) return isRed ? COLORS.GREEN : COLORS.ORANGE;
+    return isRed ? COLORS.RED : COLORS.BLUE;
   }
-
   public void setLEDColor(int start, int end, colors color){
     if (color == currentColor) return;
     currentColor = color;
