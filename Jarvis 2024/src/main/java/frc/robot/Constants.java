@@ -24,6 +24,7 @@ public class Constants {
     public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
 
+    public static final int LED_LENGTH = 200;
 
     public static final Pose3d redSpeakerPose = new Pose3d(16.58 , 4.98, Units.inchesToMeters(83), new Rotation3d());
     public static final Pose3d blueSpeakerPose = new Pose3d();

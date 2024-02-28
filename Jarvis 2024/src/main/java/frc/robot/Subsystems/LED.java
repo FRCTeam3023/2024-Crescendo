@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
+
   SerialPort serialPort = new SerialPort(115200, Port.kMXP);
   COLORS currentColor = null;
   boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
@@ -19,7 +21,7 @@ public class LED extends SubsystemBase {
   int iterations = 0;
 
   public LED() {
-
+    setLEDColor(0, Constants.LED_LENGTH, COLORS.OFF);
   }
 
   @Override
@@ -64,7 +66,8 @@ public class LED extends SubsystemBase {
     YELLOW(255, 80, 0),
     PURPLE(60,0,255),
     AQUA(0,255,255),
-    HOTPINK(255,0,10);
+    HOTPINK(255,0,10),
+    OFF(0,0,0);
 
     public byte r;
     public byte g;
