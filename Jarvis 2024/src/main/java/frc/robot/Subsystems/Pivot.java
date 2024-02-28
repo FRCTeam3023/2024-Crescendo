@@ -38,9 +38,11 @@ public class Pivot extends SubsystemBase {
   private final Gains pivotGains = new Gains(25, 0, 0, 0, 6);
 
   private final TalonFX climberMotor = new TalonFX(14);
+  private TalonFXConfiguration climberConfig;
 
   public static Rotation2d holdPosition = new Rotation2d();
   public static boolean climbMode = false;
+  public static boolean previousClimbMode = false;
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
@@ -49,6 +51,7 @@ public class Pivot extends SubsystemBase {
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(1, 3).getEntry();
   private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(1, 4).getEntry();
   private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(2, 4).getEntry();
+  private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",0).withPosition(3, 4).getEntry();
 
 
   public Pivot() {
@@ -57,7 +60,7 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration = new TalonFXConfiguration();
 
     pivotConfiguration.MotorOutput.Inverted = ArmConstants.pivotInverted;
-    pivotConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    pivotConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
@@ -96,8 +99,8 @@ public class Pivot extends SubsystemBase {
     holdPosition = getLocalAngle();
 
 
-    TalonFXConfiguration climberConfig = new TalonFXConfiguration();
-    climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    climberConfig = new TalonFXConfiguration();
+    climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     climberMotor.getConfigurator().apply(climberConfig);
   }
@@ -110,6 +113,10 @@ public class Pivot extends SubsystemBase {
     angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
     angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
     targetAngle.setDouble(holdPosition.getDegrees());
+    climberModeEntry.setBoolean(climbMode);
+
+    checkClimbStatus();
+
   }
 
   //Convert world angle with ground to local angle with pivot's starting position
@@ -214,6 +221,25 @@ public class Pivot extends SubsystemBase {
   public void setPivotNeutralMode(NeutralModeValue mode){
     pivotConfiguration.MotorOutput.NeutralMode = mode;
     pivotMotor.getConfigurator().apply(pivotConfiguration);
+  }
+
+  public void setClimberNeutralMode(NeutralModeValue mode){
+    climberConfig.MotorOutput.NeutralMode = mode;
+    climberMotor.getConfigurator().apply(climberConfig);
+  }
+
+  public void checkClimbStatus(){
+    if(previousClimbMode != climbMode){
+      if(climbMode){
+        setPivotNeutralMode(NeutralModeValue.Coast);
+        setClimberNeutralMode(NeutralModeValue.Brake);
+      }else{
+        setPivotNeutralMode(NeutralModeValue.Brake);
+        setClimberNeutralMode(NeutralModeValue.Coast);
+      }
+    }
+    previousClimbMode = climbMode;
+
   }
 
 
