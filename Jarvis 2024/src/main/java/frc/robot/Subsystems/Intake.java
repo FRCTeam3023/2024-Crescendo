@@ -42,7 +42,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void intakeTillSensed(double speed) {
-    if (!noteSensor.get()) {
+    if (!noteSensor.get() && !noteLoaded) {
       noteLoaded = true;
       run(() -> new SequentialCommandGroup(
         new InstantCommand(() -> setIntakeSpeed(-speed)),
