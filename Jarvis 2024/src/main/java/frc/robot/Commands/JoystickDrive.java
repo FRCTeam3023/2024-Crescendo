@@ -4,29 +4,38 @@
 
 package frc.robot.Commands;
 
+import java.util.List;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
-import frc.robot.Subsystems.Pivot;
+import frc.robot.Util.PIDDisplay;
+import frc.robot.Util.ProfiledWPILibSetter;
 
 public class JoystickDrive extends Command {
   Drivetrain drivetrain;
   Joystick controller;
-  ProfiledPIDController turnController = new ProfiledPIDController(0, 0, 0, new Constraints(2, 3));
+  Joystick rightJoystick;
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(2, 4));
 
   /** Creates a new JoystickDrive. */
-  public JoystickDrive(Drivetrain drivetrain, Joystick controller) {
+  public JoystickDrive(Drivetrain drivetrain, Joystick controller, Joystick rightJoystick) {
     this.drivetrain = drivetrain;
     this.controller = controller;
+    this.rightJoystick = rightJoystick;
     addRequirements(drivetrain);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
+    PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
   }
 
   // Called when the command is initially scheduled.
@@ -65,15 +74,21 @@ public class JoystickDrive extends Command {
 
     double rotationSpeed = 0;
 
-    if(controller.getRawButton(3)){
+    if(rightJoystick.getRawButton(3)){
       Pose2d currentPose = drivetrain.getPose();
-      Translation2d relativeTargetTranslation = currentPose.getTranslation().minus(Constants.speakerPose.toPose2d().getTranslation());
+      Pose3d targetPose = new Pose3d();
+      if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
+        targetPose = Constants.blueSpeakerPose;
+      }else{
+        targetPose = Constants.redSpeakerPose;
+      }
+      Translation2d relativeTargetTranslation = currentPose.getTranslation().minus(targetPose.toPose2d().getTranslation());
 
-      //Account for velocity
-      double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
-      double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
-      relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
-        relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
+      // //Account for velocity
+      // double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
+      // double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
+      // relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
+      //   relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
 
       Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
       rotationSpeed = turnController.calculate(currentPose.getRotation().getRadians(), targetRotation.getRadians());

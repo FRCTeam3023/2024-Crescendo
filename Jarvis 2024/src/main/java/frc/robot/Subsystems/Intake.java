@@ -8,11 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -47,6 +43,7 @@ public class Intake extends SubsystemBase {
     }
     else
       setIntakeSpeed(speed);
+      noteLoaded = false;
   }
 
   public boolean senseNote() {

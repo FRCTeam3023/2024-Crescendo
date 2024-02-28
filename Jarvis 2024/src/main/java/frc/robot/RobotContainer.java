@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -38,7 +37,7 @@ public class RobotContainer {
   private static final Joystick controller2 = new Joystick(1);
 
   private static final Drivetrain drivetrain = new Drivetrain();
-  private static final VisionSystem visionSystem = new VisionSystem();
+  // private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
   private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
@@ -46,26 +45,27 @@ public class RobotContainer {
   private static final LED led = new LED();
 
 
-  private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller);
+  private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller, controller2);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
   private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller);
-  private static final AimPivot aimPivot = new AimPivot(pivot, drivetrain);
-  private static final PIDDisplay pid = new PIDDisplay();
+    private static final PIDDisplay pid = new PIDDisplay();
 
-  private static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
-  private static final Command intakeNoSensorCommand = new InstantCommand(() -> intake.setIntakeSpeed(1));
-  private static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
-  private static final Command prepShooterCommand = new SequentialCommandGroup(
+
+  public static final AimPivot aimPivotCommand = new AimPivot(pivot, drivetrain);
+  public static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
+  public static final Command intakeNoSensorCommand = new InstantCommand(() -> intake.setIntakeSpeed(1));
+  public static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
+  public static final Command prepShooterCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
                 new RunCommand(() -> intake.setIntakeSpeed(-.25)),
                 new WaitUntilCommand(() -> !intake.senseNote())
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
         );
-  private static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
-  private static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
+  public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+  public static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
 
-  private static final Command shootSequenceCommand = 
+  public static final Command shootSequenceCommand = 
       new SequentialCommandGroup(
           prepShooterCommand,
           shootCommand,
@@ -94,7 +94,7 @@ public class RobotContainer {
     new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> {Pivot.holdPosition = new Rotation2d(); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
-    new JoystickButton(controller2, 3).whileTrue(aimPivot);
+    new JoystickButton(controller2, 3).whileTrue(aimPivotCommand);
 
     new JoystickButton(controller, 6).whileTrue(shootSequenceCommand).onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
 

@@ -4,16 +4,16 @@
 
 package frc.robot.Subsystems;
 
-import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
-  AnalogOutput signalPin = new AnalogOutput(1);
   SerialPort serialPort = new SerialPort(115200, Port.kMXP);
-  colors currentColor = null;
+  COLORS currentColor = null;
   boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
 
   int iterations = 0;
@@ -25,7 +25,6 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     if (iterations > 30) {
-      System.out.println("Color: " + currentColor.name());
       iterations = 0;
     }
     isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
@@ -37,10 +36,11 @@ public class LED extends SubsystemBase {
   //Descending priority
   public COLORS getColorState() {
     if (Pivot.climbMode) return COLORS.YELLOW;
-    if (Intake.noteLoaded) return isRed ? COLORS.GREEN : COLORS.ORANGE;
+    if (Intake.noteLoaded) return isRed ? COLORS.ORANGE : COLORS.GREEN;
     return isRed ? COLORS.RED : COLORS.BLUE;
   }
-  public void setLEDColor(int start, int end, colors color){
+
+  public void setLEDColor(int start, int end, COLORS color){
     if (color == currentColor) return;
     currentColor = color;
 
@@ -56,17 +56,20 @@ public class LED extends SubsystemBase {
     if (serialPort.write(data, data.length) < data.length) System.out.println("Failed to send (" + data.length + ") bytes over serial");
   }
 
-  public enum colors{
+  public enum COLORS{
     RED(255, 0, 0),
     BLUE(0, 0, 255),
-    GREEN(0, 0xFF, 0x00),
+    GREEN(0, 255, 0),
     ORANGE(255, 20, 0),
-    YELLOW(255, 80, 0);
+    YELLOW(255, 80, 0),
+    PURPLE(60,0,255),
+    AQUA(0,255,255),
+    HOTPINK(255,0,10);
 
     public byte r;
     public byte g;
     public byte b;
-    private colors(int _r, int _g, int _b) {
+    private COLORS(int _r, int _g, int _b) {
       r = (byte)_r;
       g = (byte)_g;
       b = (byte)_b;

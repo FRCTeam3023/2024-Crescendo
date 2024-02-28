@@ -21,6 +21,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -175,7 +177,14 @@ public class Pivot extends SubsystemBase {
   }
 
   public void faceTarget(Pose2d robotPose) {
-    Pose3d target = Constants.speakerPose;
+    Pose3d target;
+    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
+      target = Constants.blueSpeakerPose;
+    }else{
+      target = Constants.redSpeakerPose;
+    }
+
+    // Pose3d target = Constants.speakerPose;
     // double xDistance = target.getX() - robotPose.getX();
     // double yDistance = target.getY() - robotPose.getY();
     // double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
@@ -195,8 +204,8 @@ public class Pivot extends SubsystemBase {
       double lsinTheta = Constants.ArmConstants.pivotLength * Math.sin(last);
       double lcosTheta = Constants.ArmConstants.pivotLength * Math.cos(last);
       double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
-      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + 
-        4.9 * Math.pow((groundDistance / (Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(last - Constants.ArmConstants.launcherAngleWithPivot.getRadians()))), 2);//Math.max(0, (groundDistance - 1)/6);
+      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + Math.max(0, (groundDistance - 1)/6);
+        //4.9 * Math.pow((groundDistance / (Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(last - Constants.ArmConstants.launcherAngleWithPivot.getRadians()))), 2);//
       double evaluation = evaluateAngle(last, totalHeight, groundDistance);
       double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
 
