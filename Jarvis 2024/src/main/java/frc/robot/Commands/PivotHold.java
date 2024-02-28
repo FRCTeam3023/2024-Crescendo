@@ -12,7 +12,6 @@ public class PivotHold extends Command {
   /** Creates a new PivotHold. */
   Pivot pivot;
   Joystick joystick;
-  boolean faceTargetPoint = false;
  
   public PivotHold(Pivot pivot, Joystick joystick) {
     // Use addRequirements() here to declare subsystem dependencies.

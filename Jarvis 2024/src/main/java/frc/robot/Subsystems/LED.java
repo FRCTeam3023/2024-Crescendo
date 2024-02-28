@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
-  AnalogOutput signalPin = new AnalogOutput(0);
-  COLORS currentColor = null;
-  boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+  AnalogOutput signalPin = new AnalogOutput(1);
+  SerialPort serialPort = new SerialPort(115200, Port.kMXP);
+  colors currentColor = null;
+  boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
 
   int iterations = 0;
 
@@ -27,10 +28,10 @@ public class LED extends SubsystemBase {
       System.out.println("Color: " + currentColor.name());
       iterations = 0;
     }
+    isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
     iterations++;
-    isRed = DriverStation.getAlliance().get() == Alliance.Red;
     
-    setLEDColor(getColorState());
+    setLEDColor(0, 100, getColorState());
   }
 
   //Descending priority
@@ -39,19 +40,36 @@ public class LED extends SubsystemBase {
     if (Intake.noteLoaded) return isRed ? COLORS.GREEN : COLORS.ORANGE;
     return isRed ? COLORS.RED : COLORS.BLUE;
   }
-
-  public void setLEDColor(COLORS color){
+  public void setLEDColor(int start, int end, colors color){
     if (color == currentColor) return;
     currentColor = color;
 
-    signalPin.setVoltage((double)color.ordinal() / (double)COLORS.values().length * 5);
+    //Construct
+    byte[] data = new byte[7];
+    data[0] = (byte)(start);
+    data[1] = (byte)(start >> 8);
+    data[2] = (byte)(end);
+    data[3] = (byte)(end >> 8);
+    data[4] = color.r;
+    data[5] = color.g;
+    data[6] = color.b;
+    if (serialPort.write(data, data.length) < data.length) System.out.println("Failed to send (" + data.length + ") bytes over serial");
   }
 
-  public enum COLORS{
-    RED,
-    BLUE,
-    GREEN,
-    ORANGE,
-    YELLOW
+  public enum colors{
+    RED(255, 0, 0),
+    BLUE(0, 0, 255),
+    GREEN(0, 0xFF, 0x00),
+    ORANGE(255, 20, 0),
+    YELLOW(255, 80, 0);
+
+    public byte r;
+    public byte g;
+    public byte b;
+    private colors(int _r, int _g, int _b) {
+      r = (byte)_r;
+      g = (byte)_g;
+      b = (byte)_b;
+    }
   }
 }

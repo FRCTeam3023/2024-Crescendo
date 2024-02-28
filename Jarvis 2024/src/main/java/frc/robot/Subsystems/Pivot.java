@@ -108,7 +108,6 @@ public class Pivot extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // faceTarget(new Pose3d(7, -5, 10, new Rotation3d()), new Pose2d(0, 0, Rotation2d.fromRadians(-0.95)));
     angleEntry.setDouble(getLocalAngle().getDegrees());
     angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
     angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
@@ -122,11 +121,9 @@ public class Pivot extends SubsystemBase {
   //Convert world angle with ground to local angle with pivot's starting position
   public Rotation2d localizeAngle(Rotation2d angle) {
     return angle.minus(ArmConstants.pivotInitializePosition);
-    // return Rotation2d.fromRadians(angle.getRadians() + Constants.ArmConstants.pivotInitializePosition.getRadians());
   }
   //Convert local angle with pivot's starting position to world angle with ground 
   public Rotation2d globalizeAngle(Rotation2d angle) {
-    // return Rotation2d.fromRadians(angle.getRadians() - Constants.ArmConstants.pivotInitializePosition.getRadians());
     return angle.plus(ArmConstants.pivotInitializePosition);
   }
 
@@ -177,7 +174,6 @@ public class Pivot extends SubsystemBase {
     holdPosition = getLocalAngle();
   }
 
-  //Face the shooter output towards the target point variable defined in this class
   public void faceTarget(Pose2d robotPose) {
     Pose3d target = Constants.speakerPose;
     // double xDistance = target.getX() - robotPose.getX();
@@ -199,9 +195,11 @@ public class Pivot extends SubsystemBase {
       double lsinTheta = Constants.ArmConstants.pivotLength * Math.sin(last);
       double lcosTheta = Constants.ArmConstants.pivotLength * Math.cos(last);
       double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
-      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + Math.max(0, (groundDistance - 1)/6);
+      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + 
+        4.9 * Math.pow((groundDistance / (Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(last - Constants.ArmConstants.launcherAngleWithPivot.getRadians()))), 2);//Math.max(0, (groundDistance - 1)/6);
       double evaluation = evaluateAngle(last, totalHeight, groundDistance);
       double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
+
       last = last - evaluation / derivative;
     }
 

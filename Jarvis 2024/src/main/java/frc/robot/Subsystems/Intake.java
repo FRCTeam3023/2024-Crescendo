@@ -32,22 +32,24 @@ public class Intake extends SubsystemBase {
     //   System.out.println("Note sensor data: " + noteSensor.get());
     //   iterations = 0;
     // }
+    //noteLoaded = noteSensor.get();
   }
 
   public void setIntakeSpeed(double speed) {
+    System.out.println(speed);
     intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 
   public void intakeTillSensed(double speed) {
-    if (!noteSensor.get()) {
+    if (senseNote()) {
       noteLoaded = true;
-      run(() -> new SequentialCommandGroup(
-        new InstantCommand(() -> setIntakeSpeed(-speed)),
-        new WaitCommand(Constants.ArmConstants.NOTE_RETRACTION_TIME), 
-        new InstantCommand(() -> setIntakeSpeed(0))
-      ));
+      setIntakeSpeed(0);
     }
     else
       setIntakeSpeed(speed);
+  }
+
+  public boolean senseNote() {
+    return !noteSensor.get();
   }
 }

@@ -70,8 +70,8 @@ public class JoystickDrive extends Command {
       Translation2d relativeTargetTranslation = currentPose.getTranslation().minus(Constants.speakerPose.toPose2d().getTranslation());
 
       //Account for velocity
-      double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians()) * currentPose.getRotation().getSin();
-      double airTime = relativeTargetTranslation.getY() / horizontalSpeed;
+      double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
+      double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
       relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
         relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
 
