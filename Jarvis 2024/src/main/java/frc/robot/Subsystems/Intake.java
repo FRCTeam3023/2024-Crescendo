@@ -35,6 +35,7 @@ public class Intake extends SubsystemBase {
     //   System.out.println("Note sensor data: " + noteSensor.get());
     //   iterations = 0;
     // }
+    //noteLoaded = noteSensor.get();
   }
 
   public void setIntakeSpeed(double speed) {

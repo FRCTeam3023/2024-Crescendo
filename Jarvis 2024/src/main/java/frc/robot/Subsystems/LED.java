@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
   AnalogOutput signalPin = new AnalogOutput(1);
-  SerialPort serialPort = new SerialPort(9600, Port.kMXP);
+  SerialPort serialPort = new SerialPort(115200, Port.kMXP);
   colors currentColor = null;
   boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
 
@@ -30,10 +30,10 @@ public class LED extends SubsystemBase {
       System.out.println("Color: " + currentColor.name());
       iterations = 0;
     }
-    iterations++;
     isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+    iterations++;
     
-    setLEDColor(getColorState());
+    setLEDColor(0, 100, getColorState());
   }
 
   //Descending priority
@@ -43,22 +43,26 @@ public class LED extends SubsystemBase {
     return isRed ? colors.RED : colors.BLUE;
   }
 
-  public void setLEDColor(colors color){
+  public void setLEDColor(int start, int end, colors color){
     if (color == currentColor) return;
     currentColor = color;
 
     //Construct
-    byte[] data = new byte[3];
-    data[0] = color.r;
-    data[1] = color.g;
-    data[2] = color.b;
+    byte[] data = new byte[7];
+    data[0] = (byte)(start);
+    data[1] = (byte)(start >> 8);
+    data[2] = (byte)(end);
+    data[3] = (byte)(end >> 8);
+    data[4] = color.r;
+    data[5] = color.g;
+    data[6] = color.b;
     if (serialPort.write(data, data.length) < data.length) System.out.println("Failed to send (" + data.length + ") bytes over serial");
   }
 
   public enum colors{
-    RED(0xFF, 0x00, 0x00),
-    BLUE(0x00, 0x00, 0xFF),
-    GREEN(0x00, 0xFF, 0x00),
+    RED(255, 0, 0),
+    BLUE(0, 0, 255),
+    GREEN(0, 0xFF, 0x00),
     ORANGE(0xF0, 0xF0, 0x00),
     YELLOW(0xF5, 0xF5, 0xF5);
 

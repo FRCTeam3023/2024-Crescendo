@@ -74,8 +74,8 @@ public class RobotContainer {
         ),
       new SequentialCommandGroup(
         new WaitCommand(2),
-        intakeCommand,
-        new InstantCommand(() -> Intake.noteLoaded = false)
+        intakeCommand
+        // new InstantCommand(() -> Intake.noteLoaded = false)
       )
     );
         
