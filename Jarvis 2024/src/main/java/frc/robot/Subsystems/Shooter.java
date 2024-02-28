@@ -32,7 +32,9 @@ public class Shooter extends SubsystemBase {
   private static final GenericEntry rightSpeedEntry = armTab.add("Right RPM", 0).withPosition(2, 2).getEntry();
 
 
-  private final Gains shooterGains = new Gains(0,0,1);  
+  private final Gains shooterGains = new Gains(0,1/2500,12);  
+
+
   public Shooter() {
     
     leftPID = leftShooterMotor.getPIDController();
@@ -53,8 +55,8 @@ public class Shooter extends SubsystemBase {
     leftEncoder.setVelocityConversionFactor(0.5);
     rightEncoder.setVelocityConversionFactor(0.5);
 
-    leftShooterMotor.enableVoltageCompensation(12);
-    rightShooterMotor.enableVoltageCompensation(12);
+    leftShooterMotor.enableVoltageCompensation(11.5);
+    rightShooterMotor.enableVoltageCompensation(11.5);
 
 
   }
@@ -80,6 +82,11 @@ public class Shooter extends SubsystemBase {
   public void setShooterDutyCycle(double speed){
     leftShooterMotor.set(speed);
     rightShooterMotor.set(speed); 
+  }
+
+  public void setShooterVoltage(double voltage){
+    leftShooterMotor.setVoltage(voltage);
+    rightShooterMotor.setVoltage(voltage);
   }
 
 }

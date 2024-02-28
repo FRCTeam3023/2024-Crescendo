@@ -62,7 +62,8 @@ public class RobotContainer {
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
         );
-  public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+  // public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+  public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterVoltage(11.5));
   public static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
 
   public static final Command shootSequenceCommand = 
