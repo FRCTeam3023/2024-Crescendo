@@ -92,18 +92,21 @@ public class Constants {
     } 
     
     public static class ArmConstants{
-        public static final InvertedValue pivotInverted = InvertedValue.CounterClockwise_Positive;
-        public static final double pivotGearRatio = 30 * (72/24) * (72/24);
-        public static final Rotation2d pivotInitializePosition = Rotation2d.fromDegrees(-15);
-        public static final double pivotFeedForward = 0;
+        public static final InvertedValue PIVOT_INVERTED = InvertedValue.CounterClockwise_Positive;
+        public static final double PIVOT_GEAR_RATIO = 30 * (72/24) * (72/24);
+        public static final Rotation2d PIVOT_INITIALIZE_POSITION = Rotation2d.fromDegrees(-15);
+        public static final double PIVOT_FEED_FORWARD = 0;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
-        public static final Rotation2d launcherAngleWithPivot = Rotation2d.fromDegrees(45);
-        public static final double pivotHeight = Units.inchesToMeters(16);//0.4064
-        public static final double pivotLength = Units.inchesToMeters(19);//0.4826 // 0.7476497326006278352758474891518 // d/0.390616919861084336400557186368 seconds
-        public static final int pivotApproximationPrecision = 4; //Number of iterations for newton's method
-        public static final Rotation2d pivotMax = Rotation2d.fromDegrees(115);
+        public static final Rotation2d LAUNCHER_ANGLE_WITH_PIVOT = Rotation2d.fromDegrees(45);
+        public static final double PIVOT_HEIGHT = Units.inchesToMeters(16);
+        public static final double PIVOT_LENGTH = Units.inchesToMeters(19);
+        public static final int PIVOT_APPROXIMATION_PRECISION = 4; //Number of iterations for newton's method
+        public static final Rotation2d PIVOT_MAX = Rotation2d.fromDegrees(115);
         public static final double PIVOT_SENSOR_OFFSET = -.202;
         public static final double NOTE_LAUNCH_SPEED = 5; //m/s
         public static final double NOTE_RETRACTION_TIME = 0.5;
+        public static final boolean USE_REMOTE_PIVOT_SENSOR = false;
+        public static final double PIVOT_ENCODER_DEADZONE = 0.01; //rotations
+        public static final double MAX_PIVOT_DEVIATION = 0.1;
     }
 }
