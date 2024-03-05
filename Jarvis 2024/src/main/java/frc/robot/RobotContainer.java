@@ -57,8 +57,9 @@ public class RobotContainer {
   public static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
   public static final Command prepShooterCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
-                new RunCommand(() -> intake.setIntakeSpeed(-.5)),
-                new WaitUntilCommand(() -> !intake.senseNote())
+                new RunCommand(() -> intake.setIntakeSpeed(-.25)),
+                new WaitUntilCommand(() -> !intake.senseNote()),
+                new WaitCommand(1)
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
         );

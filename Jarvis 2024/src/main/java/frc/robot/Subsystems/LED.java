@@ -18,19 +18,13 @@ public class LED extends SubsystemBase {
   COLORS currentColor = null;
   boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
 
-  int iterations = 0;
-
   public LED() {
     setLEDColor(0, Constants.LED_LENGTH, COLORS.OFF);
   }
 
   @Override
   public void periodic() {
-    if (iterations > 30) {
-      iterations = 0;
-    }
     isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
-    iterations++;
     
     setLEDColor(0, Constants.LED_LENGTH, getColorState());
   }

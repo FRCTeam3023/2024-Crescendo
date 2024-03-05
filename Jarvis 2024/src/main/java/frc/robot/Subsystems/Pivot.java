@@ -61,7 +61,7 @@ public class Pivot extends SubsystemBase {
     //basic configuration for the pivot motor
     pivotConfiguration = new TalonFXConfiguration();
 
-    pivotConfiguration.MotorOutput.Inverted = ArmConstants.pivotInverted;
+    pivotConfiguration.MotorOutput.Inverted = ArmConstants.PIVOT_INVERTED;
     pivotConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
@@ -80,11 +80,16 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Audio.BeepOnConfig = false;
 
     //set feedback sensor as a remote CANcoder, resets the rotor sensor position every time it publishes values
-    pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    //Im not sure which one I should use, if it is using the remote sensor to adjust the rotor or if 
-    // pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.pivotGearRatio / (Math.PI * 2);
-    pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (Math.PI * 2);
-    pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
+
+    if (Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) {
+      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
+      pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (2 * Math.PI);
+    }
+    else {
+      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+      pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO / (2 * Math.PI);
+    }
 
     pivotMotor.getConfigurator().apply(pivotConfiguration);
 
@@ -117,16 +122,27 @@ public class Pivot extends SubsystemBase {
     climberModeEntry.setBoolean(climbMode);
 
     checkClimbStatus();
-
+    if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
   }
 
-  //Convert world angle with ground to local angle with pivot's starting position
-  public Rotation2d localizeAngle(Rotation2d angle) {
-    return angle.minus(ArmConstants.pivotInitializePosition);
+//#region Angle Logic
+  /**
+   * Convert between local robot space and global world space
+   * @param angle Local angle
+   * @return Global angle
+   */
+  public Rotation2d globalToLocalAngle(Rotation2d angle) {
+    return angle.minus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
-  //Convert local angle with pivot's starting position to world angle with ground 
-  public Rotation2d globalizeAngle(Rotation2d angle) {
-    return angle.plus(ArmConstants.pivotInitializePosition);
+
+  
+  /**
+   * Convert between local robot space and global world space
+   * @param angle Global angle
+   * @return Local angle
+   */
+  public Rotation2d localToGlobalAngle(Rotation2d angle) {
+    return angle.plus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
 
   /**
@@ -142,8 +158,9 @@ public class Pivot extends SubsystemBase {
    * @return angle of arm
    */
   public Rotation2d getGlobalAngle(){
-    return globalizeAngle(getLocalAngle());
+    return localToGlobalAngle(getLocalAngle());
   }
+//#endregion
 
   /**
    * Set the closed loop motion magic control target of the pivot joint, adjustable between global and local control.
@@ -151,19 +168,37 @@ public class Pivot extends SubsystemBase {
    * @param isGlobal if angle being passed in is global or local
    */
   public void setPivotAngle(Rotation2d angle, boolean isGlobal) {
-    if (isGlobal) angle = localizeAngle(angle);
-
-    angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.pivotMax.getRadians()));
+    if (isGlobal) angle = globalToLocalAngle(angle);
+    holdPosition = angle;
+    angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.PIVOT_MAX.getRadians()));
     pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
   }
   
   public void setPivotDutyCycle(double speed){
     pivotMotor.setControl(new DutyCycleOut(speed));
-
     holdPosition = getLocalAngle();
   }
 
-  public void faceTarget(Pose2d robotPose) {
+  /**
+   * Compare the rotor encoder's position with the remote sensor and update under these conditions:
+   * <pre>
+   *the difference between the rotor and remote sensor is too large
+   *the difference between the rotor and target position is too large
+   * </pre>
+   */
+  public void checkRotorEncoder() {
+    double sensorPosition = pivotSensor.getPosition().getValueAsDouble();
+    double rotorPosition = pivotMotor.getPosition().getValueAsDouble();// / Constants.ArmConstants.PIVOT_GEAR_RATIO;
+
+    double difference = Math.abs(sensorPosition - rotorPosition);
+    double error = Math.abs(rotorPosition - holdPosition.getRadians());
+
+    if (difference > Constants.ArmConstants.MAX_PIVOT_DEVIATION || error > Constants.ArmConstants.PIVOT_ENCODER_DEADZONE)
+      pivotMotor.setPosition(sensorPosition /* * Constants.ArmConstants.PIVOT_GEAR_RATIO*/);
+  }
+
+//#region Auto-Aim
+  public void faceSpeaker(Pose2d robotPose) {
     Pose3d target;
     if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
       target = Constants.blueSpeakerPose;
@@ -171,11 +206,6 @@ public class Pivot extends SubsystemBase {
       target = Constants.redSpeakerPose;
     }
 
-    // Pose3d target = Constants.speakerPose;
-    // double xDistance = target.getX() - robotPose.getX();
-    // double yDistance = target.getY() - robotPose.getY();
-    // double groundDistance = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
-    // double targetAngle = Constants.ArmConstants.launcherAngleWithPivot.getDegrees() - Math.atan(target.getZ() / groundDistance);
     Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
     Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
     aimAngleEntry.setDouble(newtonApproximation.getDegrees());
@@ -186,12 +216,12 @@ public class Pivot extends SubsystemBase {
     //All measures are in radians for this function
     double last = Math.PI / 4; //Initial guess
 
-    for (int i = 0; i < Constants.ArmConstants.pivotApproximationPrecision; i++) {
+    for (int i = 0; i < Constants.ArmConstants.PIVOT_APPROXIMATION_PRECISION; i++) {
       //Compute variables that appear more than once
-      double lsinTheta = Constants.ArmConstants.pivotLength * Math.sin(last);
-      double lcosTheta = Constants.ArmConstants.pivotLength * Math.cos(last);
+      double lsinTheta = Constants.ArmConstants.PIVOT_LENGTH * Math.sin(last);
+      double lcosTheta = Constants.ArmConstants.PIVOT_LENGTH * Math.cos(last);
       double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
-      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.pivotHeight + Math.max(0, (groundDistance - 1)/6);
+      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.PIVOT_HEIGHT + Math.max(0, (groundDistance - 1)/6);
         //4.9 * Math.pow((groundDistance / (Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(last - Constants.ArmConstants.launcherAngleWithPivot.getRadians()))), 2);//
       double evaluation = evaluateAngle(last, totalHeight, groundDistance);
       double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
@@ -203,7 +233,7 @@ public class Pivot extends SubsystemBase {
   }
 
   private double evaluateAngle(double theta, double totalHeight, double groundDistance) {
-    return Constants.ArmConstants.launcherAngleWithPivot.getRadians() - theta - Math.atan2(totalHeight, groundDistance);
+    return Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians() - theta - Math.atan2(totalHeight, groundDistance);
   }
 
   private double evaluateAngleDerivative(double theta, double lsinTheta, double lcosTheta, double groundDistance, double totalHeight) {
@@ -211,6 +241,7 @@ public class Pivot extends SubsystemBase {
     double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
     return numerator / denominator - 1;
   }
+//#endregion
 
   public void setPivotNeutralMode(NeutralModeValue mode){
     pivotConfiguration.MotorOutput.NeutralMode = mode;
