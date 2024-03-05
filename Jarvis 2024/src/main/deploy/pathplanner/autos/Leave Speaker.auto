@@ -22,24 +22,30 @@
                 }
               },
               {
-                "type": "named",
+                "type": "wait",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "waitTime": 2.0
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Middle Note"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Leave speaker"
           }
         }
       ]

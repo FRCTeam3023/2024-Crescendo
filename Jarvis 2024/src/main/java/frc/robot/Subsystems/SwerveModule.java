@@ -49,7 +49,7 @@ public class SwerveModule {
     // private Gains driveGains = new Gains(0 /*0.05*/,0,0,0.05,0,1);
 
     public boolean homeStatus = false;
-    private boolean lastState;
+    private boolean lastState = false;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
@@ -58,7 +58,8 @@ public class SwerveModule {
     private static List<SparkPIDController> turnPIDControllers = new ArrayList<SparkPIDController>();
 
      /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
-    private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
+
+    private static ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve Modules");
 
     private TalonFXConfiguration driveConfiguration;
 
@@ -68,6 +69,7 @@ public class SwerveModule {
     GenericEntry actualAngleEntry;
     GenericEntry turnOutputEntry;
     GenericEntry driveOutputEntry;
+    GenericEntry switchStateEntry;
 
     /**
      * A single swerve module object
@@ -94,7 +96,7 @@ public class SwerveModule {
         driveConfiguration = new TalonFXConfiguration();
         driveConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveConfiguration.MotorOutput.Inverted = inverted;
-        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 10;
+        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 6;
 
         driveConfiguration.Slot0.kP = driveGains.P;
         driveConfiguration.Slot0.kI = driveGains.I;
@@ -126,7 +128,7 @@ public class SwerveModule {
         turnPIDController = turnMotor.getPIDController();
         
         //reduce shocking turn speeds, for testing and smoother driving
-        turnMotor.setClosedLoopRampRate(0.3);
+        turnMotor.setClosedLoopRampRate(0.1);
 
         //set up encoder on the NEO
         turnEncoder = turnMotor.getEncoder();
@@ -161,15 +163,13 @@ public class SwerveModule {
 
 
 
-        desiredSpeedEntry = telemTab.add("Desired Speed " + moduleID, 0).withPosition(0, moduleID - 1).getEntry();
-        desiredAngleEntry = telemTab.add("Desired Angle " + moduleID, 0).withPosition(3, moduleID - 1).getEntry();
-
-        actualSpeedEntry = telemTab.add("Actual Speed " + moduleID, 0).withPosition(1, moduleID - 1).getEntry();
-        actualAngleEntry = telemTab.add("Actual Angle " + moduleID, 0).withPosition(4, moduleID - 1).getEntry();
-
-        driveOutputEntry = telemTab.add("Drive Output " + moduleID, 0).withPosition(6, moduleID - 1).getEntry();
-        turnOutputEntry = telemTab.add("Turn Output " + moduleID, 0).withPosition(7, moduleID - 1).getEntry();
-
+        switchStateEntry = swerveTab.add("Switch State " + moduleID, false).withPosition(0, moduleID - 1).getEntry();
+        desiredSpeedEntry = swerveTab.add("Desired Speed " + moduleID, 0).withPosition(1, moduleID - 1).getEntry();
+        actualSpeedEntry = swerveTab.add("Actual Speed " + moduleID, 0).withPosition(2, moduleID - 1).getEntry();
+        desiredAngleEntry = swerveTab.add("Desired Angle " + moduleID, 0).withPosition(3, moduleID - 1).getEntry();
+        actualAngleEntry = swerveTab.add("Actual Angle " + moduleID, 0).withPosition(4, moduleID - 1).getEntry();
+        driveOutputEntry = swerveTab.add("Drive Output " + moduleID, 0).withPosition(5, moduleID - 1).getEntry();
+        turnOutputEntry = swerveTab.add("Turn Output " + moduleID, 0).withPosition(6, moduleID - 1).getEntry();
     }
 
     
@@ -216,7 +216,8 @@ public class SwerveModule {
      */
     public void home(){
         //only triggers on rising edge of switch, set new home state and target location
-        if(getSwitch() != lastState  && getSwitch()){
+
+        if(getSwitch() != lastState && getSwitch()){
             turnEncoder.setPosition(moduleOffset);
             homeStatus = true;
         }
@@ -230,6 +231,10 @@ public class SwerveModule {
         }
 
         lastState = getSwitch();
+    }
+
+    public void displayStatus() {
+        switchStateEntry.setBoolean(getSwitch());
     }
 
 

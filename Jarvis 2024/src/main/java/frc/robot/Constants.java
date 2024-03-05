@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -19,17 +20,22 @@ public class Constants {
     public static final double ROBOT_WHEEL_BASE_WIDTH = Units.inchesToMeters(21.5);
     public static final double ROBOT_WHEEL_BASE_LENGTH = Units.inchesToMeters(23.5);
     public static final double MAX_DRIVE_SPEED = 1.5;
-    public static final double FAST_DRIVE_SPEED = 3;
+    public static final double FAST_DRIVE_SPEED = 5;
     public static final double MAX_ANGULAR_SPEED = 2;
     public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
 
-    public static final int LED_LENGTH = 200;
+    /**Total length of the LED strip */
+    public static final int LED_LENGTH = 41;
 
-    public static final Pose3d redSpeakerPose = new Pose3d(16.58 , 4.98, Units.inchesToMeters(83), new Rotation3d());
-    public static final Pose3d blueSpeakerPose = new Pose3d();
+    //target pose for the opening of the speakers
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(80), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(80), new Rotation3d());
 
-    public static final Pose3d speakerPose = new Pose3d(Units.inchesToMeters(-54), 0, Units.inchesToMeters(83), new Rotation3d());
+    //target positions for auto alignment into the amps
+    public static final Pose2d blueAmpPose = new Pose2d(1.83,7.65, Rotation2d.fromDegrees(90));
+    public static final Pose2d redAmpPose = new Pose2d(14.7,7.65,Rotation2d.fromDegrees(90));
+    // public static final Pose3d speakerPose = new Pose3d(Units.inchesToMeters(-54), 0, Units.inchesToMeters(83), new Rotation3d());
 
     public class ModuleConstants{
         /** Overall max speed of the module in m/s */
@@ -51,7 +57,7 @@ public class Constants {
         public static final double TURN_GEARING = 2.89 * 2.89 * 6;
 
         /**Diameter of the billet wheel */
-        public static final double WHEEL_DIA = 3.875;
+        public static final double WHEEL_DIA = 3.75;
 
     }
 
@@ -61,8 +67,8 @@ public class Constants {
         public final static double CAM_PITCH = 15; //degrees
         public final static Transform3d CAMERA_TO_ROBOT = 
             new Transform3d(
-                new Translation3d(-Units.inchesToMeters(-13.5), 0, -Units.inchesToMeters(14.5)), 
-                new Rotation3d(Units.degreesToRadians(CAM_PITCH),0, Math.PI)
+                new Translation3d(-Units.inchesToMeters(13.5), 0, -Units.inchesToMeters(14.5)), 
+                new Rotation3d(0,CAM_PITCH, Math.PI)
             );
 
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();

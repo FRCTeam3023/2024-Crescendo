@@ -32,19 +32,22 @@ public class LED extends SubsystemBase {
     isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
     iterations++;
     
-    setLEDColor(0, 100, getColorState());
+    setLEDColor(0, Constants.LED_LENGTH, getColorState());
   }
 
   //Descending priority
   public COLORS getColorState() {
+
     if (Pivot.climbMode) return COLORS.YELLOW;
-    if (Intake.noteLoaded) return isRed ? COLORS.ORANGE : COLORS.GREEN;
+    if (Intake.noteLoaded) return isRed ? COLORS.HOTPINK : COLORS.GREEN;
     return isRed ? COLORS.RED : COLORS.BLUE;
   }
 
   public void setLEDColor(int start, int end, COLORS color){
+
     if (color == currentColor) return;
     currentColor = color;
+
 
     //Construct
     byte[] data = new byte[7];

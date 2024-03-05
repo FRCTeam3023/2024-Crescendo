@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3633965729469937,
-      "y": 5.555088802485298
+      "x": 1.1852004303152672,
+      "y": 6.686887667641241
     },
-    "rotation": 0
+    "rotation": 28.300755766006308
   },
   "command": {
     "type": "sequential",
@@ -18,13 +18,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Pivot Speaker"
+                  "name": "Shoot Sequence"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Aim Pivot"
                 }
               }
             ]
@@ -33,13 +33,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle Note"
+            "pathName": "Top Speaker Wide"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot Sequence"
+            "name": "Aim Pivot"
           }
         }
       ]

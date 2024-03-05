@@ -2,15 +2,33 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3633965729469937,
-      "y": 5.555088802485298
+      "x": 1.442332115433463,
+      "y": 7.301537679998438
     },
-    "rotation": 0
+    "rotation": -90.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Aproach Amp"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
         {
           "type": "race",
           "data": {
@@ -18,13 +36,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Pivot Speaker"
+                  "name": "Pivot Pickup"
                 }
               },
               {
-                "type": "named",
+                "type": "wait",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "waitTime": 2.0
                 }
               }
             ]
@@ -33,7 +51,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle Note"
+            "pathName": "Amp"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {

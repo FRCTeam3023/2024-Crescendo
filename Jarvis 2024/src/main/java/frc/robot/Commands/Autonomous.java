@@ -13,8 +13,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
+import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
@@ -24,12 +30,7 @@ public class Autonomous {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
     SendableChooser<Command> autoChooser;
 
-
-    Command exampleAuto; 
-    Command twoNoteAuto;
-    
-
-    public Autonomous(Pivot pivot, Shooter shooter, Intake intake){
+    public Autonomous(Pivot pivot, Shooter shooter, Intake intake, Drivetrain drivetrain){
         // Command intakeCommand = new RunCommand(() -> intake.setIntakeSpeed(0.65), intake);
         // Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
         // Command prepShooterCommand = new SequentialCommandGroup(
@@ -55,27 +56,87 @@ public class Autonomous {
         // );
         
 
+        
+        AimPivot aimPivotCommand = new AimPivot(pivot, drivetrain);
+        Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
+        Command intakeNoSensorCommand = new InstantCommand(() -> intake.setIntakeSpeed(1), intake);
+        Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0), intake);
+        Command prepShooterCommand = new SequentialCommandGroup(
+            new InstantCommand(() -> intake.setIntakeSpeed(-.5)),
+            new WaitUntilCommand(() -> !intake.senseNote()),
+            new InstantCommand(()->intake.setIntakeSpeed(0))
+        );
+      
+        // public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
+        Command shootCommand = new InstantCommand(() -> shooter.setShooterVoltage(11.5), shooter);
+        Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
 
-        NamedCommands.registerCommand("Intake", RobotContainer.intakeCommand);
-        NamedCommands.registerCommand("Intake Stop", RobotContainer.intakeStopCommand);
-        NamedCommands.registerCommand("Prep Shooter", RobotContainer.prepShooterCommand);
-        NamedCommands.registerCommand("Shoot", RobotContainer.shootCommand);
-        NamedCommands.registerCommand("Shoot Sequence", RobotContainer.shootSequenceCommand);
-        NamedCommands.registerCommand("Shooter Stop", RobotContainer.shootStopCommand);
+        Command shootSequenceCommand = 
+            new SequentialCommandGroup(
+                prepShooterCommand,
+                shootCommand,
+                new WaitCommand(1),
+                intakeNoSensorCommand,
+                new WaitCommand(1),
+                intakeStopCommand,
+                shootStopCommand,
+                new InstantCommand(() -> Intake.noteLoaded = false)
+            );
+
+        // Command shootAmpSequenceCommand = 
+        //     new SequentialCommandGroup(
+        //         new InstantCommand(() -> intake.setIntakeSpeed(-.25)),
+        //         new WaitUntilCommand(() -> !intake.senseNote()),
+        //         new InstantCommand(()->intake.setIntakeSpeed(0))
+        //         // prepShooterCommand
+        //         // shootCommand,
+        //         // new WaitCommand(0.5),
+        //         // intakeNoSensorCommand,
+        //         // new WaitCommand(1),
+        //         // intakeStopCommand,
+        //         // shootStopCommand,
+        //         // new InstantCommand(()-> Intake.noteLoaded = false)
+        //     );
+
+
+        
+
+
+        NamedCommands.registerCommand("Intake", intakeCommand);
+        NamedCommands.registerCommand("Intake Stop", intakeStopCommand);
+        NamedCommands.registerCommand("Prep Shooter", prepShooterCommand);
+        NamedCommands.registerCommand("Shoot", shootCommand);
+        NamedCommands.registerCommand("Shoot Sequence", shootSequenceCommand);
+        // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
+        NamedCommands.registerCommand("Shooter Stop", shootStopCommand);
 
         NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> pivot.setPivotAngle(new Rotation2d(), false), pivot));
         NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(12), false), pivot));
         NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(115), false), pivot));
-        NamedCommands.registerCommand("Aim Pivot", RobotContainer.aimPivotCommand);
+        NamedCommands.registerCommand("Aim Pivot", aimPivotCommand);
 
-        exampleAuto = new PathPlannerAuto("Test Auto");
-        twoNoteAuto = new PathPlannerAuto("2 Note Center");
+        new PathPlannerAuto("Test Auto");
+        new PathPlannerAuto("2 Note Center");
+        new PathPlannerAuto("3 Note Top");
+        new PathPlannerAuto("3 Note Bottom");
+        new PathPlannerAuto("Leave");
+        new PathPlannerAuto("Amp");
+        new PathPlannerAuto("2 Note Top");
+        new PathPlannerAuto("2 Note Bottom");
+        new PathPlannerAuto("2 Note Amp");
+        new PathPlannerAuto("Amp Long");
+        new PathPlannerAuto("2 Note Amp Modified");
+        new PathPlannerAuto("Amp Hide");
+        new PathPlannerAuto("Leave Speaker");
+
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add(autoChooser).withPosition(0, 0);
     }
 
     public Command getSelectedAuto(){
         return autoChooser.getSelected();
+        // return new InstantCommand();
     }
 
+    
 }
