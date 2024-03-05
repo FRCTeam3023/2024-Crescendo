@@ -18,13 +18,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Pivot Speaker"
+                  "name": "Shoot Sequence"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Pivot Speaker"
                 }
               }
             ]
@@ -34,6 +34,18 @@
           "type": "path",
           "data": {
             "pathName": "Middle Note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Note"
           }
         },
         {

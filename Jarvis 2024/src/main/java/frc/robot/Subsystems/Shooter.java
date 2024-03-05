@@ -28,8 +28,8 @@ public class Shooter extends SubsystemBase {
   private RelativeEncoder rightEncoder;
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
-  private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 1).getEntry();
-  private static final GenericEntry rightSpeedEntry = armTab.add("Right RPM", 0).withPosition(2, 2).getEntry();
+  private static final GenericEntry rightSpeedEntry = armTab.add("Right RPM", 0).withPosition(1, 2).getEntry();
+  private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 2).getEntry();
 
 
   private final Gains shooterGains = new Gains(0,1/2500,12);  

@@ -48,12 +48,12 @@ public class Pivot extends SubsystemBase {
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
-  private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(1, 1).getEntry();
-  private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(1, 2).getEntry();
-  private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(1, 3).getEntry();
-  private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(1, 4).getEntry();
-  private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(2, 4).getEntry();
-  private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",0).withPosition(3, 4).getEntry();
+  private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(0, 0).getEntry();
+  private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(0, 1).getEntry();
+  private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(0, 2).getEntry();
+  private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(0, 3).getEntry();
+  private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(3, 1).getEntry();
+  private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",false).withPosition(3, 2).getEntry();
 
 
   public Pivot() {
@@ -67,7 +67,7 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 1;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 2;
     pivotConfiguration.MotionMagic.MotionMagicAcceleration = 2;
     pivotConfiguration.MotionMagic.MotionMagicJerk = 50;
 
@@ -115,8 +115,8 @@ public class Pivot extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    angleEntry.setDouble(getLocalAngle().getDegrees());
-    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
+    // angleEntry.setDouble(getLocalAngle().getDegrees());
+    // angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
     angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
     targetAngle.setDouble(holdPosition.getDegrees());
     climberModeEntry.setBoolean(climbMode);
@@ -161,12 +161,6 @@ public class Pivot extends SubsystemBase {
     return localToGlobalAngle(getLocalAngle());
   }
 //#endregion
-
-  // public void resetAngleOffset(){
-
-  //   pivotEncoderConfig.MagnetSensor.MagnetOffset = pivotEncoderConfig.MagnetSensor.MagnetOffset + (-getLocalAngle().getRadians() / (Math.PI * 2));
-  //   pivotSensor.getConfigurator().apply(pivotEncoderConfig);
-  // }
 
   /**
    * Set the closed loop motion magic control target of the pivot joint, adjustable between global and local control.
@@ -262,9 +256,11 @@ public class Pivot extends SubsystemBase {
   public void checkClimbStatus(){
     if(previousClimbMode != climbMode){
       if(climbMode){
+        System.out.println("Climb Mode");
         setPivotNeutralMode(NeutralModeValue.Coast);
         setClimberNeutralMode(NeutralModeValue.Brake);
       }else{
+        System.out.println("Normal Mode");
         setPivotNeutralMode(NeutralModeValue.Brake);
         setClimberNeutralMode(NeutralModeValue.Coast);
       }

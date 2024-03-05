@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
+import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.JoystickDrive;
@@ -37,19 +38,18 @@ public class RobotContainer {
   private static final Joystick controller2 = new Joystick(1);
 
   private static final Drivetrain drivetrain = new Drivetrain();
-  // private static final VisionSystem visionSystem = new VisionSystem();
+  private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
   private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
-  private static final Autonomous autonomous = new Autonomous(pivot,shooter,intake);
+  private static final Autonomous autonomous = new Autonomous(pivot,shooter,intake, drivetrain);
   private static final LED led = new LED();
-
 
   private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller, controller2);
   private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
-  private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller);
-    private static final PIDDisplay pid = new PIDDisplay();
-
+  private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller2);
+  private static final PIDDisplay pid = new PIDDisplay();
+  private static final AmpOrient ampOrientCommand = new AmpOrient(drivetrain);
 
   public static final AimPivot aimPivotCommand = new AimPivot(pivot, drivetrain);
   public static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
@@ -63,6 +63,7 @@ public class RobotContainer {
             ),
             new InstantCommand(()->intake.setIntakeSpeed(0))
         );
+      
   // public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
   public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterVoltage(11.5));
   public static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
@@ -71,7 +72,7 @@ public class RobotContainer {
       new SequentialCommandGroup(
           prepShooterCommand,
           shootCommand,
-          new WaitCommand(2),
+          new WaitCommand(1),
           intakeNoSensorCommand,
           new InstantCommand(() -> Intake.noteLoaded = false)
     );
@@ -79,7 +80,7 @@ public class RobotContainer {
 
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
-  private static final GenericEntry angleSetpoint = armTab.add("Angle Setpoint", 110).withPosition(3, 1).getEntry();
+  private static final GenericEntry angleSetpoint = armTab.add("Angle Setpoint", 110).withPosition(4, 2).getEntry();
 
   public RobotContainer() {
     configureBindings();
@@ -90,38 +91,46 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    new JoystickButton(controller, 8).whileTrue(homeCommand);
-    // new JoystickButton(controller, 7).onTrue(new InstantCommand(() -> pivot.resetAngleOffset(), pivot));
 
-    new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> {Pivot.holdPosition = new Rotation2d(); Pivot.climbMode = false;}, pivot));
-    new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
-    new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
-    new JoystickButton(controller2, 3).whileTrue(aimPivotCommand);
+    /*
+     * Button layout on each controller:
+     * 1 - A
+     * 2 - B
+     * 3 - X
+     * 4 - Y
+     * 5 - leftBumper
+     * 6 - rightBumper
+     * 7 - reset
+     * 8 - Start 
+     * 9 - Left Joystick Pushbutton
+     * 10 - Right Joystick Pushbutton
+     */
 
-    new JoystickButton(controller, 6).whileTrue(shootSequenceCommand).onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
-
-
-      //   new StartEndCommand(() -> shooter.setShooterDutyCycle(1), () -> shooter.setShooterDutyCycle(0), shooter)
-      // ).onTrue(new SequentialCommandGroup(
-      //   new ParallelRaceGroup(
-      //     new WaitCommand(.05),
-      //     new RunCommand(() -> intake.setIntakeSpeed(-.25))
-      //   ),
-      //   new InstantCommand(()->intake.setIntakeSpeed(0))
-      // ));
 
     
-
+    new JoystickButton(controller, 8).whileTrue(homeCommand);
+    new JoystickButton(controller, 6)
+      .whileTrue(shootSequenceCommand)
+      .onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
     new JoystickButton(controller, 5).whileTrue(intakeCommand).onFalse(intakeStopCommand);
-
     new JoystickButton(controller, 7).onTrue(new InstantCommand(
         () -> drivetrain.setPose(new Pose2d(drivetrain.getPose().getX(),drivetrain.getPose().getY(),new Rotation2d()))
       ));
 
+    new JoystickButton(controller, 1).onTrue(new InstantCommand(() -> drivetrain.calibrateGyro()));
+    new JoystickButton(controller, 2).whileTrue(ampOrientCommand);
+    new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
+    new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
+
+    new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> {Pivot.holdPosition = new Rotation2d(); Pivot.climbMode = false;}, pivot));
+    new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
+    new JoystickButton(controller2, 3).whileTrue(aimPivotCommand);
+    new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
+
+
   }
 
   public Command getAutonomousCommand() {
-    // return new HomeCommand(drivetrain);
     return new SequentialCommandGroup(
       // new InstantCommand(() -> drivetrain.calibrateGyro()),
       homeCommand,

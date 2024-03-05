@@ -23,16 +23,9 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // iterations++;
-    // if (iterations > 30) {
-    //   System.out.println("Note sensor data: " + noteSensor.get());
-    //   iterations = 0;
-    // }
-    //noteLoaded = noteSensor.get();
   }
 
   public void setIntakeSpeed(double speed) {
-    System.out.println(speed);
     intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 
@@ -43,7 +36,6 @@ public class Intake extends SubsystemBase {
     }
     else
       setIntakeSpeed(speed);
-      noteLoaded = false;
   }
 
   public boolean senseNote() {

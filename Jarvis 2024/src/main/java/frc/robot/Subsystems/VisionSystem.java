@@ -6,12 +6,16 @@ package frc.robot.Subsystems;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CameraServerJNI.TelemetryKind;
+
 // import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,15 +25,30 @@ public class VisionSystem extends SubsystemBase {
   /** Creates a new PhotonCamera. */
 
   private static final PhotonCamera photonCamera = new PhotonCamera("VisionCamera");
+  //private static final PhotonCamera intakeCamera = new PhotonCamera("IntakeView");
 
   private static final ShuffleboardTab PhotonTab = Shuffleboard.getTab("PhotonVision");
+  private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
   private static final GenericEntry visionPoseEntry = PhotonTab.add("Vision Pose", new Pose2d().toString()).withPosition(0, 0).getEntry();
+  private static final GenericEntry enabledEntry = telemTab.add("Vision System", false).withPosition(1, 2).getEntry();
   private double previousPipelineTimestamp = 0;
+  public static boolean disabled = true;
+  
+  private static boolean intakeCameraInitialized = false;
 
-  public VisionSystem() {}
+  public VisionSystem() {
+    if (!intakeCameraInitialized)
+      try {telemTab.addCamera("Intake View", "IntakeView", "mjpg:http://10.30.23.11:1184/stream.mjpg");}
+      catch(Exception e) {System.out.println("Failed to initialize intake camera stream: " + e.getMessage());}
+    intakeCameraInitialized = true;
+    // telemTab.add(CameraServer.getVideo("IntakeView").getSource());
+  }
 
   @Override
   public void periodic() {
+    enabledEntry.setBoolean(!disabled);
+    if (disabled) return;
+
     var pipelineResult = photonCamera.getLatestResult();
     var resultTimestamp = pipelineResult.getTimestampSeconds();
 
@@ -45,8 +64,6 @@ public class VisionSystem extends SubsystemBase {
         Pose3d camPose = targetPose.transformBy(targetToCamera);
 
         Pose2d visionMeasurement = camPose.transformBy(PhotonConstants.CAMERA_TO_ROBOT).toPose2d();
-
-        
 
         Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
         visionPoseEntry.setString(visionMeasurement.toString());

@@ -13,9 +13,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
@@ -26,7 +29,8 @@ public class JoystickDrive extends Command {
   Drivetrain drivetrain;
   Joystick controller;
   Joystick rightJoystick;
-  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(2, 4));
+
+  public static boolean fieldRelativeDrive = true;
 
   /** Creates a new JoystickDrive. */
   public JoystickDrive(Drivetrain drivetrain, Joystick controller, Joystick rightJoystick) {
@@ -34,8 +38,6 @@ public class JoystickDrive extends Command {
     this.controller = controller;
     this.rightJoystick = rightJoystick;
     addRequirements(drivetrain);
-    turnController.enableContinuousInput(-Math.PI, Math.PI);
-    PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
   }
 
   // Called when the command is initially scheduled.
@@ -71,35 +73,31 @@ public class JoystickDrive extends Command {
     double ySpeed = -Math.cos(theta) * processedMagnitude;
     //------------------------------------------------------------------------------------
     //rotation input -closed loop and open loop toggle
-
+    Alliance currentColor = null;
+    if (DriverStation.getAlliance().isPresent())
+      currentColor = DriverStation.getAlliance().get();
     double rotationSpeed = 0;
 
+    //flip Direction if alliance is red, field-centric based on blue alliance
+    if(currentColor == Alliance.Red){
+      xSpeed = -xSpeed;
+      ySpeed = -ySpeed;
+    }
+
     if(rightJoystick.getRawButton(3)){
-      Pose2d currentPose = drivetrain.getPose();
       Pose3d targetPose = new Pose3d();
-      if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
+      if(currentColor == Alliance.Blue){
         targetPose = Constants.blueSpeakerPose;
       }else{
         targetPose = Constants.redSpeakerPose;
       }
-      Translation2d relativeTargetTranslation = currentPose.getTranslation().minus(targetPose.toPose2d().getTranslation());
 
-      // //Account for velocity
-      // double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
-      // double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
-      // relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
-      //   relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
-
-      Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
-      rotationSpeed = turnController.calculate(currentPose.getRotation().getRadians(), targetRotation.getRadians());
+      drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true, targetPose);
     }else{
       double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
       rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;
+      drivetrain.drive(new ChassisSpeeds(xSpeed,ySpeed,rotationSpeed), fieldRelativeDrive);
     }
-
-
-    drivetrain.drive(new ChassisSpeeds(xSpeed,ySpeed,rotationSpeed), true);
-
   }
 
   // Called once the command ends or is interrupted.

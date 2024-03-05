@@ -4,6 +4,9 @@
 
 package frc.robot.Subsystems;
 
+import java.util.List;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -12,26 +15,31 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.CalibrationTime;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Commands.JoystickDrive;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Util.PIDDisplay;
+import frc.robot.Util.ProfiledWPILibSetter;
 import frc.robot.Util.SparkMaxSetter;
 import frc.robot.Util.TalonFXsetter;
 
@@ -39,7 +47,8 @@ public class Drivetrain extends SubsystemBase {
 
   public static boolean allModuleHomeStatus = false;
   
-  ADIS16470_IMU gyro = new ADIS16470_IMU();
+  //ADIS16470_IMU gyro = new ADIS16470_IMU();
+  Pigeon2 pigeonGyro = new Pigeon2(20);
 
   //module objects
   private static final SwerveModule frontLeft = new SwerveModule(1, 1, 5, ModuleConstants.MODULE1_OFFSET, InvertedValue.Clockwise_Positive, 0); // Module 1
@@ -55,6 +64,13 @@ public class Drivetrain extends SubsystemBase {
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(2, 4));
+
+  ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+  GenericEntry targetPositionEntry = armTab.add("Aiming Target Position", "placeholder").withPosition(1, 0).withSize(2, 1).getEntry();
+  GenericEntry relativePositionEntry = armTab.add("Relative Target Position", "placeholder").withPosition(3, 0).withSize(2, 1).getEntry();
+  GenericEntry robotPoseEntry = armTab.add("Robot Pose", "placeholder").withPosition(1, 1).withSize(2, 1).getEntry();
+  GenericEntry targetRotationEntry = armTab.add("Aim Heading", 0).withPosition(4, 1).getEntry();
 
    //Swerve Drive Pose Estimator, uses the combination of encoder data and vision to estimate pose on the field
   private static final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
@@ -69,12 +85,20 @@ public class Drivetrain extends SubsystemBase {
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
   private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
   /** Shuffleboard entry to display robot heading */
-  private static GenericEntry headingEntry = telemTab.add("Robot Heading", 0).withPosition(9, 0).getEntry();
-  private static GenericEntry poseEntry = telemTab.add("Pose", new Pose2d().toString()).withPosition(9, 1).getEntry();
-
+  private static GenericEntry headingEntry = telemTab.add("Robot Heading", 0).withPosition(0, 0).getEntry();
+  private static GenericEntry gyroRawEntry = telemTab.add("Raw Gyro", 0).withPosition(0, 1).getEntry();
+  private static GenericEntry gyroDifferenceEntry = telemTab.add("Gyro Difference", 0).withPosition(0, 2).getEntry();
+  private static GenericEntry isFieldRelative = telemTab.add("Field Relative", false).withPosition(2, 2).getEntry();
+  private static GenericEntry poseEntry = telemTab.add("Pose", new Pose2d().toString()).withPosition(1, 0).withSize(3, 1).getEntry();
+  private static GenericEntry poseX = telemTab.add("Override Pose X", 0).withPosition(1, 1).getEntry();
+  private static GenericEntry poseY = telemTab.add("Override Pose Y", 0).withPosition(2, 1).getEntry();
+  private static GenericEntry poseH = telemTab.add("Override Pose H", 0).withPosition(3, 1).getEntry();
 
   public Drivetrain() {
-    gyro.configCalTime(CalibrationTime._32ms);
+    turnController.enableContinuousInput(-Math.PI, Math.PI);
+    PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
+
+    // gyro.configCalTime(CalibrationTime._32ms);
     //recalibrate gyro and initialize starting pose
     calibrateGyro();
 
@@ -112,25 +136,30 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     headingEntry.setDouble(getPose().getRotation().getDegrees());
+    gyroRawEntry.setDouble(getChassisAngle().getDegrees());
+    gyroDifferenceEntry.setDouble(getChassisAngle().getDegrees() - getPose().getRotation().getDegrees());
+    isFieldRelative.setBoolean(JoystickDrive.fieldRelativeDrive);
+    
+    if (poseX.getDouble(0) != 0 || poseY.getDouble(0) != 0 || poseH.getDouble(0) != 0)
+      setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
+    else
+      poseEstimator.update(getChassisAngle(), getModulePositions());
 
-    poseEstimator.update(getChassisAngle(), getModulePositions());
-    poseEntry.setString(getPose().toString());
+
+    poseEntry.setString(getPose().toString());    
+    displayAllModuleSwitches();
   }
 
-
+//#region Driving
   /**
    * Primary drive method for the robot
    * @param speeds Speeds that the robot should be moving in - positive x is foreward, y is left, omega is CCW
    * @param isFieldRelative true if running in field relative mode
    */
   public void drive(ChassisSpeeds speeds, boolean isFieldRelative){
-
-    double omega = speeds.omegaRadiansPerSecond;
-
-    omega = Math.signum(omega) * Math.min(Math.abs(omega), Constants.MAX_ANGULAR_SPEED);
-
+    
     if(isFieldRelative){
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation());
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation());
     } 
 
     SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
@@ -138,9 +167,28 @@ public class Drivetrain extends SubsystemBase {
     setModuleStates(moduleStates);
   }
 
+
+  public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative, Pose3d targetPose) {
+    Translation2d relativeTargetTranslation = getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
+    Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
+    double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
+    drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
+
+    targetPositionEntry.setString(targetPose.toString());
+    targetRotationEntry.setDouble(targetRotation.getDegrees());
+    relativePositionEntry.setString(relativeTargetTranslation.toString());
+    robotPoseEntry.setString(getPose().toString());
+
+          // double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
+      // double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
+      // relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
+      //   relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
+  }
+
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds){
     drive(chassisSpeeds, false);
   }
+//#endregion
 
   /** Sets drivetrain to 0 speeds */
   public void stop(){
@@ -188,6 +236,13 @@ public class Drivetrain extends SubsystemBase {
 
   }
 
+  public void displayAllModuleSwitches () {
+    frontLeft.displayStatus();
+    frontRight.displayStatus();
+    backLeft.displayStatus();
+    backRight.displayStatus();
+  }
+
   /**
    * Resets all the modules' home status to false
    */
@@ -224,7 +279,8 @@ public class Drivetrain extends SubsystemBase {
    * @return Gyro angle
    */
   public Rotation2d getChassisAngle(){
-    return Rotation2d.fromDegrees(gyro.getAngle(IMUAxis.kZ));
+    return Rotation2d.fromDegrees(-pigeonGyro.getAngle());
+    //return Rotation2d.fromDegrees(gyro.getAngle(IMUAxis.kZ));
   }
 
   /**
@@ -237,9 +293,9 @@ public class Drivetrain extends SubsystemBase {
 
   /** Calibrates gyro - will take significant time so put in beginning of code */
   public void calibrateGyro(){
-    gyro.calibrate();
+    //gyro.calibrate();
+    pigeonGyro.reset();
+    Timer.delay(1);
   }
-
-
 
 }

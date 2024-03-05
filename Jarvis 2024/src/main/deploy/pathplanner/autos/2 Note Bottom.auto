@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3633965729469937,
-      "y": 5.555088802485298
+      "x": 1.3491521419562087,
+      "y": 5.539225686154654
     },
     "rotation": 0
   },
@@ -33,7 +33,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle Note"
+            "pathName": "Bottom Note"
           }
         },
         {
