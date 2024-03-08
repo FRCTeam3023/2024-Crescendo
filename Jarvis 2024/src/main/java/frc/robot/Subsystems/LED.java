@@ -8,15 +8,18 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
 
-  SerialPort serialPort = new SerialPort(115200, Port.kMXP);
-  COLORS currentColor = null;
-  boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+  private static SerialPort serialPort = new SerialPort(115200, Port.kMXP);
+  private static COLORS currentColor = null;
+  private static boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+  private static boolean interupted = false;
 
   public LED() {
     setLEDColor(0, Constants.LED_LENGTH, COLORS.OFF);
@@ -25,19 +28,23 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
-    
-    setLEDColor(0, Constants.LED_LENGTH, getColorState());
+    if (!interupted)
+      setLEDColor(0, Constants.LED_LENGTH, getColorState());
   }
 
   //Descending priority
   public COLORS getColorState() {
-
     if (Pivot.climbMode) return COLORS.YELLOW;
-    if (Intake.noteLoaded) return isRed ? COLORS.HOTPINK : COLORS.GREEN;
+    if (Intake.noteLoaded) return COLORS.GREEN;
     return isRed ? COLORS.RED : COLORS.BLUE;
   }
 
-  public void setLEDColor(int start, int end, COLORS color){
+  public static void interuptSignal(Command sequence) {
+    sequence.andThen(new InstantCommand(() -> interupted = false));
+    sequence.schedule();
+  }
+
+  public static void setLEDColor(int start, int end, COLORS color){
 
     if (color == currentColor) return;
     currentColor = color;

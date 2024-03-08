@@ -24,6 +24,8 @@ public class Constants {
     public static final double MAX_ANGULAR_SPEED = 2;
     public static final double DRIVE_TOLERANCE_PERCENT = 0.015;
 
+    public static final double MAX_GYRO_DIFFERENCE = 20; //Degrees
+    public static final int MAX_ALLOWED_GYRO_FAULTS = 10;
 
     /**Total length of the LED strip */
     public static final int LED_LENGTH = 41;

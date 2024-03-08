@@ -34,7 +34,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Constants.ModuleConstants;
@@ -49,6 +53,8 @@ public class Drivetrain extends SubsystemBase {
   
   //ADIS16470_IMU gyro = new ADIS16470_IMU();
   Pigeon2 pigeonGyro = new Pigeon2(20);
+  private static double lastGyroReading = 4; //4 is never within the rotation; this is the initialization value
+  private static int consecutiveFaults = 0; //-1 when failed
 
   //module objects
   private static final SwerveModule frontLeft = new SwerveModule(1, 1, 5, ModuleConstants.MODULE1_OFFSET, InvertedValue.Clockwise_Positive, 0); // Module 1
@@ -93,6 +99,7 @@ public class Drivetrain extends SubsystemBase {
   private static GenericEntry poseX = telemTab.add("Override Pose X", 0).withPosition(1, 1).getEntry();
   private static GenericEntry poseY = telemTab.add("Override Pose Y", 0).withPosition(2, 1).getEntry();
   private static GenericEntry poseH = telemTab.add("Override Pose H", 0).withPosition(3, 1).getEntry();
+  private static GenericEntry gyroFaultEntry = telemTab.add("Gyro Fault", false).withPosition(3, 2).getEntry();
 
   public Drivetrain() {
     turnController.enableContinuousInput(-Math.PI, Math.PI);
@@ -279,8 +286,36 @@ public class Drivetrain extends SubsystemBase {
    * @return Gyro angle
    */
   public Rotation2d getChassisAngle(){
-    return Rotation2d.fromDegrees(-pigeonGyro.getAngle());
+    double reading = -pigeonGyro.getAngle();
+    if (consecutiveFaults > Constants.MAX_ALLOWED_GYRO_FAULTS) {
+      onGyroFault();
+      //Use another gyro maybe?
+      return Rotation2d.fromDegrees(lastGyroReading);
+    }
+    else if (lastGyroReading != 4 && Math.abs(reading - lastGyroReading) > Constants.MAX_GYRO_DIFFERENCE) {
+      consecutiveFaults++;
+      return Rotation2d.fromDegrees(lastGyroReading);
+    }
+    consecutiveFaults = 0;
+    lastGyroReading = reading;
+
+    return Rotation2d.fromDegrees(reading);
     //return Rotation2d.fromDegrees(gyro.getAngle(IMUAxis.kZ));
+  }
+
+  public void onGyroFault() {
+    consecutiveFaults = -1;
+    gyroFaultEntry.setBoolean(true);
+    LED.interuptSignal(new SequentialCommandGroup(
+      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
+      new WaitCommand(0.25),
+      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
+      new WaitCommand(0.25),
+      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
+      new WaitCommand(0.25),
+      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
+      new WaitCommand(0.25)
+    ));
   }
 
   /**

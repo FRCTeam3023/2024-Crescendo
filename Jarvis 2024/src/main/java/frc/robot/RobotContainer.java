@@ -126,8 +126,6 @@ public class RobotContainer {
     new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 3).whileTrue(aimPivotCommand);
     new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
-
-
   }
 
   public Command getAutonomousCommand() {
