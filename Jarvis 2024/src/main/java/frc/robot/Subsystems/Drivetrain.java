@@ -287,9 +287,12 @@ public class Drivetrain extends SubsystemBase {
    */
   public Rotation2d getChassisAngle(){
     double reading = -pigeonGyro.getAngle();
-    if (consecutiveFaults > Constants.MAX_ALLOWED_GYRO_FAULTS) {
+    if (consecutiveFaults == -1) {
+      //use another gyro or reference?
+      return Rotation2d.fromDegrees(reading);
+    }
+    else if (consecutiveFaults > Constants.MAX_ALLOWED_GYRO_FAULTS) {
       onGyroFault();
-      //Use another gyro maybe?
       return Rotation2d.fromDegrees(lastGyroReading);
     }
     else if (lastGyroReading != 4 && Math.abs(reading - lastGyroReading) > Constants.MAX_GYRO_DIFFERENCE) {
