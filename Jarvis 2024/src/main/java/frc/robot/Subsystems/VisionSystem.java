@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PhotonConstants;
 
@@ -28,11 +29,13 @@ public class VisionSystem extends SubsystemBase {
   //private static final PhotonCamera intakeCamera = new PhotonCamera("IntakeView");
 
   private static final ShuffleboardTab PhotonTab = Shuffleboard.getTab("PhotonVision");
+  private final Field2d field = new Field2d();
+  
   private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
   private static final GenericEntry visionPoseEntry = PhotonTab.add("Vision Pose", new Pose2d().toString()).withPosition(0, 0).getEntry();
   private static final GenericEntry enabledEntry = telemTab.add("Vision System", false).withPosition(1, 2).getEntry();
   private double previousPipelineTimestamp = 0;
-  public static boolean disabled = true;
+  public static boolean disabled = false;
   
   private static boolean intakeCameraInitialized = false;
 
@@ -42,6 +45,8 @@ public class VisionSystem extends SubsystemBase {
       catch(Exception e) {System.out.println("Failed to initialize intake camera stream: " + e.getMessage());}
     intakeCameraInitialized = true;
     // telemTab.add(CameraServer.getVideo("IntakeView").getSource());
+    PhotonTab.add(field);
+
   }
 
   @Override
@@ -56,7 +61,7 @@ public class VisionSystem extends SubsystemBase {
       previousPipelineTimestamp = resultTimestamp;
       var target = pipelineResult.getBestTarget();
 
-      if (target.getPoseAmbiguity() <= .05) {
+      if (target.getPoseAmbiguity() <= .1) {
         Transform3d camToTarget = target.getBestCameraToTarget();
         Transform3d targetToCamera = camToTarget.inverse();
 
@@ -67,7 +72,7 @@ public class VisionSystem extends SubsystemBase {
 
         Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
         visionPoseEntry.setString(visionMeasurement.toString());
-
+        field.setRobotPose(visionMeasurement);
       }
     }
 

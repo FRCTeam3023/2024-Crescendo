@@ -70,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
-  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(2, 4));
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(4, 8));
 
   ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
   GenericEntry targetPositionEntry = armTab.add("Aiming Target Position", "placeholder").withPosition(1, 0).withSize(2, 1).getEntry();
@@ -85,7 +85,7 @@ public class Drivetrain extends SubsystemBase {
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
     MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    MatBuilder.fill(Nat.N3(), Nat.N1(),0.9,0.9,0.9) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.75,0.75,0.75) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -174,6 +174,9 @@ public class Drivetrain extends SubsystemBase {
     setModuleStates(moduleStates);
   }
 
+  public void resetTurnController() {
+    turnController.reset(getPose().getRotation().getRadians());
+  }
 
   public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative, Pose3d targetPose) {
     Translation2d relativeTargetTranslation = getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
@@ -309,16 +312,18 @@ public class Drivetrain extends SubsystemBase {
   public void onGyroFault() {
     consecutiveFaults = -1;
     gyroFaultEntry.setBoolean(true);
-    LED.interuptSignal(new SequentialCommandGroup(
-      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
-      new WaitCommand(0.25),
-      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
-      new WaitCommand(0.25),
-      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
-      new WaitCommand(0.25),
-      new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
-      new WaitCommand(0.25)
-    ));
+    // LED.interuptSignal(new SequentialCommandGroup(
+    //   new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
+    //   new WaitCommand(0.25),
+    //   new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
+    //   new WaitCommand(0.25),
+    //   new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.OFF)),
+    //   new WaitCommand(0.25),
+    //   new InstantCommand(() -> LED.setLEDColor(0, Constants.LED_LENGTH, LED.COLORS.HOTPINK)),
+    //   new WaitCommand(0.25)
+    // ));
+
+
   }
 
   /**

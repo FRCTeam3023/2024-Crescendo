@@ -38,6 +38,14 @@ public class Intake extends SubsystemBase {
       setIntakeSpeed(speed);
   }
 
+  public void outakeTillSensed(double speed) {
+    if (!senseNote()) {
+      setIntakeSpeed(0);
+    }
+    else
+      setIntakeSpeed(speed);
+  }
+
   public boolean senseNote() {
     return !noteSensor.get();
   }

@@ -40,8 +40,9 @@ public class LED extends SubsystemBase {
   }
 
   public static void interuptSignal(Command sequence) {
+    interupted = true;
     sequence.andThen(new InstantCommand(() -> interupted = false));
-    sequence.schedule();
+    //sequence.schedule();
   }
 
   public static void setLEDColor(int start, int end, COLORS color){

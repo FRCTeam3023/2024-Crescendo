@@ -31,8 +31,8 @@ public class Constants {
     public static final int LED_LENGTH = 41;
 
     //target pose for the opening of the speakers
-    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(80), new Rotation3d());
-    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(80), new Rotation3d());
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(83), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(83), new Rotation3d());
 
     //target positions for auto alignment into the amps
     public static final Pose2d blueAmpPose = new Pose2d(1.83,7.65, Rotation2d.fromDegrees(90));
@@ -66,14 +66,14 @@ public class Constants {
     public static class PhotonConstants {
 
         //Camera position relative to the bot to translate vision data to the center of the robot instead of based around the camera's reference
-        public final static double CAM_PITCH = 15; //degrees
-        public final static Transform3d CAMERA_TO_ROBOT = 
+        public final static double CAM_PITCH = Units.degreesToRadians(50); //degrees
+        public final static Transform3d ROBOT_TO_CAMERA = 
             new Transform3d(
-                new Translation3d(-Units.inchesToMeters(13.5), 0, -Units.inchesToMeters(14.5)), 
-                new Rotation3d(0,CAM_PITCH, Math.PI)
+                new Translation3d(-Units.inchesToMeters(15.0), 0, Units.inchesToMeters(14.5)), 
+                new Rotation3d(0, -CAM_PITCH, Math.PI)
             );
 
-        public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+        public static final Transform3d CAMERA_TO_ROBOT = ROBOT_TO_CAMERA.inverse();
 
 
 
@@ -113,7 +113,7 @@ public class Constants {
         public static final double PIVOT_SENSOR_OFFSET = -.202;
         public static final double NOTE_LAUNCH_SPEED = 5; //m/s
         public static final double NOTE_RETRACTION_TIME = 0.5;
-        public static final boolean USE_REMOTE_PIVOT_SENSOR = false;
+        public static final boolean USE_REMOTE_PIVOT_SENSOR = true;
         public static final double PIVOT_ENCODER_DEADZONE = 0.01; //rotations
         public static final double MAX_PIVOT_DEVIATION = 0.1;
     }
