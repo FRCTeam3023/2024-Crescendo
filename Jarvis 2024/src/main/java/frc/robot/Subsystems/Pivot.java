@@ -37,7 +37,7 @@ public class Pivot extends SubsystemBase {
   private TalonFXConfiguration pivotConfiguration;
   private final CANcoder pivotSensor = new CANcoder(9);
   private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
-  private final Gains pivotGains = new Gains(25, 0, 0, 0, 6);
+  private final Gains pivotGains = new Gains(25, 0, 0, 0, 10);
 
   private final TalonFX climberMotor = new TalonFX(14);
   private TalonFXConfiguration climberConfig;
@@ -49,6 +49,7 @@ public class Pivot extends SubsystemBase {
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
   private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(0, 0).getEntry();
+  private static final GenericEntry sensorAngleEntry = armTab.add("Sensor Angle", 0).withPosition(1, 0).getEntry();
   private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(0, 1).getEntry();
   private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(0, 2).getEntry();
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(0, 3).getEntry();
@@ -67,9 +68,9 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 2;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 2;
-    pivotConfiguration.MotionMagic.MotionMagicJerk = 50;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 5;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 14;
+    pivotConfiguration.MotionMagic.MotionMagicJerk = 200;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
     pivotConfiguration.Slot0.kD = pivotGains.D;
@@ -81,16 +82,18 @@ public class Pivot extends SubsystemBase {
 
     //set feedback sensor as a remote CANcoder, resets the rotor sensor position every time it publishes values
 
-    if (Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) {
-      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-      pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
-      pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (2 * Math.PI);
-    }
-    else {
-      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-      pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO / (2 * Math.PI);
-    }
+    // if (Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) {
+    //   pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    //   pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
+    //   pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (2 * Math.PI);
+    // } else {
+    //   pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+    //   pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO; // (2.0 * Math.PI);
+    // }
 
+    // pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+      pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO;
+    
     pivotMotor.getConfigurator().apply(pivotConfiguration);
 
     //---------------------------------------------------------------------------------------------------
@@ -110,19 +113,23 @@ public class Pivot extends SubsystemBase {
     climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     climberMotor.getConfigurator().apply(climberConfig);
+
+    pivotMotor.setPosition(pivotSensor.getPosition().getValue() * (2 * Math.PI));
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // angleEntry.setDouble(getLocalAngle().getDegrees());
+    angleEntry.setDouble(pivotMotor.getPosition().getValue());
+    sensorAngleEntry.setDouble(pivotSensor.getPosition().getValue() * 2 * Math.PI);
     // angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
     angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
     targetAngle.setDouble(holdPosition.getDegrees());
     climberModeEntry.setBoolean(climbMode);
 
     checkClimbStatus();
-    if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
+    //if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
   }
 
 //#region Angle Logic
@@ -150,7 +157,7 @@ public class Pivot extends SubsystemBase {
    * @return angle of arm
    */
   public Rotation2d getLocalAngle(){
-    return new Rotation2d(pivotMotor.getPosition().getValue());
+    return Rotation2d.fromRadians(pivotMotor.getPosition().getValue());
   }
 
   /**
