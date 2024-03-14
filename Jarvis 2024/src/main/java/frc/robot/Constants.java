@@ -101,7 +101,7 @@ public class Constants {
     
     public static class ArmConstants{
         public static final InvertedValue PIVOT_INVERTED = InvertedValue.CounterClockwise_Positive;
-        public static final double PIVOT_GEAR_RATIO = 64.45775; //30 * (72/24) * (72/16);
+        public static final double PIVOT_GEAR_RATIO = 405;
         public static final Rotation2d PIVOT_INITIALIZE_POSITION = Rotation2d.fromDegrees(-15);
         public static final double PIVOT_FEED_FORWARD = 0;
         //The angle made by the launcher's output with the pivot "arms" as the positive x-axis
@@ -114,7 +114,8 @@ public class Constants {
         public static final double NOTE_LAUNCH_SPEED = 5; //m/s
         public static final double NOTE_RETRACTION_TIME = 0.5;
         public static final boolean USE_REMOTE_PIVOT_SENSOR = false;
-        public static final double PIVOT_ENCODER_DEADZONE = 0.01; //rotations
-        public static final double MAX_PIVOT_DEVIATION = 0.1;
+        public static final double PIVOT_REST_AMBIGUITY = 0.01; //rad/s
+        public static final double REST_TIME = 2; //s
+        public static final double MAX_PIVOT_DEVIATION = 0.1; //rad
     }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.Subsystems;
 
+import java.sql.Driver;
 import java.util.List;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -22,6 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -36,6 +38,8 @@ public class Pivot extends SubsystemBase {
   private final TalonFX pivotMotor = new TalonFX(10);
   private TalonFXConfiguration pivotConfiguration;
   private final CANcoder pivotSensor = new CANcoder(9);
+  private double lastPivotPosition = 0;
+  private double pivotRestTime = -1;
   private final CANcoderConfiguration pivotEncoderConfig = new CANcoderConfiguration();
   private final Gains pivotGains = new Gains(25, 0, 0, 0, 10);
 
@@ -82,17 +86,14 @@ public class Pivot extends SubsystemBase {
 
     //set feedback sensor as a remote CANcoder, resets the rotor sensor position every time it publishes values
 
-    // if (Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) {
-    //   pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    //   pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
-    //   pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (2 * Math.PI);
-    // } else {
-    //   pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-    //   pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO; // (2.0 * Math.PI);
-    // }
-
-    // pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-      pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO;
+    if (Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) {
+      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      pivotConfiguration.Feedback.FeedbackRemoteSensorID = pivotSensor.getDeviceID();
+      pivotConfiguration.Feedback.SensorToMechanismRatio = 1 / (2 * Math.PI);
+    } else {
+      pivotConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+      pivotConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.PIVOT_GEAR_RATIO / (2.0 * Math.PI);
+    }
     
     pivotMotor.getConfigurator().apply(pivotConfiguration);
 
@@ -187,21 +188,22 @@ public class Pivot extends SubsystemBase {
   }
 
   /**
-   * Compare the rotor encoder's position with the remote sensor and update under these conditions:
-   * <pre>
-   *the difference between the rotor and remote sensor is too large
-   *the difference between the rotor and target position is too large
-   * </pre>
+   * Compare the rotor encoder's position with the remote sensor and update when minimal motion is detected
    */
   public void checkRotorEncoder() {
-    double sensorPosition = pivotSensor.getPosition().getValueAsDouble();
-    double rotorPosition = pivotMotor.getPosition().getValueAsDouble();// / Constants.ArmConstants.PIVOT_GEAR_RATIO;
+    double sensorPosition = pivotSensor.getPosition().getValueAsDouble() * 2 * Math.PI;
+    double rotorPosition = pivotMotor.getPosition().getValueAsDouble();
+    double currentTime = Timer.getFPGATimestamp();
 
-    double difference = Math.abs(sensorPosition - rotorPosition);
-    double error = Math.abs(rotorPosition - holdPosition.getRadians());
+    if (Math.abs(sensorPosition - lastPivotPosition) < ArmConstants.PIVOT_REST_AMBIGUITY)
+      pivotRestTime = currentTime;
+    else
+      pivotRestTime = -1;
 
-    if (difference > Constants.ArmConstants.MAX_PIVOT_DEVIATION || error > Constants.ArmConstants.PIVOT_ENCODER_DEADZONE)
-      pivotMotor.setPosition(sensorPosition /* * Constants.ArmConstants.PIVOT_GEAR_RATIO*/);
+    if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION)
+      pivotMotor.setPosition(sensorPosition);
+
+    lastPivotPosition = sensorPosition;
   }
 
 //#region Auto-Aim
