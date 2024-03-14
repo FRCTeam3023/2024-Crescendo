@@ -191,8 +191,8 @@ public class Pivot extends SubsystemBase {
    * Compare the rotor encoder's position with the remote sensor and update when minimal motion is detected
    */
   public void checkRotorEncoder() {
-    double sensorPosition = pivotSensor.getPosition().getValueAsDouble() * 2 * Math.PI;
-    double rotorPosition = pivotMotor.getPosition().getValueAsDouble();
+    double sensorPosition = pivotSensor.getPosition().getValueAsDouble();
+    double rotorPosition = pivotMotor.getPosition().getValueAsDouble() * 2 * Math.PI;
     double currentTime = Timer.getFPGATimestamp();
 
     if (Math.abs(sensorPosition - lastPivotPosition) < ArmConstants.PIVOT_REST_AMBIGUITY)
@@ -201,7 +201,7 @@ public class Pivot extends SubsystemBase {
       pivotRestTime = -1;
 
     if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION)
-      pivotMotor.setPosition(sensorPosition);
+      pivotMotor.setPosition(sensorPosition / (2 * Math.PI));
 
     lastPivotPosition = sensorPosition;
   }
