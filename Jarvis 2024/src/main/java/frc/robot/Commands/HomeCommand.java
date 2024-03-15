@@ -1,5 +1,7 @@
 package frc.robot.Commands;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drivetrain;
 
@@ -20,7 +22,6 @@ public class HomeCommand extends Command {
   @Override
   public void initialize() {
     drivetrain.resetHomeStatus();  //reset the status of the modules to false to initialize the homing process
-    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,7 +32,8 @@ public class HomeCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

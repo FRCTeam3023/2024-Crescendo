@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AmpOrient;
+import frc.robot.Commands.CommandList.*;
 import frc.robot.Commands.Autonomous;
+import frc.robot.Commands.CommandList;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Commands.PivotHold;
@@ -52,32 +54,10 @@ public class RobotContainer {
   private static final PIDDisplay pid = new PIDDisplay();
   private static final AmpOrient ampOrientCommand = new AmpOrient(drivetrain);
 
+  IntakeCommand command = new IntakeCommand();
+  IntakeCommand comman2d = new IntakeCommand();
+
   public static final AimPivot aimPivotCommand = new AimPivot(pivot, drivetrain);
-  public static final Command intakeCommand = new RunCommand(() -> intake.intakeTillSensed(1), intake);
-  public static final Command intakeNoSensorCommand = new InstantCommand(() -> intake.setIntakeSpeed(1));
-  public static final Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
-  public static final Command prepShooterCommand = new SequentialCommandGroup(
-            new ParallelRaceGroup(
-                new RunCommand(() -> intake.setIntakeSpeed(-.9)),
-                new WaitUntilCommand(() -> !intake.senseNote()),
-                new WaitCommand(1)
-            ),
-            new InstantCommand(()->intake.setIntakeSpeed(0))
-        );
-
-      
-  // public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
-  public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterVoltage(11.5));
-  public static final Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
-
-  public static final Command shootSequenceCommand = 
-      new SequentialCommandGroup(
-          prepShooterCommand,
-          shootCommand,
-          new WaitCommand(1),
-          intakeNoSensorCommand,
-          new InstantCommand(() -> Intake.noteLoaded = false)
-    );
         
 
 
@@ -85,6 +65,7 @@ public class RobotContainer {
   private static final GenericEntry angleSetpoint = armTab.add("Angle Setpoint", 110).withPosition(4, 2).getEntry();
 
   public RobotContainer() {
+    CommandList.setSubsystemRequirements(drivetrain, pivot, shooter, led, intake);
     configureBindings();
     drivetrain.setDefaultCommand(joystickDrive);
     pivot.setDefaultCommand(pivotHoldCommand);
@@ -112,9 +93,9 @@ public class RobotContainer {
     
     new JoystickButton(controller, 8).whileTrue(homeCommand);
     new JoystickButton(controller, 6)
-      .whileTrue(shootSequenceCommand)
+      .whileTrue(new ShootSequenceCommand())
       .onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
-    new JoystickButton(controller, 5).whileTrue(intakeCommand).onFalse(intakeStopCommand);
+    new JoystickButton(controller, 5).whileTrue(new IntakeCommand()).onFalse(new IntakeStopCommand());
     new JoystickButton(controller, 7).onTrue(new InstantCommand(
         () -> drivetrain.setPose(new Pose2d(drivetrain.getPose().getX(),drivetrain.getPose().getY(),new Rotation2d()))
       ));
@@ -132,10 +113,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(
-      // new InstantCommand(() -> drivetrain.calibrateGyro()),
-      homeCommand,
-      autonomous.getSelectedAuto()
-    );
+    return new AutoSequence(autonomous.getSelectedAuto());
   }
 }
