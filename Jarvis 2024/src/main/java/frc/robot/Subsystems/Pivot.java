@@ -139,7 +139,7 @@ public class Pivot extends SubsystemBase {
    * @param angle Local angle
    * @return Global angle
    */
-  public Rotation2d globalToLocalAngle(Rotation2d angle) {
+  public static Rotation2d globalToLocalAngle(Rotation2d angle) {
     return angle.minus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
 
@@ -149,7 +149,7 @@ public class Pivot extends SubsystemBase {
    * @param angle Global angle
    * @return Local angle
    */
-  public Rotation2d localToGlobalAngle(Rotation2d angle) {
+  public static Rotation2d localToGlobalAngle(Rotation2d angle) {
     return angle.plus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
 
@@ -200,8 +200,10 @@ public class Pivot extends SubsystemBase {
     else
       pivotRestTime = -1;
 
-    if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION)
-      pivotMotor.setPosition(sensorPosition / (2 * Math.PI));
+    if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) 
+        || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION
+        && sensorPosition < Math.toRadians(80) && sensorPosition > Math.toRadians(2))
+      pivotMotor.setPosition(sensorPosition);
 
     lastPivotPosition = sensorPosition;
   }

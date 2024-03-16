@@ -79,9 +79,9 @@ public class Autonomous {
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
         NamedCommands.registerCommand("Shooter Stop", new ShootStopCommand());
 
-        NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> pivot.setPivotAngle(new Rotation2d(), false), pivot));
-        NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(12), false), pivot));
-        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> pivot.setPivotAngle(Rotation2d.fromDegrees(115), false), pivot));
+        NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> new SetPivotHoldCommand(new Rotation2d())));
+        NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> new SetPivotHoldCommand(Rotation2d.fromDegrees(12))));
+        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> new SetPivotHoldCommand(Rotation2d.fromDegrees(115))));
         NamedCommands.registerCommand("Aim Pivot", new AimPivot(pivot, drivetrain));
 
         new PathPlannerAuto("Test Auto");

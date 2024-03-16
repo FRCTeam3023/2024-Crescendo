@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
@@ -58,20 +59,33 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+//#region Bindings
     /*
-     * Button layout on each controller:
-     * 1 - A
-     * 2 - B
-     * 3 - X
-     * 4 - Y
+     * Button layout on controller 1:
+     * 1 - A - Calibrate gyro
+     * 2 - B - Amp orient
+     * 3 - X - Toggle vision system
+     * 4 - Y - Toggle field relative drive
+     * 5 - leftBumper - Intake
+     * 6 - rightBumper - Shoot
+     * 7 - reset - Set heading to 0
+     * 8 - Start - Home swerve
+     * 9 - Left Joystick Pushbutton
+     * 10 - Right Joystick Pushbutton
+     *
+     * Button layout on controller 2:
+     * 1 - A - Set pivot to local 0
+     * 2 - B - Set pivot to fire when flush at speaker
+     * 3 - X - Auto aim
+     * 4 - Y - Aim at amp
      * 5 - leftBumper
      * 6 - rightBumper
      * 7 - reset
-     * 8 - Start 
+     * 8 - Start
      * 9 - Left Joystick Pushbutton
      * 10 - Right Joystick Pushbutton
      */
+//#endregion
 
 
     
@@ -89,17 +103,29 @@ public class RobotContainer {
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
-    new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> {Pivot.holdPosition = new Rotation2d(); Pivot.climbMode = false;}, pivot));
-    new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
+    new JoystickButton(controller2, 1).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(new Rotation2d()),
+      new InstantCommand(() -> Pivot.climbMode = false)
+    ));
+    new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(Rotation2d.fromDegrees(13)),
+      new InstantCommand(() -> Pivot.climbMode = false)
+    ));
     new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
       .whileTrue(new AimPivot(pivot, drivetrain));
-    new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
+    new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(110))),
+      new InstantCommand(() -> Pivot.climbMode = false)
+    ));
   }
 
   public Command getAutonomousCommand() {
     return new SequentialCommandGroup(
       new HomeCommand(drivetrain),
-      autonomous.getSelectedAuto()
+      new ParallelCommandGroup(
+        new PivotHold(pivot, controller),
+        autonomous.getSelectedAuto()
+      )
     );
   }
 }
