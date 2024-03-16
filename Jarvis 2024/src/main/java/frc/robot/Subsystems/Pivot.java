@@ -4,7 +4,6 @@
 
 package frc.robot.Subsystems;
 
-import java.sql.Driver;
 import java.util.List;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -115,17 +114,15 @@ public class Pivot extends SubsystemBase {
 
     climberMotor.getConfigurator().apply(climberConfig);
 
-    pivotMotor.setPosition(pivotSensor.getPosition().getValue() * (2 * Math.PI));
+    pivotMotor.setPosition(getPivotEncoderPosition().getRadians());
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    // angleEntry.setDouble(getLocalAngle().getDegrees());
-    angleEntry.setDouble(pivotMotor.getPosition().getValue());
-    sensorAngleEntry.setDouble(pivotSensor.getPosition().getValue() * 2 * Math.PI);
-    // angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
-    angleError.setDouble(Math.abs(getLocalAngle().getDegrees() - holdPosition.getDegrees()));
+    angleEntry.setDouble(getPivotMotorPosition().getDegrees());
+    sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
+    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
+    angleError.setDouble(getLocalAngle().getDegrees() - holdPosition.getDegrees());
     targetAngle.setDouble(holdPosition.getDegrees());
     climberModeEntry.setBoolean(climbMode);
 
@@ -139,7 +136,7 @@ public class Pivot extends SubsystemBase {
    * @param angle Local angle
    * @return Global angle
    */
-  public Rotation2d globalToLocalAngle(Rotation2d angle) {
+  public static Rotation2d globalToLocalAngle(Rotation2d angle) {
     return angle.minus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
 
@@ -149,7 +146,7 @@ public class Pivot extends SubsystemBase {
    * @param angle Global angle
    * @return Local angle
    */
-  public Rotation2d localToGlobalAngle(Rotation2d angle) {
+  public static Rotation2d localToGlobalAngle(Rotation2d angle) {
     return angle.plus(ArmConstants.PIVOT_INITIALIZE_POSITION);
   }
 
@@ -169,6 +166,22 @@ public class Pivot extends SubsystemBase {
     return localToGlobalAngle(getLocalAngle());
   }
 //#endregion
+
+/**
+ * Returns the position of the cancoder for the pivot 
+ * @return Rotation2d of cancoder position - local angle
+ */
+  public Rotation2d getPivotEncoderPosition(){
+    return Rotation2d.fromRotations(pivotSensor.getPosition().getValue());
+  }
+
+  /**
+   * Returns the postion of the rotor sensor for the pivot - local angle
+   * @return Current pivot position
+   */
+  public Rotation2d getPivotMotorPosition(){
+    return Rotation2d.fromRadians(pivotMotor.getPosition().getValue());
+  }
 
   /**
    * Set the closed loop motion magic control target of the pivot joint, adjustable between global and local control.
@@ -200,8 +213,10 @@ public class Pivot extends SubsystemBase {
     else
       pivotRestTime = -1;
 
-    if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION)
-      pivotMotor.setPosition(sensorPosition / (2 * Math.PI));
+    if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) 
+        || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION
+        && sensorPosition < Math.toRadians(80) && sensorPosition > Math.toRadians(2))
+      pivotMotor.setPosition(sensorPosition);
 
     lastPivotPosition = sensorPosition;
   }
@@ -282,4 +297,7 @@ public class Pivot extends SubsystemBase {
   public void setClimberOutput(double speed){
     climberMotor.set(speed);
   }
+
+
+  
 }

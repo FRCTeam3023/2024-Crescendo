@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -83,6 +84,11 @@ public class CommandList {
                 new ShootStopCommand(),
                 new InstantCommand(() -> Intake.noteLoaded = false)
             );
+        }
+    }
+    public static final class SetPivotHoldCommand extends FunctionalCommand {
+        public SetPivotHoldCommand(Rotation2d target) {
+            super(() -> {}, () -> Pivot.holdPosition = target, interrupted -> {}, () -> true);
         }
     }
 }
