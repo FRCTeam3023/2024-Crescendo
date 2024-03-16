@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LED;
@@ -79,6 +78,9 @@ public class CommandList {
                 new ShootCommand(),
                 new WaitCommand(1),
                 new IntakeNoSensorCommand(),
+                new WaitCommand(1),
+                new IntakeStopCommand(),
+                new ShootStopCommand(),
                 new InstantCommand(() -> Intake.noteLoaded = false)
             );
         }
