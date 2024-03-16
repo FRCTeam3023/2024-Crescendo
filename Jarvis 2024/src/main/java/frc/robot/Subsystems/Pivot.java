@@ -22,8 +22,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -119,14 +119,9 @@ public class Pivot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    angleEntry.setDouble(getPivotMotorPosition().getDegrees());
-    sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
-    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
-    angleError.setDouble(getLocalAngle().getDegrees() - holdPosition.getDegrees());
-    targetAngle.setDouble(holdPosition.getDegrees());
-    climberModeEntry.setBoolean(climbMode);
-
+    telemUpdate();
     checkClimbStatus();
+    checkHoldPositionDisabled();
     //if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
   }
 
@@ -299,6 +294,18 @@ public class Pivot extends SubsystemBase {
     climberMotor.set(speed);
   }
 
-
+  public void checkHoldPositionDisabled(){
+    if(DriverStation.isDisabled()){
+      holdPosition = getPivotMotorPosition();
+    }
+  }
   
+  public void telemUpdate(){
+    angleEntry.setDouble(getPivotMotorPosition().getDegrees());
+    sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
+    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
+    angleError.setDouble(getLocalAngle().getDegrees() - holdPosition.getDegrees());
+    targetAngle.setDouble(holdPosition.getDegrees());
+    climberModeEntry.setBoolean(climbMode);
+  }
 }
