@@ -189,6 +189,7 @@ public class Pivot extends SubsystemBase {
    * @param isGlobal if angle being passed in is global or local
    */
   public void setPivotAngle(Rotation2d angle, boolean isGlobal) {
+    climbMode = false;
     if (isGlobal) angle = globalToLocalAngle(angle);
     holdPosition = angle;
     angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.PIVOT_MAX.getRadians()));
