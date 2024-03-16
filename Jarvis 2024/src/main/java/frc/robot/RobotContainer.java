@@ -86,8 +86,6 @@ public class RobotContainer {
      * 10 - Right Joystick Pushbutton
      */
 //#endregion
-
-
     
     new JoystickButton(controller, 8).whileTrue(new HomeCommand(drivetrain));
     new JoystickButton(controller, 6)
@@ -103,20 +101,11 @@ public class RobotContainer {
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
-    new JoystickButton(controller2, 1).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(new Rotation2d()),
-      new InstantCommand(() -> Pivot.climbMode = false)
-    ));
-    new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(Rotation2d.fromDegrees(13)),
-      new InstantCommand(() -> Pivot.climbMode = false)
-    ));
+    new JoystickButton(controller2, 1).onTrue(new SetPivotHoldCommand(new Rotation2d()));
+    new JoystickButton(controller2, 2).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(13)));
     new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
       .whileTrue(new AimPivot(pivot, drivetrain));
-    new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(110))),
-      new InstantCommand(() -> Pivot.climbMode = false)
-    ));
+    new JoystickButton(controller2, 4).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(110))));
   }
 
   public Command getAutonomousCommand() {
