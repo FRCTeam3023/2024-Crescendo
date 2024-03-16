@@ -12,12 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AmpOrient;
@@ -48,18 +43,7 @@ public class RobotContainer {
   private static final Autonomous autonomous = new Autonomous(pivot,shooter,intake, drivetrain);
   private static final LED led = new LED();
 
-  private static final JoystickDrive joystickDrive = new JoystickDrive(drivetrain, controller, controller2);
-  private static final HomeCommand homeCommand = new HomeCommand(drivetrain);
-  private static final PivotHold pivotHoldCommand = new PivotHold(pivot, controller2);
-  private static final PIDDisplay pid = new PIDDisplay();
-  private static final AmpOrient ampOrientCommand = new AmpOrient(drivetrain);
-
-  IntakeCommand command = new IntakeCommand();
-  IntakeCommand comman2d = new IntakeCommand();
-
-  public static final AimPivot aimPivotCommand = new AimPivot(pivot, drivetrain);
-        
-
+   private static final PIDDisplay pid = new PIDDisplay();
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
   private static final GenericEntry angleSetpoint = armTab.add("Angle Setpoint", 110).withPosition(4, 2).getEntry();
@@ -67,8 +51,8 @@ public class RobotContainer {
   public RobotContainer() {
     CommandList.setSubsystemRequirements(drivetrain, pivot, shooter, led, intake);
     configureBindings();
-    drivetrain.setDefaultCommand(joystickDrive);
-    pivot.setDefaultCommand(pivotHoldCommand);
+    drivetrain.setDefaultCommand(new JoystickDrive(drivetrain, controller, controller2));
+    pivot.setDefaultCommand(new PivotHold(pivot, controller2));
     // shooter.setDefaultCommand(intakeShooterControl);
     drivetrain.calibrateGyro();
   }
@@ -91,7 +75,7 @@ public class RobotContainer {
 
 
     
-    new JoystickButton(controller, 8).whileTrue(homeCommand);
+    new JoystickButton(controller, 8).whileTrue(new HomeCommand(drivetrain));
     new JoystickButton(controller, 6)
       .whileTrue(new ShootSequenceCommand())
       .onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
@@ -101,18 +85,21 @@ public class RobotContainer {
       ));
 
     new JoystickButton(controller, 1).onTrue(new InstantCommand(() -> drivetrain.calibrateGyro()));
-    new JoystickButton(controller, 2).whileTrue(ampOrientCommand);
+    new JoystickButton(controller, 2).whileTrue(new AmpOrient(drivetrain));
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
     new JoystickButton(controller2, 1).onTrue(new InstantCommand(() -> {Pivot.holdPosition = new Rotation2d(); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 2).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(13); Pivot.climbMode = false;}, pivot));
     new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
-      .whileTrue(aimPivotCommand);
+      .whileTrue(new AimPivot(pivot, drivetrain));
     new JoystickButton(controller2, 4).onTrue(new InstantCommand(() -> {Pivot.holdPosition = Rotation2d.fromDegrees(angleSetpoint.getDouble(110)); Pivot.climbMode = false;}, pivot));
   }
 
   public Command getAutonomousCommand() {
-    return new AutoSequence(autonomous.getSelectedAuto());
+    return new SequentialCommandGroup(
+      new HomeCommand(drivetrain),
+      autonomous.getSelectedAuto()
+    );
   }
 }

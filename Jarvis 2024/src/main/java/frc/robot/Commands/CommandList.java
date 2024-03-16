@@ -83,12 +83,4 @@ public class CommandList {
             );
         }
     }
-    public static final class AutoSequence extends SequentialCommandGroup {
-        public AutoSequence(Command autoCommand) {
-            addCommands(
-                new HomeCommand(drivetrain),
-                autoCommand
-            );
-        }
-    }
 }
