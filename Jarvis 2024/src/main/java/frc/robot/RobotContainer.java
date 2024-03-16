@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.CommandList.*;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.CommandList;
 import frc.robot.Commands.HomeCommand;
@@ -101,11 +102,11 @@ public class RobotContainer {
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
-    new JoystickButton(controller2, 1).onTrue(new SetPivotHoldCommand(new Rotation2d()));
-    new JoystickButton(controller2, 2).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(13)));
+    new JoystickButton(controller2, 1).onTrue(new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
+    new JoystickButton(controller2, 2).onTrue(new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
     new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
       .whileTrue(new AimPivot(pivot, drivetrain));
-    new JoystickButton(controller2, 4).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(110))));
+    new JoystickButton(controller2, 4).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))));
   }
 
   public Command getAutonomousCommand() {

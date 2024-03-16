@@ -19,6 +19,7 @@ import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Commands.CommandList.*;
+import frc.robot.Constants.ArmConstants;
 
 /** Add your docs here. */
 public class Autonomous {
@@ -26,50 +27,6 @@ public class Autonomous {
     SendableChooser<Command> autoChooser;
 
     public Autonomous(Pivot pivot, Shooter shooter, Intake intake, Drivetrain drivetrain){
-        // Command intakeCommand = new RunCommand(() -> intake.setIntakeSpeed(0.65), intake);
-        // Command intakeStopCommand = new InstantCommand(() -> intake.setIntakeSpeed(0));
-        // Command prepShooterCommand = new SequentialCommandGroup(
-        //     new ParallelRaceGroup(
-        //         new WaitCommand(.15),
-        //         new RunCommand(() -> intake.setIntakeSpeed(-.25))
-        //     ),
-        //     new InstantCommand(()->intake.setIntakeSpeed(0))
-        // );
-        // Command shootCommand = new RunCommand(() -> shooter.setShooterDutyCycle(1), shooter);
-        // Command shootStopCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(0), shooter);
-
-        // Command shootSequenceCommand = new ParallelRaceGroup(
-        //     new SequentialCommandGroup(
-        //         prepShooterCommand,
-        //         shootCommand
-        //     ),
-        //     new SequentialCommandGroup(
-        //         new WaitCommand(2),
-        //         intakeCommand
-        //     ),
-        //     new WaitCommand(3.5)
-        // );
-      
-        // public static final Command shootCommand = new InstantCommand(() -> shooter.setShooterDutyCycle(1), shooter);
-
-        // Command shootAmpSequenceCommand = 
-        //     new SequentialCommandGroup(
-        //         new InstantCommand(() -> intake.setIntakeSpeed(-.25)),
-        //         new WaitUntilCommand(() -> !intake.senseNote()),
-        //         new InstantCommand(()->intake.setIntakeSpeed(0))
-        //         // prepShooterCommand
-        //         // shootCommand,
-        //         // new WaitCommand(0.5),
-        //         // intakeNoSensorCommand,
-        //         // new WaitCommand(1),
-        //         // intakeStopCommand,
-        //         // shootStopCommand,
-        //         // new InstantCommand(()-> Intake.noteLoaded = false)
-        //     );
-
-
-        
-
 
         NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Intake Stop", new IntakeStopCommand());
@@ -79,9 +36,9 @@ public class Autonomous {
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
         NamedCommands.registerCommand("Shooter Stop", new ShootStopCommand());
 
-        NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> new SetPivotHoldCommand(new Rotation2d())));
-        NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> new SetPivotHoldCommand(Rotation2d.fromDegrees(12))));
-        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> new SetPivotHoldCommand(Rotation2d.fromDegrees(115))));
+        NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION)));
+        NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION)));
+        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.AMP_POSITION)));
         NamedCommands.registerCommand("Aim Pivot", new AimPivot(pivot, drivetrain));
 
         new PathPlannerAuto("Test Auto");
@@ -99,7 +56,7 @@ public class Autonomous {
         new PathPlannerAuto("Leave Speaker");
 
         autoChooser = AutoBuilder.buildAutoChooser();
-        autoTab.add(autoChooser).withPosition(0, 0);
+        autoTab.add(autoChooser).withPosition(0, 0).withSize(5, 1);
     }
 
     public Command getSelectedAuto(){
