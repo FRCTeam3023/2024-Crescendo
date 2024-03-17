@@ -28,7 +28,6 @@ public class Autonomous {
     SendableChooser<Command> autoChooser;
 
     public Autonomous(Pivot pivot, Shooter shooter, Intake intake, Drivetrain drivetrain){
-
         NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Intake Stop", new IntakeStopCommand());
         NamedCommands.registerCommand("Prep Shooter", new PrepShooterCommand());
@@ -41,13 +40,9 @@ public class Autonomous {
         NamedCommands.registerCommand("Pivot Speaker", new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
         NamedCommands.registerCommand("Pivot Amp", new SetPivotHoldCommand(ArmConstants.AMP_POSITION));
         NamedCommands.registerCommand("Aim Pivot", new AimPivot(drivetrain));
-        NamedCommands.registerCommand("Aim and Fire", new ParallelRaceGroup(
-            new AimPivot(drivetrain),
+        NamedCommands.registerCommand("Aim and Shoot", new SequentialCommandGroup(
             new FaceSpeakerCommand(),
-            new SequentialCommandGroup(
-                new WaitCommand(2),
-                new ShootSequenceCommand()
-            )
+            new ShootSequenceCommand()
         ));
 
         new PathPlannerAuto("Test Auto");
@@ -68,6 +63,6 @@ public class Autonomous {
     }
 
     public Command getSelectedAuto(){
-        return autoChooser.getSelected();
+        return AutoBuilder.buildAuto(autoChooser.getSelected().getName());
     }
 }

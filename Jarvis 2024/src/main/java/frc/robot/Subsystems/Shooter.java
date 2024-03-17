@@ -4,11 +4,11 @@
 
 package frc.robot.Subsystems;
 
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -33,8 +33,8 @@ public class Shooter extends SubsystemBase {
   private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 2).getEntry();
 
 
-  private final Gains shooterGains = new Gains(0,1/2500,12);  
-  private double targetRPM;
+  private final Gains shooterGains = new Gains(0,1.0/Constants.ArmConstants.SHOOTER_RPM,1);  
+  private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
 
   public Shooter() {
     
@@ -48,7 +48,9 @@ public class Shooter extends SubsystemBase {
     leftPID.setFF(shooterGains.F);
     leftPID.setOutputRange(-shooterGains.peakOutput,shooterGains.peakOutput);
 
-    rightPID = leftPID;
+    rightPID.setP(shooterGains.P);
+    rightPID.setFF(shooterGains.F);
+    rightPID.setOutputRange(-shooterGains.peakOutput,shooterGains.peakOutput);
 
     leftShooterMotor.setInverted(true);
     rightShooterMotor.setInverted(false);
@@ -85,6 +87,7 @@ public class Shooter extends SubsystemBase {
   public boolean isFlywheelReady() {
     double leftError = Math.abs(leftShooterMotor.getEncoder().getVelocity() - targetRPM);
     double rightError = Math.abs(rightShooterMotor.getEncoder().getVelocity() - targetRPM);
+
     return leftError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR && rightError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR;
   }
 

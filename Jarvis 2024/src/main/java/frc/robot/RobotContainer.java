@@ -13,18 +13,18 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.CommandList;
-import frc.robot.Commands.CommandList.IntakeCommand;
-import frc.robot.Commands.CommandList.IntakeStopCommand;
-import frc.robot.Commands.CommandList.SetPivotHoldCommand;
-import frc.robot.Commands.CommandList.ShootSequenceCommand;
+import frc.robot.Commands.CommandList.*;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Commands.PivotHold;
@@ -108,11 +108,28 @@ public class RobotContainer {
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
-    new JoystickButton(controller2, 1).onTrue(new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
-    new JoystickButton(controller2, 2).onTrue(new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
-    new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
-      .whileTrue(new AimPivot(drivetrain));
-    new JoystickButton(controller2, 4).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))));
+    new JoystickButton(controller2, 1).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION),
+      new StopShooterCommand(),
+      new ParallelRaceGroup(
+        new IntakeCommand(),
+        new WaitCommand(0.5)
+      ),
+      new IntakeStopCommand()
+    ));
+    new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION),
+      new PrimeShootSequenceCommand()
+    ));
+    new JoystickButton(controller2, 3).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION),
+      new InstantCommand(() -> drivetrain.resetTurnController()),
+      new PrimeShootSequenceCommand()
+    )).whileTrue(new AimPivot(drivetrain));
+    new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
+      new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))),
+      new PrimeShootSequenceCommand()
+    ));
   }
 
   public Command getAutonomousCommand() {

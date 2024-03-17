@@ -124,9 +124,9 @@ public class Constants {
         public static final Rotation2d LAUNCHER_ANGLE_WITH_PIVOT = Rotation2d.fromDegrees(45);
 
         /**What speed the shooter flywheels should spin at*/
-        public static final double SHOOTER_RPM = 3000;
+        public static final double SHOOTER_RPM = 2600;
         /**The maximum difference between the shooter's RPM and the target RPM*/
-        public static final double MAX_SHOOTER_RPM_ERROR = 10;
+        public static final double MAX_SHOOTER_RPM_ERROR = 100;
 
         /**Height of the pivot point in meters */
         public static final double PIVOT_HEIGHT = Units.inchesToMeters(16);
@@ -148,6 +148,8 @@ public class Constants {
         /**Minimum wait time for the encoder to reset rotor relative position */ 
         public static final double REST_TIME = 2; //s
         /**Minimum amount in radians the relative positions of the remote sensor and the rotor sensor are differing for the code to reset the offset between the two*/
+        public static final double MAX_PIVOT_SENSOR_DEVIATION = 0.1; //rad
+        /**The maximum difference between the pivot and target angle*/
         public static final double MAX_PIVOT_DEVIATION = 0.1; //rad
     }
 }

@@ -44,7 +44,7 @@ public class CommandList {
 
     public static final class IntakeCommand extends FunctionalCommand {
         public IntakeCommand() {
-            super(() -> {}, () -> intake.intakeTillSensed(1), interrupted -> {}, () -> false, intake);
+            super(() -> {}, () -> intake.intakeTillSensed(1), interrupted -> {}, intake::senseNote, intake);
         }
     }
     public static final class IntakeNoSensorCommand extends FunctionalCommand {
@@ -71,12 +71,12 @@ public class CommandList {
     }
     public static final class SpinShooterCommand extends FunctionalCommand {
         public SpinShooterCommand() {
-            super(() -> {}, () -> shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM), interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
+            super(() -> {shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);}, () -> {}, interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
     public static final class StopShooterCommand extends FunctionalCommand {
         public StopShooterCommand() {
-            super(() -> {}, () -> shooter.setShooterVoltage(0), interrupted -> {}, () -> true, shooter);
+            super(() -> {}, () -> shooter.setShooterRPM(0), interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
     public static final class ShootSequenceCommand extends SequentialCommandGroup {
@@ -101,7 +101,6 @@ public class CommandList {
     }
     public static final class FaceSpeakerCommand extends ParallelCommandGroup {
         public FaceSpeakerCommand() {
-            addRequirements(drivetrain);
             addCommands(
                 new AimPivot(drivetrain),
                 new RunCommand(() -> drivetrain.driveFacingTarget(
@@ -109,6 +108,15 @@ public class CommandList {
                     true, 
                     DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Blue) 
                         ? Constants.blueSpeakerPose : Constants.redSpeakerPose), drivetrain)
+            );
+        }
+    }
+    public static final class PrimeShootSequenceCommand extends SequentialCommandGroup {
+        public PrimeShootSequenceCommand() {
+            addCommands(
+                new WaitUntilCommand(() -> pivot.noteClearsGround()),
+                new PrepShooterCommand(),
+                new SpinShooterCommand()
             );
         }
     }

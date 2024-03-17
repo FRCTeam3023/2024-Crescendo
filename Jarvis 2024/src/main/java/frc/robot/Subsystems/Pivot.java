@@ -190,6 +190,22 @@ public class Pivot extends SubsystemBase {
     angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.PIVOT_MAX.getRadians()));
     pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
   }
+
+  /**
+   * Check if pivot motor is at holdPosition
+   * @return True if the difference is small enough
+   */
+  public boolean isAtTargetAngle() {
+    return Math.abs(holdPosition.getRadians() - pivotMotor.getPosition().getValueAsDouble()) < Constants.ArmConstants.MAX_PIVOT_DEVIATION;
+  }
+
+  /**
+   * Check if prepping the shooter will cause the note to hit the ground
+   * @return True if the note does not hit the ground when prepping the shooter
+   */
+  public boolean noteClearsGround() {
+    return pivotMotor.getPosition().getValueAsDouble() > Math.toRadians(10);
+  }
   
   public void setPivotDutyCycle(double speed){
     pivotMotor.setControl(new DutyCycleOut(speed));
@@ -210,7 +226,7 @@ public class Pivot extends SubsystemBase {
       pivotRestTime = -1;
 
     if ((currentTime - pivotRestTime > ArmConstants.REST_TIME && pivotRestTime != -1) 
-        || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_DEVIATION
+        || Math.abs(sensorPosition - rotorPosition) > ArmConstants.MAX_PIVOT_SENSOR_DEVIATION
         && sensorPosition < Math.toRadians(80) && sensorPosition > Math.toRadians(2))
       pivotMotor.setPosition(sensorPosition);
 
