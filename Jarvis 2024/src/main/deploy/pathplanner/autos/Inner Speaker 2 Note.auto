@@ -2,44 +2,56 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.1852004303152672,
-      "y": 6.686887667641241
+      "x": 0.7417791758660457,
+      "y": 4.410523436431489
     },
-    "rotation": 28.300755766006308
+    "rotation": -55.95406264339838
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Pivot Speaker"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Aim Pivot"
+                  "name": "Shoot Sequence"
                 }
               }
             ]
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Pivot Pickup"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Top Speaker Wide"
+            "pathName": "Inner Speaker to Inner Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Inner Note to Inner Speaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Aim Pivot"
+            "name": "Shoot Sequence"
           }
         }
       ]

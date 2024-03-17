@@ -43,7 +43,7 @@ public class SwerveModule {
 
     private Gains turnGains = new Gains(.6, 1);
 
-    private Gains driveGains = new Gains(5, 0, 0.15, 2.65, 12);
+    private Gains driveGains = new Gains(5, 0, 0.15, 3, 12);
 
 
     // private Gains driveGains = new Gains(0 /*0.05*/,0,0,0.05,0,1);
@@ -96,7 +96,7 @@ public class SwerveModule {
         driveConfiguration = new TalonFXConfiguration();
         driveConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveConfiguration.MotorOutput.Inverted = inverted;
-        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 6;
+        driveConfiguration.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 4;
 
         driveConfiguration.Slot0.kP = driveGains.P;
         driveConfiguration.Slot0.kI = driveGains.I;

@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Pivot;
@@ -36,10 +39,18 @@ public class Autonomous {
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
         NamedCommands.registerCommand("Shooter Stop", new ShootStopCommand());
 
-        NamedCommands.registerCommand("Pivot Pickup", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION)));
-        NamedCommands.registerCommand("Pivot Speaker", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION)));
-        NamedCommands.registerCommand("Pivot Amp", new RunCommand(() -> new SetPivotHoldCommand(ArmConstants.AMP_POSITION)));
-        NamedCommands.registerCommand("Aim Pivot", new AimPivot(pivot, drivetrain));
+        NamedCommands.registerCommand("Pivot Pickup", new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
+        NamedCommands.registerCommand("Pivot Speaker", new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
+        NamedCommands.registerCommand("Pivot Amp", new SetPivotHoldCommand(ArmConstants.AMP_POSITION));
+        NamedCommands.registerCommand("Aim Pivot", new AimPivot(drivetrain));
+        // NamedCommands.registerCommand("Aim and Fire", new ParallelRaceGroup(
+        //     new AimPivot(drivetrain),
+
+        //     new SequentialCommandGroup(
+        //         new WaitCommand(2),
+        //         new ShootSequenceCommand()
+        //     )
+        // ));
 
         new PathPlannerAuto("Test Auto");
         new PathPlannerAuto("2 Note Center");
@@ -50,10 +61,9 @@ public class Autonomous {
         new PathPlannerAuto("2 Note Top");
         new PathPlannerAuto("2 Note Bottom");
         new PathPlannerAuto("2 Note Amp");
-        new PathPlannerAuto("Amp Long");
-        new PathPlannerAuto("2 Note Amp Modified");
         new PathPlannerAuto("Amp Hide");
         new PathPlannerAuto("Leave Speaker");
+        new PathPlannerAuto("Inner Speaker 2 Note");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add(autoChooser).withPosition(0, 0).withSize(5, 1);

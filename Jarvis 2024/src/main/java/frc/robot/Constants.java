@@ -59,7 +59,7 @@ public class Constants {
         public static final double TURN_GEARING = 2.89 * 2.89 * 6;
 
         /**Diameter of the billet wheel */
-        public static final double WHEEL_DIA = 3.75;
+        public static final double WHEEL_DIA = 3.88;
 
     }
 
@@ -104,7 +104,7 @@ public class Constants {
         /**Angle for floor pickup */
         public static final Rotation2d PICKUP_POSITION = new Rotation2d();
         /**Angle for speaker shot from the subwoofer */
-        public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(12);
+        public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(13);
         /**Angle for shooting down into the Amp */
         public static final Rotation2d AMP_POSITION = Rotation2d.fromDegrees(110);
 
@@ -112,11 +112,12 @@ public class Constants {
         public static final InvertedValue PIVOT_INVERTED = InvertedValue.CounterClockwise_Positive;
 
         /**Gear ratio from pivot motor rotor to mechanism */
-        public static final double PIVOT_GEAR_RATIO = 405;
+        public static final double PIVOT_GEAR_RATIO = 30.0 * (72.0/24.0) * (36.0/12.0);
 
         /**Relative to horizontal in global angle where is 0 degrees local*/
         public static final Rotation2d PIVOT_INITIALIZE_POSITION = Rotation2d.fromDegrees(-15);
 
+        
         public static final double PIVOT_FEED_FORWARD = 0;
 
         /**The angle made by the launcher's output with the pivot "arms" as the positive x-axis*/
@@ -131,12 +132,12 @@ public class Constants {
         /**Max allowable pivot angle relative to local origin */
         public static final Rotation2d PIVOT_MAX = Rotation2d.fromDegrees(115);
         /**Cancoder Magnet offset in rotations relative to local origin */
-        public static final double PIVOT_SENSOR_OFFSET = -.202;
+        public static final double PIVOT_SENSOR_OFFSET = .181;
 
         public static final double NOTE_LAUNCH_SPEED = 5; //m/s
         
         /**True if set to using remote CANCoder, false if rotor sensor */
-        public static final boolean USE_REMOTE_PIVOT_SENSOR = false;
+        public static final boolean USE_REMOTE_PIVOT_SENSOR = true;
         /**Maximum movement speed in rad/s still allowable to reset the position of the rotor relative to the cancoder*/
         public static final double PIVOT_REST_AMBIGUITY = 0.01;
         /**Minimum wait time for the encoder to reset rotor relative position */ 

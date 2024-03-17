@@ -35,7 +35,7 @@ public class LED extends SubsystemBase {
   //Descending priority
   public COLORS getColorState() {
     if (Pivot.climbMode) return COLORS.YELLOW;
-    if (Intake.noteLoaded) return COLORS.GREEN;
+    if (Intake.noteSensed) return COLORS.GREEN;
     return isRed ? COLORS.RED : COLORS.BLUE;
   }
 

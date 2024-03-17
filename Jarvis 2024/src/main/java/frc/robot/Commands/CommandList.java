@@ -5,14 +5,18 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LED;
@@ -64,12 +68,12 @@ public class CommandList {
     }
     public static final class ShootCommand extends FunctionalCommand {
         public ShootCommand() {
-            super(() -> {}, () -> shooter.setShooterVoltage(11.5), interrupted -> {}, () -> true, intake);
+            super(() -> {}, () -> shooter.setShooterVoltage(12.0), interrupted -> {}, () -> true, shooter);
         }
     }
     public static final class ShootStopCommand extends FunctionalCommand {
         public ShootStopCommand() {
-            super(() -> {}, () -> shooter.setShooterVoltage(0), interrupted -> {}, () -> true, intake);
+            super(() -> {}, () -> shooter.setShooterVoltage(0), interrupted -> {}, () -> true, shooter);
         }
     }
     public static final class ShootSequenceCommand extends SequentialCommandGroup {
@@ -81,14 +85,21 @@ public class CommandList {
                 new IntakeNoSensorCommand(),
                 new WaitCommand(1),
                 new IntakeStopCommand(),
-                new ShootStopCommand(),
-                new InstantCommand(() -> Intake.noteLoaded = false)
+                new ShootStopCommand()
             );
         }
     }
     public static final class SetPivotHoldCommand extends FunctionalCommand {
         public SetPivotHoldCommand(Rotation2d target) {
-            super(() -> {}, () -> Pivot.holdPosition = target, interrupted -> {}, () -> true);
+            super(() -> {}, () -> {Pivot.holdPosition = target; Pivot.climbMode = false;}, interrupted -> {}, () -> true);
         }
     }
+    // public static final class FaceTargetCommand extends ParallelCommandGroup {
+    //     public FaceTargetCommand() {
+    //         addCommands(
+    //             new AimPivot(drivetrain),
+    //             new RunCommand(() -> drivetrain.driveFacingTarget(DriverStation.getAlliance().isPresent().get() == Alliance.Blue ? Constants.blueSpeakerPose : Constants.redSpeakerPose, isScheduled(), null);, drivetrain)
+    //         );
+    //     }
+    // }
 }

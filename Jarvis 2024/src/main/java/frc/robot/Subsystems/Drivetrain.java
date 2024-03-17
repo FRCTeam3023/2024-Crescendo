@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Commands.JoystickDrive;
@@ -79,7 +80,7 @@ public class Drivetrain extends SubsystemBase {
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
     MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    MatBuilder.fill(Nat.N3(), Nat.N1(),0.75,0.75,0.75) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.6,0.6,0.6) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -94,6 +95,7 @@ public class Drivetrain extends SubsystemBase {
   private static GenericEntry poseY = telemTab.add("Override Pose Y", 0).withPosition(2, 1).getEntry();
   private static GenericEntry poseH = telemTab.add("Override Pose H", 0).withPosition(3, 1).getEntry();
   private static GenericEntry gyroFaultEntry = telemTab.add("Gyro Fault", false).withPosition(3, 2).getEntry();
+  private static Field2d field = new Field2d();
 
   public Drivetrain() {
     turnController.enableContinuousInput(-Math.PI, Math.PI);
@@ -131,7 +133,7 @@ public class Drivetrain extends SubsystemBase {
     PIDDisplay.PIDList.addOption("Swerve Drive Motors", swerveDriveMotors);
     PIDDisplay.PIDList.addOption("Swerve Turn Motors", swerveTurnMotors);
 
-
+    telemTab.add(field).withPosition(5, 1).withSize(3, 3);
   }
 
   @Override
@@ -149,6 +151,8 @@ public class Drivetrain extends SubsystemBase {
 
     poseEntry.setString(getPose().toString());    
     displayAllModuleSwitches();
+
+    field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
   }
 
 //#region Driving

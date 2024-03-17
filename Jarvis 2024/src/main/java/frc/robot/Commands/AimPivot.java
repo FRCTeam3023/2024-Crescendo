@@ -11,12 +11,9 @@ import frc.robot.Subsystems.Pivot;
 public class AimPivot extends Command {
   /** Creates a new AimPivot. */
   Drivetrain drivetrain;
-  Pivot pivot;
 
-  public AimPivot(Pivot pivot, Drivetrain drivetrain) {
-    this.pivot = pivot;
+  public AimPivot(Drivetrain drivetrain) {
     this.drivetrain = drivetrain;
-    addRequirements(pivot);
   }
 
   @Override
@@ -26,7 +23,7 @@ public class AimPivot extends Command {
 
   @Override
   public void execute() {
-    pivot.faceSpeaker(drivetrain.getPose());
+    Pivot.faceSpeaker(drivetrain.getPose());
   }
 
   @Override

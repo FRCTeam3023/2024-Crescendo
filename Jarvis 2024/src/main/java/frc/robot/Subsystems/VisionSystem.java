@@ -37,13 +37,12 @@ public class VisionSystem extends SubsystemBase {
   private static boolean intakeCameraInitialized = false;
 
   public VisionSystem() {
-    if (!intakeCameraInitialized)
-      try {telemTab.addCamera("Intake View", "IntakeView", "mjpg:http://10.30.23.11:1184/stream.mjpg");}
-      catch(Exception e) {System.out.println("Failed to initialize intake camera stream: " + e.getMessage());}
-    intakeCameraInitialized = true;
+    // if (!intakeCameraInitialized)
+    //   try {telemTab.addCamera("Processed Feed", "VisionCamera", "mjpg:http://photonvision.local:1182/stream.mjpg");}
+    //   catch(Exception e) {System.out.println("Failed to initialize intake camera stream: " + e.getMessage());}
+    // intakeCameraInitialized = true;
     // telemTab.add(CameraServer.getVideo("IntakeView").getSource());
     PhotonTab.add(field);
-
   }
 
   @Override

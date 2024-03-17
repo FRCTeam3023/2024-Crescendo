@@ -121,7 +121,7 @@ public class Pivot extends SubsystemBase {
   public void periodic() {
     telemUpdate();
     checkClimbStatus();
-    checkHoldPositionDisabled();
+    // checkHoldPositionDisabled();
     //if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
   }
 
@@ -218,7 +218,7 @@ public class Pivot extends SubsystemBase {
   }
 
 //#region Auto-Aim
-  public void faceSpeaker(Pose2d robotPose) {
+  public static void faceSpeaker(Pose2d robotPose) {
     Pose3d target;
     if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
       target = Constants.blueSpeakerPose;
@@ -229,10 +229,10 @@ public class Pivot extends SubsystemBase {
     Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
     Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
     aimAngleEntry.setDouble(newtonApproximation.getDegrees());
-    setPivotAngle(newtonApproximation, true);
+    holdPosition = globalToLocalAngle(newtonApproximation);//setPivotAngle(newtonApproximation, true);
   }
 
-  private Rotation2d newtonApproximation(Pose3d relativeTarget) {
+  private static Rotation2d newtonApproximation(Pose3d relativeTarget) {
     //All measures are in radians for this function
     double last = Math.PI / 4; //Initial guess
 
@@ -252,11 +252,11 @@ public class Pivot extends SubsystemBase {
     return Rotation2d.fromRadians(last);
   }
 
-  private double evaluateAngle(double theta, double totalHeight, double groundDistance) {
+  private static double evaluateAngle(double theta, double totalHeight, double groundDistance) {
     return Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians() - theta - Math.atan2(totalHeight, groundDistance);
   }
 
-  private double evaluateAngleDerivative(double theta, double lsinTheta, double lcosTheta, double groundDistance, double totalHeight) {
+  private static double evaluateAngleDerivative(double theta, double lsinTheta, double lcosTheta, double groundDistance, double totalHeight) {
     double numerator = groundDistance * lcosTheta - totalHeight * lsinTheta;
     double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
     return numerator / denominator - 1;
@@ -298,6 +298,7 @@ public class Pivot extends SubsystemBase {
     if(DriverStation.isDisabled()){
       holdPosition = getPivotMotorPosition();
     }
+
   }
   
   public void telemUpdate(){

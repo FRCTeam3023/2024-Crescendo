@@ -13,14 +13,18 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AmpOrient;
-import frc.robot.Commands.CommandList.*;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.CommandList;
+import frc.robot.Commands.CommandList.IntakeCommand;
+import frc.robot.Commands.CommandList.IntakeStopCommand;
+import frc.robot.Commands.CommandList.SetPivotHoldCommand;
+import frc.robot.Commands.CommandList.ShootSequenceCommand;
 import frc.robot.Commands.HomeCommand;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Commands.PivotHold;
@@ -42,7 +46,7 @@ public class RobotContainer {
   private static final Pivot pivot = new Pivot();
   private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
-  private static final Autonomous autonomous = new Autonomous(pivot,shooter,intake, drivetrain);
+  private static Autonomous autonomous;
   private static final LED led = new LED();
 
    private static final PIDDisplay pid = new PIDDisplay();
@@ -57,6 +61,8 @@ public class RobotContainer {
     pivot.setDefaultCommand(new PivotHold(pivot, controller2));
     // shooter.setDefaultCommand(intakeShooterControl);
     drivetrain.calibrateGyro();
+
+    autonomous =  new Autonomous(pivot,shooter,intake, drivetrain);
   }
 
   private void configureBindings() {
@@ -105,7 +111,7 @@ public class RobotContainer {
     new JoystickButton(controller2, 1).onTrue(new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
     new JoystickButton(controller2, 2).onTrue(new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
     new JoystickButton(controller2, 3).onTrue(new InstantCommand(() -> drivetrain.resetTurnController()))
-      .whileTrue(new AimPivot(pivot, drivetrain));
+      .whileTrue(new AimPivot(drivetrain));
     new JoystickButton(controller2, 4).onTrue(new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))));
   }
 
@@ -113,7 +119,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new HomeCommand(drivetrain),
       new ParallelCommandGroup(
-        new PivotHold(pivot, controller),
+        new RunCommand(() -> pivot.setPivotAngle(Pivot.holdPosition, false), pivot),
         autonomous.getSelectedAuto()
       )
     );

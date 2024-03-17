@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.442332115433463,
-      "y": 7.301537679998438
+      "x": 1.4225982298118458,
+      "y": 7.222602137511967
     },
     "rotation": -90.0
   },
@@ -51,13 +51,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp"
+            "pathName": "Amp to top note approach"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "top note to Amp"
           }
         },
         {
