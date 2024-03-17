@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Util.Gains;
 
 public class Shooter extends SubsystemBase {
@@ -33,7 +34,7 @@ public class Shooter extends SubsystemBase {
 
 
   private final Gains shooterGains = new Gains(0,1/2500,12);  
-
+  private double targetRPM;
 
   public Shooter() {
     
@@ -57,8 +58,6 @@ public class Shooter extends SubsystemBase {
 
     leftShooterMotor.enableVoltageCompensation(11.5);
     rightShooterMotor.enableVoltageCompensation(11.5);
-
-
   }
 
   @Override
@@ -76,8 +75,18 @@ public class Shooter extends SubsystemBase {
   public void setShooterRPM(double rpm){
     leftPID.setReference(rpm, ControlType.kVelocity);
     rightPID.setReference(rpm, ControlType.kVelocity);
+    targetRPM = rpm;
   }
 
+
+  /**
+   * @return True if both flywheels have reached the target RPM
+   */
+  public boolean isFlywheelReady() {
+    double leftError = Math.abs(leftShooterMotor.getEncoder().getVelocity() - targetRPM);
+    double rightError = Math.abs(rightShooterMotor.getEncoder().getVelocity() - targetRPM);
+    return leftError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR && rightError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR;
+  }
 
   public void setShooterDutyCycle(double speed){
     leftShooterMotor.set(speed);
@@ -88,5 +97,4 @@ public class Shooter extends SubsystemBase {
     leftShooterMotor.setVoltage(voltage);
     rightShooterMotor.setVoltage(voltage);
   }
-
 }

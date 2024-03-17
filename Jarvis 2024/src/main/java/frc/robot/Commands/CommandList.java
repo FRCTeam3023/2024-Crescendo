@@ -4,7 +4,10 @@
 
 package frc.robot.Commands;
 
+import java.sql.Driver;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -66,13 +69,13 @@ public class CommandList {
             );
         }
     }
-    public static final class ShootCommand extends FunctionalCommand {
-        public ShootCommand() {
-            super(() -> {}, () -> shooter.setShooterVoltage(12.0), interrupted -> {}, () -> true, shooter);
+    public static final class SpinShooterCommand extends FunctionalCommand {
+        public SpinShooterCommand() {
+            super(() -> {}, () -> shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM), interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
-    public static final class ShootStopCommand extends FunctionalCommand {
-        public ShootStopCommand() {
+    public static final class StopShooterCommand extends FunctionalCommand {
+        public StopShooterCommand() {
             super(() -> {}, () -> shooter.setShooterVoltage(0), interrupted -> {}, () -> true, shooter);
         }
     }
@@ -80,12 +83,14 @@ public class CommandList {
         public ShootSequenceCommand() {
             addCommands(
                 new PrepShooterCommand(),
-                new ShootCommand(),
-                new WaitCommand(1),
+                new ParallelRaceGroup(
+                    new SpinShooterCommand(),
+                    new WaitCommand(2)
+                ),
                 new IntakeNoSensorCommand(),
                 new WaitCommand(1),
                 new IntakeStopCommand(),
-                new ShootStopCommand()
+                new StopShooterCommand()
             );
         }
     }
@@ -94,12 +99,17 @@ public class CommandList {
             super(() -> {}, () -> {Pivot.holdPosition = target; Pivot.climbMode = false;}, interrupted -> {}, () -> true);
         }
     }
-    // public static final class FaceTargetCommand extends ParallelCommandGroup {
-    //     public FaceTargetCommand() {
-    //         addCommands(
-    //             new AimPivot(drivetrain),
-    //             new RunCommand(() -> drivetrain.driveFacingTarget(DriverStation.getAlliance().isPresent().get() == Alliance.Blue ? Constants.blueSpeakerPose : Constants.redSpeakerPose, isScheduled(), null);, drivetrain)
-    //         );
-    //     }
-    // }
+    public static final class FaceSpeakerCommand extends ParallelCommandGroup {
+        public FaceSpeakerCommand() {
+            addRequirements(drivetrain);
+            addCommands(
+                new AimPivot(drivetrain),
+                new RunCommand(() -> drivetrain.driveFacingTarget(
+                    new ChassisSpeeds(0, 0, 0), 
+                    true, 
+                    DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Blue) 
+                        ? Constants.blueSpeakerPose : Constants.redSpeakerPose), drivetrain)
+            );
+        }
+    }
 }

@@ -123,6 +123,11 @@ public class Constants {
         /**The angle made by the launcher's output with the pivot "arms" as the positive x-axis*/
         public static final Rotation2d LAUNCHER_ANGLE_WITH_PIVOT = Rotation2d.fromDegrees(45);
 
+        /**What speed the shooter flywheels should spin at*/
+        public static final double SHOOTER_RPM = 3000;
+        /**The maximum difference between the shooter's RPM and the target RPM*/
+        public static final double MAX_SHOOTER_RPM_ERROR = 10;
+
         /**Height of the pivot point in meters */
         public static final double PIVOT_HEIGHT = Units.inchesToMeters(16);
         /**Length of the pivot arm in meters */

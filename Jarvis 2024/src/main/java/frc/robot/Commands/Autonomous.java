@@ -8,13 +8,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Subsystems.Drivetrain;
@@ -34,23 +32,23 @@ public class Autonomous {
         NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Intake Stop", new IntakeStopCommand());
         NamedCommands.registerCommand("Prep Shooter", new PrepShooterCommand());
-        NamedCommands.registerCommand("Shoot", new ShootCommand());
+        NamedCommands.registerCommand("Shoot", new SpinShooterCommand());
         NamedCommands.registerCommand("Shoot Sequence", new ShootSequenceCommand());
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
-        NamedCommands.registerCommand("Shooter Stop", new ShootStopCommand());
+        NamedCommands.registerCommand("Shooter Stop", new StopShooterCommand());
 
         NamedCommands.registerCommand("Pivot Pickup", new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
         NamedCommands.registerCommand("Pivot Speaker", new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
         NamedCommands.registerCommand("Pivot Amp", new SetPivotHoldCommand(ArmConstants.AMP_POSITION));
         NamedCommands.registerCommand("Aim Pivot", new AimPivot(drivetrain));
-        // NamedCommands.registerCommand("Aim and Fire", new ParallelRaceGroup(
-        //     new AimPivot(drivetrain),
-
-        //     new SequentialCommandGroup(
-        //         new WaitCommand(2),
-        //         new ShootSequenceCommand()
-        //     )
-        // ));
+        NamedCommands.registerCommand("Aim and Fire", new ParallelRaceGroup(
+            new AimPivot(drivetrain),
+            new FaceSpeakerCommand(),
+            new SequentialCommandGroup(
+                new WaitCommand(2),
+                new ShootSequenceCommand()
+            )
+        ));
 
         new PathPlannerAuto("Test Auto");
         new PathPlannerAuto("2 Note Center");
