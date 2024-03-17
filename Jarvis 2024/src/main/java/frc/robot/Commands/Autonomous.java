@@ -34,7 +34,7 @@ public class Autonomous {
         NamedCommands.registerCommand("Shoot", new SpinShooterCommand());
         NamedCommands.registerCommand("Shoot Sequence", new ShootSequenceCommand());
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
-        NamedCommands.registerCommand("Shooter Stop", new StopShooterCommand());
+        NamedCommands.registerCommand("Shooter Stop", new ShooterStopCommand());
 
         NamedCommands.registerCommand("Pivot Pickup", new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
         NamedCommands.registerCommand("Pivot Speaker", new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));

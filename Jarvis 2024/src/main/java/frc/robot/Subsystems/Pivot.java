@@ -52,8 +52,8 @@ public class Pivot extends SubsystemBase {
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
   private static final GenericEntry angleEntry = armTab.add("Local Angle", 0).withPosition(0, 0).getEntry();
-  private static final GenericEntry sensorAngleEntry = armTab.add("Sensor Angle", 0).withPosition(1, 0).getEntry();
-  private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(0, 1).getEntry();
+  private static final GenericEntry sensorAngleEntry = armTab.add("Sensor Angle", 0).withPosition(0, 1).getEntry();
+  private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(0, 3).getEntry();
   private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(0, 2).getEntry();
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(0, 3).getEntry();
   private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(3, 1).getEntry();

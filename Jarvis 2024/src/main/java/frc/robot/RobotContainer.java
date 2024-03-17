@@ -97,8 +97,11 @@ public class RobotContainer {
     new JoystickButton(controller, 8).whileTrue(new HomeCommand(drivetrain));
     new JoystickButton(controller, 6)
       .whileTrue(new ShootSequenceCommand())
-      .onFalse(new InstantCommand(() -> {intake.setIntakeSpeed(0); shooter.setShooterDutyCycle(0);}));
-    new JoystickButton(controller, 5).whileTrue(new IntakeCommand()).onFalse(new IntakeStopCommand());
+      .onFalse(new ParallelCommandGroup(
+        new IntakeStopCommand(),
+        new ShooterStopCommand()
+      ));
+    new JoystickButton(controller, 5).whileTrue(new IntakeCommand()).whileFalse(new IntakeStopCommand());
     new JoystickButton(controller, 7).onTrue(new InstantCommand(
         () -> drivetrain.setPose(new Pose2d(drivetrain.getPose().getX(),drivetrain.getPose().getY(),new Rotation2d()))
       ));
@@ -109,13 +112,14 @@ public class RobotContainer {
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
     new JoystickButton(controller2, 1).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION),
-      new StopShooterCommand(),
+      new ShooterStopCommand(),
       new ParallelRaceGroup(
+        new WaitUntilCommand(() -> !Intake.noteLoaded),
         new IntakeCommand(),
         new WaitCommand(0.5)
       ),
-      new IntakeStopCommand()
+      new IntakeStopCommand(),
+      new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION)
     ));
     new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
       new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION),

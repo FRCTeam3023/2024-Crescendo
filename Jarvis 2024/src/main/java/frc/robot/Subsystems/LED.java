@@ -50,7 +50,6 @@ public class LED extends SubsystemBase {
     if (color == currentColor) return;
     currentColor = color;
 
-
     //Construct
     byte[] data = new byte[7];
     data[0] = (byte)(start);

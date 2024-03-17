@@ -74,8 +74,8 @@ public class CommandList {
             super(() -> {shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);}, () -> {}, interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
-    public static final class StopShooterCommand extends FunctionalCommand {
-        public StopShooterCommand() {
+    public static final class ShooterStopCommand extends FunctionalCommand {
+        public ShooterStopCommand() {
             super(() -> {}, () -> shooter.setShooterRPM(0), interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
@@ -87,10 +87,11 @@ public class CommandList {
                     new SpinShooterCommand(),
                     new WaitCommand(2)
                 ),
+                new InstantCommand(() -> Intake.noteLoaded = false),
                 new IntakeNoSensorCommand(),
                 new WaitCommand(1),
                 new IntakeStopCommand(),
-                new StopShooterCommand()
+                new ShooterStopCommand()
             );
         }
     }
@@ -111,12 +112,15 @@ public class CommandList {
             );
         }
     }
-    public static final class PrimeShootSequenceCommand extends SequentialCommandGroup {
+    public static final class PrimeShootSequenceCommand extends ParallelRaceGroup {
         public PrimeShootSequenceCommand() {
             addCommands(
-                new WaitUntilCommand(() -> pivot.noteClearsGround()),
-                new PrepShooterCommand(),
-                new SpinShooterCommand()
+                new WaitUntilCommand(() -> !Intake.noteLoaded),
+                new SequentialCommandGroup(
+                    new WaitUntilCommand(() -> pivot.noteClearsGround()),
+                    new PrepShooterCommand(),
+                    new SpinShooterCommand()
+                )
             );
         }
     }

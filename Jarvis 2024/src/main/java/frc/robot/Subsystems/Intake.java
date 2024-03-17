@@ -20,9 +20,10 @@ public class Intake extends SubsystemBase {
   private final DigitalInput noteSensor = new DigitalInput(4);
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
-  private static final GenericEntry noteSensorEntry = armTab.add("Note", false).withPosition(2, 4).getEntry();
+  private static final GenericEntry noteSensorEntry = armTab.add("Note", false).withPosition(2, 3).getEntry();
 
   public static boolean noteSensed;
+  public static boolean noteLoaded;
   //int iterations = 0;
 
   public Intake() {}
@@ -39,6 +40,7 @@ public class Intake extends SubsystemBase {
 
   public void intakeTillSensed(double speed) {
     if (senseNote()) {
+      noteLoaded = true;
       setIntakeSpeed(0);
     }
     else

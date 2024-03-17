@@ -95,7 +95,7 @@ public class Drivetrain extends SubsystemBase {
   private static GenericEntry poseY = telemTab.add("Override Pose Y", 0).withPosition(2, 1).getEntry();
   private static GenericEntry poseH = telemTab.add("Override Pose H", 0).withPosition(3, 1).getEntry();
   private static GenericEntry gyroFaultEntry = telemTab.add("Gyro Fault", false).withPosition(3, 2).getEntry();
-  private static Field2d field = new Field2d();
+  //private static Field2d field = new Field2d();
 
   public Drivetrain() {
     turnController.enableContinuousInput(-Math.PI, Math.PI);
@@ -133,11 +133,12 @@ public class Drivetrain extends SubsystemBase {
     PIDDisplay.PIDList.addOption("Swerve Drive Motors", swerveDriveMotors);
     PIDDisplay.PIDList.addOption("Swerve Turn Motors", swerveTurnMotors);
 
-    telemTab.add(field).withPosition(5, 1).withSize(3, 3);
+    //telemTab.add(field).withPosition(4, 0).withSize(5, 3);
   }
 
   @Override
   public void periodic() {
+    //field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
     headingEntry.setDouble(getPose().getRotation().getDegrees());
     gyroRawEntry.setDouble(getChassisAngle().getDegrees());
     gyroDifferenceEntry.setDouble(getChassisAngle().getDegrees() - getPose().getRotation().getDegrees());
@@ -151,8 +152,6 @@ public class Drivetrain extends SubsystemBase {
 
     poseEntry.setString(getPose().toString());    
     displayAllModuleSwitches();
-
-    field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
   }
 
 //#region Driving
