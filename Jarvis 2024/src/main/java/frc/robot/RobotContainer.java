@@ -44,7 +44,7 @@ public class RobotContainer {
   private static final Drivetrain drivetrain = new Drivetrain();
   private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
-  private static final Shooter shooter = new Shooter();
+  private static final Shooter shooter = new Shooter(controller);
   private static final Intake intake = new Intake();
   private static Autonomous autonomous;
   private static final LED led = new LED();

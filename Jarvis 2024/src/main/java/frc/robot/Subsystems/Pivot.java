@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Util.AutoAimCalculator;
 import frc.robot.Util.Gains;
 import frc.robot.Util.PIDDisplay;
 import frc.robot.Util.TalonFXsetter;
@@ -233,52 +235,12 @@ public class Pivot extends SubsystemBase {
     lastPivotPosition = sensorPosition;
   }
 
-//#region Auto-Aim
-  public static void faceSpeaker(Pose2d robotPose) {
-    Pose3d target;
-    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue){
-      target = Constants.blueSpeakerPose;
-    }else{
-      target = Constants.redSpeakerPose;
-    }
-
-    Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
-    Rotation2d newtonApproximation = newtonApproximation(relativeTarget);
-    aimAngleEntry.setDouble(newtonApproximation.getDegrees());
-    holdPosition = globalToLocalAngle(newtonApproximation);//setPivotAngle(newtonApproximation, true);
+  public static void faceSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    AutoAimCalculator.computeAngle(robotPose, robotVelocity);
+    aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
+    holdPosition = globalToLocalAngle(AutoAimCalculator.theta);
   }
-
-  private static Rotation2d newtonApproximation(Pose3d relativeTarget) {
-    //All measures are in radians for this function
-    double last = Math.PI / 4; //Initial guess
-
-    for (int i = 0; i < Constants.ArmConstants.PIVOT_APPROXIMATION_PRECISION; i++) {
-      //Compute variables that appear more than once
-      double lsinTheta = Constants.ArmConstants.PIVOT_LENGTH * Math.sin(last);
-      double lcosTheta = Constants.ArmConstants.PIVOT_LENGTH * Math.cos(last);
-      double groundDistance = Math.sqrt(relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()) + lcosTheta;
-      double totalHeight = relativeTarget.getZ() - lsinTheta - Constants.ArmConstants.PIVOT_HEIGHT + Math.max(0, (groundDistance - 1)/6);
-        //4.9 * Math.pow((groundDistance / (Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(last - Constants.ArmConstants.launcherAngleWithPivot.getRadians()))), 2);//
-      double evaluation = evaluateAngle(last, totalHeight, groundDistance);
-      double derivative = evaluateAngleDerivative(last, lsinTheta, lcosTheta, groundDistance, totalHeight);
-
-      last = last - evaluation / derivative;
-    }
-
-    return Rotation2d.fromRadians(last);
-  }
-
-  private static double evaluateAngle(double theta, double totalHeight, double groundDistance) {
-    return Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians() - theta - Math.atan2(totalHeight, groundDistance);
-  }
-
-  private static double evaluateAngleDerivative(double theta, double lsinTheta, double lcosTheta, double groundDistance, double totalHeight) {
-    double numerator = groundDistance * lcosTheta - totalHeight * lsinTheta;
-    double denominator = totalHeight * totalHeight + groundDistance * groundDistance;
-    return numerator / denominator - 1;
-  }
-//#endregion
-
+  
   public void setPivotNeutralMode(NeutralModeValue mode){
     pivotConfiguration.MotorOutput.NeutralMode = mode;
     pivotMotor.getConfigurator().apply(pivotConfiguration);

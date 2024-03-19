@@ -121,10 +121,14 @@ public class Constants {
         public static final double PIVOT_FEED_FORWARD = 0;
 
         /**The angle made by the launcher's output with the pivot "arms" as the positive x-axis*/
-        public static final Rotation2d LAUNCHER_ANGLE_WITH_PIVOT = Rotation2d.fromDegrees(45);
+        public static final Rotation2d LAUNCHER_ANGLE_WITH_PIVOT = Rotation2d.fromDegrees(50);
+        /**Account for velocity and gravity when aiming */
+        public static final boolean VELOCITY_BASED_AIMING = true;
+        /**The farthest the auto-aim will attempt to target the speaker */
+        public static final double MAX_AIM_DISTANCE = 10; //m
 
         /**What speed the shooter flywheels should spin at*/
-        public static final double SHOOTER_RPM = 2600;
+        public static final double SHOOTER_RPM = 2000;
         /**The maximum difference between the shooter's RPM and the target RPM*/
         public static final double MAX_SHOOTER_RPM_ERROR = 100;
 
@@ -139,7 +143,7 @@ public class Constants {
         /**Cancoder Magnet offset in rotations relative to local origin */
         public static final double PIVOT_SENSOR_OFFSET = .181;
 
-        public static final double NOTE_LAUNCH_SPEED = 5; //m/s
+        public static final double NOTE_LAUNCH_SPEED = 30; //m/s
         
         /**True if set to using remote CANCoder, false if rotor sensor */
         public static final boolean USE_REMOTE_PIVOT_SENSOR = true;

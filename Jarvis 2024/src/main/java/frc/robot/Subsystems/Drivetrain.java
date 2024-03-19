@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Util.AutoAimCalculator;
 import frc.robot.Util.PIDDisplay;
 import frc.robot.Util.ProfiledWPILibSetter;
 import frc.robot.Util.SparkMaxSetter;
@@ -148,7 +149,6 @@ public class Drivetrain extends SubsystemBase {
       setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
     else
       poseEstimator.update(getChassisAngle(), getModulePositions());
-
 
     poseEntry.setString(getPose().toString());    
     displayAllModuleSwitches();
@@ -329,6 +329,10 @@ public class Drivetrain extends SubsystemBase {
    */
   public ChassisSpeeds getChassisSpeeds(){
     return kinematics.toChassisSpeeds(frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState());
+  }
+
+  public ChassisSpeeds getFieldRelativeSpeeds() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getPose().getRotation());
   }
 
   /** Calibrates gyro - will take significant time so put in beginning of code */

@@ -23,7 +23,7 @@ public class AimPivot extends Command {
 
   @Override
   public void execute() {
-    Pivot.faceSpeaker(drivetrain.getPose());
+    Pivot.faceSpeaker(drivetrain.getPose(), drivetrain.getFieldRelativeSpeeds());
   }
 
   @Override

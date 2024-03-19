@@ -11,6 +11,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,8 +37,9 @@ public class Shooter extends SubsystemBase {
   private final Gains shooterGains = new Gains(0,1.0/Constants.ArmConstants.SHOOTER_RPM,1);  
   private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
 
-  public Shooter() {
-    
+  Joystick tempJoystick;
+  public Shooter(Joystick joystick) {
+    tempJoystick = joystick;
     leftPID = leftShooterMotor.getPIDController();
     leftEncoder = leftShooterMotor.getEncoder();
 
@@ -52,7 +54,7 @@ public class Shooter extends SubsystemBase {
     rightPID.setFF(shooterGains.F);
     rightPID.setOutputRange(-shooterGains.peakOutput,shooterGains.peakOutput);
 
-    leftShooterMotor.setInverted(true);
+    leftShooterMotor.setInverted(false);
     rightShooterMotor.setInverted(false);
 
     leftEncoder.setVelocityConversionFactor(0.5);
@@ -67,6 +69,9 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     leftSpeedEntry.setDouble(leftEncoder.getVelocity());
     rightSpeedEntry.setDouble(rightEncoder.getVelocity());
+
+    leftShooterMotor.set(tempJoystick.getRawAxis(3));
+    rightShooterMotor.set(tempJoystick.getRawAxis(3));
   }
 
 

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -59,10 +60,12 @@ public class Autonomous {
         new PathPlannerAuto("Inner Speaker 2 Note");
 
         autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.setDefaultOption("Nothing", null);
         autoTab.add(autoChooser).withPosition(0, 0).withSize(5, 1);
     }
 
     public Command getSelectedAuto(){
+        if (autoChooser.getSelected().getName() == "Nothing") return new InstantCommand();
         return AutoBuilder.buildAuto(autoChooser.getSelected().getName());
     }
 }

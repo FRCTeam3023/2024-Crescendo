@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Util.AutoAimCalculator;
 
 public class JoystickDrive extends Command {
   Drivetrain drivetrain;
@@ -73,15 +74,7 @@ public class JoystickDrive extends Command {
     }
 
     if(rightJoystick.getRawButton(3)){
-      Pose3d targetPose = new Pose3d();
-      if(currentColor == Alliance.Blue){
-        targetPose = Constants.blueSpeakerPose;
-      }else{
-        targetPose = Constants.redSpeakerPose;
-      }
-
-
-      drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true, targetPose);
+      drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.translatedPose);
     }else{
       double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
       rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;
