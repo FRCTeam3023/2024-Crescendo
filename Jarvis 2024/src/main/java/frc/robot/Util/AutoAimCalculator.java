@@ -21,10 +21,12 @@ public class AutoAimCalculator {
 
     public static void computeAngle(Pose2d robotPose, ChassisSpeeds velocity) {
         Pose3d target = Constants.blueSpeakerPose;
-        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue)
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
             target = Constants.blueSpeakerPose;
-        else
+        } else {
             target = Constants.redSpeakerPose;
+            velocity = new ChassisSpeeds(-velocity.vxMetersPerSecond, -velocity.vyMetersPerSecond, 0);
+        }
 
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
         
@@ -46,6 +48,7 @@ public class AutoAimCalculator {
         double t_z = relativeTarget.getZ();
         double l = Constants.ArmConstants.PIVOT_LENGTH;
         double h = Constants.ArmConstants.PIVOT_HEIGHT;
+        double beta = Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians();
         double v_l = Constants.ArmConstants.NOTE_LAUNCH_SPEED;
         double v_x = relativeVelocity.vxMetersPerSecond;
         double v_y = relativeVelocity.vyMetersPerSecond;
@@ -53,12 +56,14 @@ public class AutoAimCalculator {
         for (int i = 0; i < Constants.ArmConstants.PIVOT_APPROXIMATION_PRECISION; i++) {
             double sin = Math.sin(last);
             double cos = Math.cos(last);
+            double cosB = Math.cos(last - beta);
+            double sinB = Math.sin(last - beta);
 
             if (Constants.ArmConstants.VELOCITY_BASED_AIMING) {
-                double A = t_x * v_x + t_y * v_y - v_l * l * cos * cos;
-                double A_d = 2 * v_l * l * cos * sin;
-                double B = v_l * v_l * cos * cos - v_x * v_x - v_y * v_y;
-                double B_d = -2 * v_l * v_l * cos * sin;
+                double A = t_x * v_x + t_y * v_y - v_l * l * cosB * cos;
+                double A_d = v_l * l * (sinB * cos + cosB * sin);
+                double B = v_l * v_l * cosB * cosB - v_x * v_x - v_y * v_y;
+                double B_d = -2 * v_l * v_l * cosB * sinB;
                 double J = l * l * cos * cos - t_x * t_x - t_y * t_y;
                 double J_d = 2 * l * l * cos * sin;
                 double E = A * A - B * J;
@@ -102,8 +107,8 @@ public class AutoAimCalculator {
         translatedPose = new Pose3d(t_x - v_x * translationTime, t_y - v_y * translationTime, t_z + 4.9 * translationTime * translationTime, new Rotation3d());
     }
 
-    private static double evaluateAngle(double theta, double C, double F) {
-        return Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians() - theta - Math.atan2(C, F);
+    private static double evaluateAngle(double theta, double beta, double C, double F) {
+        return beta - theta - Math.atan2(C, F);
     }
 
     private static double evaluateAngleDerivative(double C, double F_d, double C_d, double F) {
