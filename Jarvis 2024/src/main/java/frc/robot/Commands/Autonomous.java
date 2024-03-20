@@ -12,10 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Pivot;
@@ -37,9 +34,9 @@ public class Autonomous {
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
         NamedCommands.registerCommand("Shooter Stop", new ShooterStopCommand());
 
-        NamedCommands.registerCommand("Pivot Pickup", new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION));
-        NamedCommands.registerCommand("Pivot Speaker", new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION));
-        NamedCommands.registerCommand("Pivot Amp", new SetPivotHoldCommand(ArmConstants.AMP_POSITION));
+        NamedCommands.registerCommand("Pivot Pickup", new SetPivotTargetCommand(ArmConstants.PICKUP_POSITION));
+        NamedCommands.registerCommand("Pivot Speaker", new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION));
+        NamedCommands.registerCommand("Pivot Amp", new SetPivotTargetCommand(ArmConstants.AMP_POSITION));
         NamedCommands.registerCommand("Aim Pivot", new AimPivot(drivetrain));
         NamedCommands.registerCommand("Aim and Shoot", new SequentialCommandGroup(
             new FaceSpeakerCommand(),
@@ -58,14 +55,13 @@ public class Autonomous {
         new PathPlannerAuto("Amp Hide");
         new PathPlannerAuto("Leave Speaker");
         new PathPlannerAuto("Inner Speaker 2 Note");
+        new PathPlannerAuto("Nothing");
 
         autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Nothing", null);
-        autoTab.add(autoChooser).withPosition(0, 0).withSize(5, 1);
+        autoTab.add("Auto Chooser", autoChooser).withPosition(0, 0).withSize(5, 1);
     }
 
     public Command getSelectedAuto(){
-        if (autoChooser.getSelected().getName() == "Nothing") return new InstantCommand();
         return AutoBuilder.buildAuto(autoChooser.getSelected().getName());
     }
 }

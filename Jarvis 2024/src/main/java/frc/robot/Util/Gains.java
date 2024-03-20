@@ -1,7 +1,7 @@
 package frc.robot.Util;
 
 public class Gains {
-    public double P = 0;
+	public double P = 0;
 	public double I = 0;
 	public double D = 0;
 	public double F = 0;
@@ -10,16 +10,17 @@ public class Gains {
 	public int Izone = 0;
 	public double peakOutput = 0;
 
-	/** 
-     * Class for PID gains
-     * @param P P gain
-     * @param I I gain
-     * @param D D gain
-     * @param F FF gain
-     * @param Izone I zone
-     * @param PeakOutput Peak Output
-     */
-	public Gains(double P, double I, double D, double F, int Izone, double PeakOutput){
+	/**
+	 * Class for PID gains
+	 * 
+	 * @param P          P gain
+	 * @param I          I gain
+	 * @param D          D gain
+	 * @param F          FF gain
+	 * @param Izone      I zone
+	 * @param PeakOutput Peak Output
+	 */
+	public Gains(double P, double I, double D, double F, int Izone, double PeakOutput) {
 		this.P = P;
 		this.I = I;
 		this.D = D;
@@ -28,7 +29,7 @@ public class Gains {
 		this.peakOutput = PeakOutput;
 	}
 
-	public Gains(double P, double D, double S, double V, double peakOutput){
+	public Gains(double P, double D, double S, double V, double peakOutput) {
 		this.P = P;
 		this.D = D;
 		this.S = S;
@@ -36,23 +37,22 @@ public class Gains {
 		this.peakOutput = peakOutput;
 	}
 
-	public Gains(double P, double D, double F, double peakOutput){
+	public Gains(double P, double D, double F, double peakOutput) {
 		this.P = P;
 		this.D = D;
 		this.F = F;
 		this.peakOutput = peakOutput;
 	}
 
-	public Gains(double P, double F, double peakOutput){
+	public Gains(double P, double F, double peakOutput) {
 		this.P = P;
 		this.F = F;
 		this.peakOutput = peakOutput;
 	}
 
-	public Gains(double P, double peakOutput){
+	public Gains(double P, double peakOutput) {
 		this.P = P;
 		this.peakOutput = peakOutput;
 	}
 
-	
 }

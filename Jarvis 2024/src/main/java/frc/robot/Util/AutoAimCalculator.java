@@ -21,20 +21,16 @@ public class AutoAimCalculator {
 
     public static void computeAngle(Pose2d robotPose, ChassisSpeeds velocity) {
         Pose3d target = Constants.blueSpeakerPose;
-        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
-            target = Constants.blueSpeakerPose;
-        } else {
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
             target = Constants.redSpeakerPose;
-            velocity = new ChassisSpeeds(-velocity.vxMetersPerSecond, -velocity.vyMetersPerSecond, 0);
         }
 
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
-        
-        if (relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()
-                < Constants.ArmConstants.MAX_AIM_DISTANCE * Constants.ArmConstants.MAX_AIM_DISTANCE)
-            newtonApproximation(relativeTarget, velocity);
-        else
-            theta = Rotation2d.fromDegrees(90);
+
+        newtonApproximation(relativeTarget, velocity);
+        // if (relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()
+        //         > Constants.ArmConstants.MAX_AIM_DISTANCE * Constants.ArmConstants.MAX_AIM_DISTANCE)
+        //     theta = Rotation2d.fromDegrees(45);
     }
 
     private static void newtonApproximation(Pose3d relativeTarget, ChassisSpeeds relativeVelocity) {
@@ -86,8 +82,8 @@ public class AutoAimCalculator {
                 double F_d = D_d / (2 * sqrtD) - l * sin;
 
                 
-                evaluation = evaluateAngle(last, C, F);
-                derivative = evaluateAngleDerivative(C, F_d, C_d, F);
+                evaluation = beta - last - Math.atan2(C, F);
+                derivative = (C * F_d - C_d * F) / (C * C + F * F) - 1;
 
                 // System.out.println("A:" + A + " A_d:" + A_d + " B:" + B + " B_d:" + B_d + " E:" + E + " E_d:" + E_d 
                 //     + " T:" + T + " T_d:" + T_d + " C:" + C + " C_d:" + C_d + " D:" + D + " D_d:" + D_d + " F:" + F 
@@ -105,14 +101,6 @@ public class AutoAimCalculator {
         }
         theta = Rotation2d.fromRadians(last);
         translatedPose = new Pose3d(t_x - v_x * translationTime, t_y - v_y * translationTime, t_z + 4.9 * translationTime * translationTime, new Rotation3d());
-    }
-
-    private static double evaluateAngle(double theta, double beta, double C, double F) {
-        return beta - theta - Math.atan2(C, F);
-    }
-
-    private static double evaluateAngleDerivative(double C, double F_d, double C_d, double F) {
-        return (C * F_d - C_d * F) / (C * C + F * F) - 1;
     }
 
     private static double evaluateAngleStationary(double theta, double totalHeight, double groundDistance) {

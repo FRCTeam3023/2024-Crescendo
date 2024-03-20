@@ -16,14 +16,9 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -47,7 +42,7 @@ public class Pivot extends SubsystemBase {
   private final TalonFX climberMotor = new TalonFX(14);
   private TalonFXConfiguration climberConfig;
 
-  public static Rotation2d holdPosition = new Rotation2d();
+  public static Rotation2d targetPosition = new Rotation2d();
   public static boolean climbMode = false;
   public static boolean previousClimbMode = false;
 
@@ -108,7 +103,7 @@ public class Pivot extends SubsystemBase {
 
     PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
 
-    holdPosition = getLocalAngle();
+    targetPosition = getLocalAngle();
 
 
     climberConfig = new TalonFXConfiguration();
@@ -126,6 +121,7 @@ public class Pivot extends SubsystemBase {
     // checkHoldPositionDisabled();
     //if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
   }
+
 
 //#region Angle Logic
   /**
@@ -188,17 +184,18 @@ public class Pivot extends SubsystemBase {
   public void setPivotAngle(Rotation2d angle, boolean isGlobal) {
     climbMode = false;
     if (isGlobal) angle = globalToLocalAngle(angle);
-    holdPosition = angle;
+    targetPosition = angle;
     angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.PIVOT_MAX.getRadians()));
     pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
   }
+
 
   /**
    * Check if pivot motor is at holdPosition
    * @return True if the difference is small enough
    */
   public boolean isAtTargetAngle() {
-    return Math.abs(holdPosition.getRadians() - pivotMotor.getPosition().getValueAsDouble()) < Constants.ArmConstants.MAX_PIVOT_DEVIATION;
+    return Math.abs(targetPosition.getRadians() - pivotMotor.getPosition().getValueAsDouble()) < Constants.ArmConstants.MAX_PIVOT_DEVIATION;
   }
 
   /**
@@ -211,7 +208,7 @@ public class Pivot extends SubsystemBase {
   
   public void setPivotDutyCycle(double speed){
     pivotMotor.setControl(new DutyCycleOut(speed));
-    holdPosition = getLocalAngle();
+    targetPosition = getLocalAngle();
   }
 
   /**
@@ -233,12 +230,6 @@ public class Pivot extends SubsystemBase {
       pivotMotor.setPosition(sensorPosition);
 
     lastPivotPosition = sensorPosition;
-  }
-
-  public static void faceSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-    AutoAimCalculator.computeAngle(robotPose, robotVelocity);
-    aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
-    holdPosition = globalToLocalAngle(AutoAimCalculator.theta);
   }
   
   public void setPivotNeutralMode(NeutralModeValue mode){
@@ -274,7 +265,7 @@ public class Pivot extends SubsystemBase {
 
   public void checkHoldPositionDisabled(){
     if(DriverStation.isDisabled()){
-      holdPosition = getPivotMotorPosition();
+      targetPosition = getPivotMotorPosition();
     }
 
   }
@@ -283,8 +274,11 @@ public class Pivot extends SubsystemBase {
     angleEntry.setDouble(getPivotMotorPosition().getDegrees());
     sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
     angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
-    angleError.setDouble(getLocalAngle().getDegrees() - holdPosition.getDegrees());
-    targetAngle.setDouble(holdPosition.getDegrees());
+    angleError.setDouble(getLocalAngle().getDegrees() - targetPosition.getDegrees());
+    targetAngle.setDouble(targetPosition.getDegrees());
     climberModeEntry.setBoolean(climbMode);
+    aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
   }
+
+
 }

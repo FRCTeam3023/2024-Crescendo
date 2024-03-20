@@ -7,6 +7,7 @@ package frc.robot.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
+import frc.robot.Util.AutoAimCalculator;
 
 public class AimPivot extends Command {
   /** Creates a new AimPivot. */
@@ -23,7 +24,7 @@ public class AimPivot extends Command {
 
   @Override
   public void execute() {
-    Pivot.faceSpeaker(drivetrain.getPose(), drivetrain.getFieldRelativeSpeeds());
+    Pivot.targetPosition = Pivot.globalToLocalAngle(AutoAimCalculator.theta);
   }
 
   @Override

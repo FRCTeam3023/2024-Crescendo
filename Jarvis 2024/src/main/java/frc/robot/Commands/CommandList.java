@@ -4,13 +4,11 @@
 
 package frc.robot.Commands;
 
-import java.sql.Driver;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -95,9 +93,9 @@ public class CommandList {
             );
         }
     }
-    public static final class SetPivotHoldCommand extends FunctionalCommand {
-        public SetPivotHoldCommand(Rotation2d target) {
-            super(() -> {}, () -> {Pivot.holdPosition = target; Pivot.climbMode = false;}, interrupted -> {}, () -> true);
+    public static final class SetPivotTargetCommand extends FunctionalCommand {
+        public SetPivotTargetCommand(Rotation2d target) {
+            super(() -> {}, () -> {Pivot.targetPosition = target; Pivot.climbMode = false;}, interrupted -> {}, () -> true);
         }
     }
     public static final class FaceSpeakerCommand extends ParallelCommandGroup {

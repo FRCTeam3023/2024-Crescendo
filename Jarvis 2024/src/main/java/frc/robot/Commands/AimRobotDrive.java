@@ -11,25 +11,27 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Pivot;
+import frc.robot.Util.AutoAimCalculator;
 
-public class JoystickDrive extends Command {
+public class AimRobotDrive extends Command {
+  /** Creates a new AimRobot. */
+
   Drivetrain drivetrain;
   Joystick controller;
-  Joystick rightJoystick;
-
-  public static boolean fieldRelativeDrive = true;
-
-  /** Creates a new JoystickDrive. */
-  public JoystickDrive(Drivetrain drivetrain, Joystick controller, Joystick rightJoystick) {
+  
+  public AimRobotDrive(Drivetrain drivetrain, Joystick controller) {
+    // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.controller = controller;
-    this.rightJoystick = rightJoystick;
     addRequirements(drivetrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    Pivot.climbMode = false;
+    drivetrain.resetTurnController();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,7 +65,6 @@ public class JoystickDrive extends Command {
     Alliance currentColor = null;
     if (DriverStation.getAlliance().isPresent())
       currentColor = DriverStation.getAlliance().get();
-    double rotationSpeed = 0;
 
     //flip Direction if alliance is red, field-centric based on blue alliance
     if(currentColor == Alliance.Red){
@@ -71,9 +72,8 @@ public class JoystickDrive extends Command {
       ySpeed = -ySpeed;
     }
 
-      double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
-      rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;
-      drivetrain.drive(new ChassisSpeeds(xSpeed,ySpeed,rotationSpeed), fieldRelativeDrive);
+    Pivot.targetPosition = Pivot.globalToLocalAngle(AutoAimCalculator.theta);
+    drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.translatedPose);
   }
 
   // Called once the command ends or is interrupted.
@@ -87,6 +87,7 @@ public class JoystickDrive extends Command {
   public boolean isFinished() {
     return false;
   }
+
 
   private double applyDeadband(double joystickValue, double tolerance){
     if(Math.abs(joystickValue) > tolerance){

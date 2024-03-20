@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.AimPivot;
+import frc.robot.Commands.AimRobotDrive;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
 import frc.robot.Commands.CommandList;
@@ -119,19 +120,22 @@ public class RobotContainer {
         new WaitCommand(0.5)
       ),
       new IntakeStopCommand(),
-      new SetPivotHoldCommand(ArmConstants.PICKUP_POSITION)
+      new SetPivotTargetCommand(ArmConstants.PICKUP_POSITION)
     ));
+    
     new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION),
+      new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION),
       new PrimeShootSequenceCommand()
     ));
+
     new JoystickButton(controller2, 3).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(ArmConstants.SPEAKER_POSITION),
+      new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION),
       new InstantCommand(() -> drivetrain.resetTurnController()),
       new PrimeShootSequenceCommand()
-    )).whileTrue(new AimPivot(drivetrain));
+    )).whileTrue(new AimRobotDrive(drivetrain,controller));
+
     new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
-      new SetPivotHoldCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))),
+      new SetPivotTargetCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))),
       new PrimeShootSequenceCommand()
     ));
   }
@@ -140,7 +144,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new HomeCommand(drivetrain),
       new ParallelCommandGroup(
-        new RunCommand(() -> pivot.setPivotAngle(Pivot.holdPosition, false), pivot),
+        new RunCommand(() -> pivot.setPivotAngle(Pivot.targetPosition, false), pivot),
         autonomous.getSelectedAuto()
       )
     );

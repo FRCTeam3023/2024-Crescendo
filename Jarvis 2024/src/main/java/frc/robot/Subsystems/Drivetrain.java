@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Commands.JoystickDrive;
@@ -99,6 +98,9 @@ public class Drivetrain extends SubsystemBase {
   //private static Field2d field = new Field2d();
 
   public Drivetrain() {
+    poseX.setDouble(0);
+    poseY.setDouble(0);
+    poseH.setDouble(0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
     PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
 
@@ -139,6 +141,11 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
+    //computes the auto aim positions periodically
+    AutoAimCalculator.computeAngle(getPose(), getFieldRelativeSpeeds());
+
+
+
     //field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
     headingEntry.setDouble(getPose().getRotation().getDegrees());
     gyroRawEntry.setDouble(getChassisAngle().getDegrees());
@@ -153,6 +160,7 @@ public class Drivetrain extends SubsystemBase {
     poseEntry.setString(getPose().toString());    
     displayAllModuleSwitches();
   }
+
 
 //#region Driving
   /**

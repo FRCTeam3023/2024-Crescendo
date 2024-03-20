@@ -32,12 +32,12 @@ public class PivotHold extends Command {
     double rightInput = joystick.getRawAxis(3);
     if(leftInput > 0.05){
       pivot.setClimberOutput(leftInput/2);
-      Pivot.holdPosition = pivot.getLocalAngle();
+      Pivot.targetPosition = pivot.getLocalAngle();
       pivot.setPivotDutyCycle(0);
       Pivot.climbMode = true;
     }else if(rightInput > 0.05){
       pivot.setClimberOutput(-rightInput / 2);
-      Pivot.holdPosition = pivot.getLocalAngle();
+      Pivot.targetPosition = pivot.getLocalAngle();
       pivot.setPivotDutyCycle(0);
       Pivot.climbMode = true;
     }else{
@@ -45,7 +45,7 @@ public class PivotHold extends Command {
         pivot.setClimberOutput(0);
         pivot.setPivotDutyCycle(0);
       }else{
-        pivot.setPivotAngle(Pivot.holdPosition, false);
+        pivot.setPivotAngle(Pivot.targetPosition, false);
       }
     }
 

@@ -6,7 +6,6 @@ package frc.robot.Subsystems;
 
 import org.photonvision.PhotonCamera;
 
-
 // import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,23 +22,27 @@ public class VisionSystem extends SubsystemBase {
   /** Creates a new PhotonCamera. */
 
   private static final PhotonCamera photonCamera = new PhotonCamera("VisionCamera");
-  //private static final PhotonCamera intakeCamera = new PhotonCamera("IntakeView");
+  // private static final PhotonCamera intakeCamera = new
+  // PhotonCamera("IntakeView");
 
   private static final ShuffleboardTab PhotonTab = Shuffleboard.getTab("PhotonVision");
   private final Field2d field = new Field2d();
-  
+
   private static final ShuffleboardTab telemTab = Shuffleboard.getTab("Telemetry");
-  private static final GenericEntry visionPoseEntry = PhotonTab.add("Vision Pose", new Pose2d().toString()).withPosition(0, 0).getEntry();
+  private static final GenericEntry visionPoseEntry = PhotonTab.add("Vision Pose", new Pose2d().toString())
+      .withPosition(0, 0).getEntry();
   private static final GenericEntry enabledEntry = telemTab.add("Vision System", false).withPosition(1, 2).getEntry();
   private double previousPipelineTimestamp = 0;
   public static boolean disabled = false;
-  
+
   private static boolean intakeCameraInitialized = false;
 
   public VisionSystem() {
     // if (!intakeCameraInitialized)
-    //   try {telemTab.addCamera("Processed Feed", "VisionCamera", "mjpg:http://photonvision.local:1182/stream.mjpg");}
-    //   catch(Exception e) {System.out.println("Failed to initialize intake camera stream: " + e.getMessage());}
+    // try {telemTab.addCamera("Processed Feed", "VisionCamera",
+    // "mjpg:http://photonvision.local:1182/stream.mjpg");}
+    // catch(Exception e) {System.out.println("Failed to initialize intake camera
+    // stream: " + e.getMessage());}
     // intakeCameraInitialized = true;
     // telemTab.add(CameraServer.getVideo("IntakeView").getSource());
     PhotonTab.add(field);
@@ -48,7 +51,8 @@ public class VisionSystem extends SubsystemBase {
   @Override
   public void periodic() {
     enabledEntry.setBoolean(!disabled);
-    if (disabled) return;
+    if (disabled)
+      return;
 
     var pipelineResult = photonCamera.getLatestResult();
     var resultTimestamp = pipelineResult.getTimestampSeconds();
@@ -74,8 +78,7 @@ public class VisionSystem extends SubsystemBase {
 
   }
 
-
-  public Pose3d getSelectedTargetPose(int ID){
+  public Pose3d getSelectedTargetPose(int ID) {
     Pose3d targetPose;
 
     switch (ID) {
@@ -125,10 +128,9 @@ public class VisionSystem extends SubsystemBase {
         targetPose = PhotonConstants.TARGET_15_POSE;
         break;
       case 16:
-        targetPose= PhotonConstants.TARGET_16_POSE;
+        targetPose = PhotonConstants.TARGET_16_POSE;
         break;
-  
-    
+
       default:
         targetPose = new Pose3d();
         break;

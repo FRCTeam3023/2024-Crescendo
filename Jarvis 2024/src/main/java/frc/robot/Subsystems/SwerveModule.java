@@ -113,7 +113,11 @@ public class SwerveModule {
         driveConfiguration.Audio.BeepOnBoot = false;
         driveConfiguration.Audio.BeepOnConfig = false;
 
+        driveConfiguration.CurrentLimits.StatorCurrentLimit = 80;
+        driveConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+
         driveMotor.getConfigurator().apply(driveConfiguration);
+        
 
         /*-------------------------------------------------------------------------------------------*/
 
@@ -146,6 +150,7 @@ public class SwerveModule {
 
 
         turnMotor.enableVoltageCompensation(12);
+        turnMotor.setSmartCurrentLimit(18);
 
         /*--------------------------------------------------------------------------------- */
 
