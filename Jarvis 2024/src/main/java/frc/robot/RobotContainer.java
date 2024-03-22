@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Commands.AimPivot;
 import frc.robot.Commands.AimRobotDrive;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
@@ -35,6 +34,7 @@ import frc.robot.Subsystems.LED;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.VisionSystem;
+import frc.robot.Subsystems.Pivot.PivotState;
 import frc.robot.Util.PIDDisplay;
 
 public class RobotContainer {
@@ -120,22 +120,22 @@ public class RobotContainer {
         new WaitCommand(0.5)
       ),
       new IntakeStopCommand(),
-      new SetPivotTargetCommand(ArmConstants.PICKUP_POSITION)
+      new SetPivotStateCommand(PivotState.PICKUP)
     ));
     
     new JoystickButton(controller2, 2).onTrue(new SequentialCommandGroup(
-      new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION),
+      new SetPivotStateCommand(PivotState.SPEAKER),
       new PrimeShootSequenceCommand()
     ));
 
     new JoystickButton(controller2, 3).onTrue(new SequentialCommandGroup(
-      new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION),
+      new SetPivotStateCommand(PivotState.SPEAKER),
       new InstantCommand(() -> drivetrain.resetTurnController()),
       new PrimeShootSequenceCommand()
     )).whileTrue(new AimRobotDrive(drivetrain,controller));
 
     new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
-      new SetPivotTargetCommand(Rotation2d.fromDegrees(angleSetpoint.getDouble(ArmConstants.AMP_POSITION.getDegrees()))),
+      new SetPivotStateCommand(PivotState.AMP),
       new PrimeShootSequenceCommand()
     ));
   }
@@ -144,7 +144,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new HomeCommand(drivetrain),
       new ParallelCommandGroup(
-        new RunCommand(() -> pivot.setPivotAngle(Pivot.targetPosition, false), pivot),
+        new RunCommand(() -> pivot.approachCurrentState()),
         autonomous.getSelectedAuto()
       )
     );

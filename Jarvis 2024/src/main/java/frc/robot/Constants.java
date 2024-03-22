@@ -31,8 +31,8 @@ public class Constants {
     public static final int LED_LENGTH = 41;
 
     //target pose for the opening of the speakers
-    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(83), new Rotation3d());
-    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(83), new Rotation3d());
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(87), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(87), new Rotation3d());
 
     //target positions for auto alignment into the amps
     public static final Pose2d blueAmpPose = new Pose2d(1.83,7.65, Rotation2d.fromDegrees(90));
@@ -104,9 +104,9 @@ public class Constants {
         /**Angle for floor pickup */
         public static final Rotation2d PICKUP_POSITION = new Rotation2d();
         /**Angle for speaker shot from the subwoofer */
-        public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(13);
+        public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(17);
         /**Angle for shooting down into the Amp */
-        public static final Rotation2d AMP_POSITION = Rotation2d.fromDegrees(110);
+        public static final Rotation2d AMP_POSITION = Rotation2d.fromDegrees(111);
 
         /**Which way the pivot direction is positive*/
         public static final InvertedValue PIVOT_INVERTED = InvertedValue.CounterClockwise_Positive;

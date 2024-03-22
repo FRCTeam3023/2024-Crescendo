@@ -17,6 +17,7 @@ import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.Pivot.PivotState;
 import frc.robot.Commands.CommandList.*;
 import frc.robot.Constants.ArmConstants;
 
@@ -34,12 +35,12 @@ public class Autonomous {
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
         NamedCommands.registerCommand("Shooter Stop", new ShooterStopCommand());
 
-        NamedCommands.registerCommand("Pivot Pickup", new SetPivotTargetCommand(ArmConstants.PICKUP_POSITION));
-        NamedCommands.registerCommand("Pivot Speaker", new SetPivotTargetCommand(ArmConstants.SPEAKER_POSITION));
-        NamedCommands.registerCommand("Pivot Amp", new SetPivotTargetCommand(ArmConstants.AMP_POSITION));
-        NamedCommands.registerCommand("Aim Pivot", new AimPivot(drivetrain));
+        NamedCommands.registerCommand("Pivot Pickup", new SetPivotStateCommand(PivotState.PICKUP));
+        NamedCommands.registerCommand("Pivot Speaker", new SetPivotStateCommand(PivotState.SPEAKER));
+        NamedCommands.registerCommand("Pivot Amp", new SetPivotStateCommand(PivotState.AMP));
+        NamedCommands.registerCommand("Pivot Aim", new SetPivotStateCommand(PivotState.AUTOAIM));
         NamedCommands.registerCommand("Aim and Shoot", new SequentialCommandGroup(
-            new FaceSpeakerCommand(),
+            new FaceSpeakerStationaryCommand(),
             new ShootSequenceCommand()
         ));
 

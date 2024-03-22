@@ -73,7 +73,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Speaker",
   "previewStartingState": {
     "rotation": 61.69924423399373,
     "velocity": 0

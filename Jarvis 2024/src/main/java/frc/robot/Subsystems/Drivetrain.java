@@ -45,6 +45,8 @@ import frc.robot.Util.TalonFXsetter;
 public class Drivetrain extends SubsystemBase {
 
   public static boolean allModuleHomeStatus = false;
+
+  public static boolean autoAimDrivetrain = false;
   
   //ADIS16470_IMU gyro = new ADIS16470_IMU();
   Pigeon2 pigeonGyro = new Pigeon2(20);
@@ -102,6 +104,7 @@ public class Drivetrain extends SubsystemBase {
     poseY.setDouble(0);
     poseH.setDouble(0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
+    turnController.setTolerance(Units.degreesToRadians(5));
     PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
 
     // gyro.configCalTime(CalibrationTime._32ms);
@@ -183,7 +186,8 @@ public class Drivetrain extends SubsystemBase {
     turnController.reset(getPose().getRotation().getRadians());
   }
 
-  public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative, Pose3d targetPose) {
+  public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative) {
+    Pose3d targetPose = AutoAimCalculator.translatedPose;
     Translation2d relativeTargetTranslation = getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
     Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
     double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
@@ -203,6 +207,15 @@ public class Drivetrain extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds){
     drive(chassisSpeeds, false);
   }
+
+
+  public void driveRobotAuto(ChassisSpeeds chassisSpeeds){
+    if(autoAimDrivetrain){
+      driveFacingTarget(chassisSpeeds, false);
+    } else {
+      drive(chassisSpeeds, false);
+    }
+  }
 //#endregion
 
   /** Sets drivetrain to 0 speeds */
@@ -210,7 +223,10 @@ public class Drivetrain extends SubsystemBase {
     drive(new ChassisSpeeds(), false);
   }
 
+  public boolean atHeadingTarget(){
+    return turnController.atGoal();
 
+  }
 
   /**
    * Sets the desired module states for all of the modules - desaturates the max speeds first

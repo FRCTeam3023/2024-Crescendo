@@ -23,6 +23,7 @@ import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LED;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.Pivot.PivotState;
 
 /** Add your docs here. */
 public class CommandList {
@@ -93,23 +94,45 @@ public class CommandList {
             );
         }
     }
-    public static final class SetPivotTargetCommand extends FunctionalCommand {
-        public SetPivotTargetCommand(Rotation2d target) {
-            super(() -> {}, () -> {Pivot.targetPosition = target; Pivot.climbMode = false;}, interrupted -> {}, () -> true);
+   
+
+
+    public static final class SetPivotStateCommand extends FunctionalCommand {
+        public SetPivotStateCommand(PivotState state){
+            super(() -> {}, () -> {Pivot.setPivotState(state);}, interrupted -> {}, () -> true);
         }
     }
-    public static final class FaceSpeakerCommand extends ParallelCommandGroup {
-        public FaceSpeakerCommand() {
+
+    public static final class SetDrivetrainAimStateCommand extends FunctionalCommand{
+        public SetDrivetrainAimStateCommand(boolean isAutoAim){
+            super(() -> drivetrain.resetTurnController(), () -> {Drivetrain.autoAimDrivetrain = isAutoAim;}, interrupted -> {}, () -> true);
+        }
+    }
+
+    public static final class FaceSpeakerDrivetrainCommand extends FunctionalCommand{
+        public FaceSpeakerDrivetrainCommand(){
+            super(() -> drivetrain.resetTurnController(), () -> drivetrain.driveFacingTarget(new ChassisSpeeds(), false), interrupted -> {}, () -> drivetrain.atHeadingTarget());
+        }
+    }
+
+    public static final class FaceSpeakerStationaryCommand extends ParallelCommandGroup {
+        public FaceSpeakerStationaryCommand() {
             addCommands(
-                new AimPivot(drivetrain),
-                new RunCommand(() -> drivetrain.driveFacingTarget(
-                    new ChassisSpeeds(0, 0, 0), 
-                    true, 
-                    DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Blue) 
-                        ? Constants.blueSpeakerPose : Constants.redSpeakerPose), drivetrain)
+                new SetPivotStateCommand(PivotState.AUTOAIM),
+                new FaceSpeakerDrivetrainCommand()
             );
         }
     }
+    public static final class FaceSpeakerMovingCommand extends ParallelCommandGroup{
+        public FaceSpeakerMovingCommand(){
+            addCommands(
+                new SetPivotStateCommand(PivotState.AUTOAIM),
+                new SetDrivetrainAimStateCommand(true)
+            );
+
+        }
+    }
+
     public static final class PrimeShootSequenceCommand extends ParallelRaceGroup {
         public PrimeShootSequenceCommand() {
             addCommands(
