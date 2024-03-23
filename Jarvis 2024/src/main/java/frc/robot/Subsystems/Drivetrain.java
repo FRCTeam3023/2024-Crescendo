@@ -67,7 +67,7 @@ public class Drivetrain extends SubsystemBase {
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
-  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(4, 8));
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(5, 12));
 
   ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
   GenericEntry targetPositionEntry = armTab.add("Aiming Target Position", "placeholder").withPosition(1, 0).withSize(2, 1).getEntry();
@@ -116,7 +116,7 @@ public class Drivetrain extends SubsystemBase {
       this::getPose,
       this::setPose, 
       this::getChassisSpeeds , 
-      this::driveRobotRelative, 
+      this::driveRobotAuto, 
       new HolonomicPathFollowerConfig(
         new PIDConstants(4), 
         new PIDConstants(4),
@@ -155,9 +155,9 @@ public class Drivetrain extends SubsystemBase {
     gyroDifferenceEntry.setDouble(getChassisAngle().getDegrees() - getPose().getRotation().getDegrees());
     isFieldRelative.setBoolean(JoystickDrive.fieldRelativeDrive);
     
-    if (poseX.getDouble(0) != 0 || poseY.getDouble(0) != 0 || poseH.getDouble(0) != 0)
-      setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
-    else
+    // if (poseX.getDouble(0) != 0 || poseY.getDouble(0) != 0 || poseH.getDouble(0) != 0)
+    //   setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
+    // else
       poseEstimator.update(getChassisAngle(), getModulePositions());
 
     poseEntry.setString(getPose().toString());    
@@ -187,13 +187,14 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative) {
-    Pose3d targetPose = AutoAimCalculator.translatedPose;
-    Translation2d relativeTargetTranslation = getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
-    Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
+    // Pose3d targetPose = AutoAimCalculator.translatedPose;
+    // Pose3d targetPose = Constants.redSpeakerPose;
+    Translation2d relativeTargetTranslation = AutoAimCalculator.translatedPose.toPose2d().getTranslation();//getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
+    Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX())).plus(Rotation2d.fromDegrees(180));
     double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
     drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
 
-    targetPositionEntry.setString(targetPose.toString());
+    // targetPositionEntry.setString(targetPose.toString());
     targetRotationEntry.setDouble(targetRotation.getDegrees());
     relativePositionEntry.setString(relativeTargetTranslation.toString());
     robotPoseEntry.setString(getPose().toString());

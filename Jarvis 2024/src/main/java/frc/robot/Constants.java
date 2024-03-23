@@ -30,6 +30,8 @@ public class Constants {
     /**Total length of the LED strip */
     public static final int LED_LENGTH = 41;
 
+    public static final double SIMULATION_SUPPLY_VOLTAGE = 12.0;
+
     //target pose for the opening of the speakers
     public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(87), new Rotation3d());
     public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(87), new Rotation3d());
@@ -129,6 +131,8 @@ public class Constants {
 
         /**What speed the shooter flywheels should spin at*/
         public static final double SHOOTER_RPM = 2000;
+
+        public static final double SHOOTER_RPM_AMP = 1000;
         /**The maximum difference between the shooter's RPM and the target RPM*/
         public static final double MAX_SHOOTER_RPM_ERROR = 100;
 

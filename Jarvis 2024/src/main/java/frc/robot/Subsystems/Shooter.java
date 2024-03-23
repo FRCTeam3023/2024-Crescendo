@@ -34,12 +34,10 @@ public class Shooter extends SubsystemBase {
   private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 2).getEntry();
 
 
-  private final Gains shooterGains = new Gains(0,1.0/Constants.ArmConstants.SHOOTER_RPM,1);  
+  private final Gains shooterGains = new Gains(0.001,1.0/2500,1);  
   private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
 
-  Joystick tempJoystick;
-  public Shooter(Joystick joystick) {
-    tempJoystick = joystick;
+  public Shooter() {
     leftPID = leftShooterMotor.getPIDController();
     leftEncoder = leftShooterMotor.getEncoder();
 
@@ -69,9 +67,6 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     leftSpeedEntry.setDouble(leftEncoder.getVelocity());
     rightSpeedEntry.setDouble(rightEncoder.getVelocity());
-
-    leftShooterMotor.set(tempJoystick.getRawAxis(3));
-    rightShooterMotor.set(tempJoystick.getRawAxis(3));
   }
 
 
@@ -94,6 +89,7 @@ public class Shooter extends SubsystemBase {
     double rightError = Math.abs(rightShooterMotor.getEncoder().getVelocity() - targetRPM);
 
     return leftError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR && rightError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR;
+    // return leftEncoder.getVelocity() > 1900 && rightEncoder.getVelocity() > 1900;
   }
 
   public void setShooterDutyCycle(double speed){

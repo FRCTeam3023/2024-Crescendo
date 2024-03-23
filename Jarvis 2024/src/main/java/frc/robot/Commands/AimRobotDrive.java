@@ -13,7 +13,6 @@ import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Pivot.PivotState;
-import frc.robot.Util.AutoAimCalculator;
 
 public class AimRobotDrive extends Command {
   /** Creates a new AimRobot. */

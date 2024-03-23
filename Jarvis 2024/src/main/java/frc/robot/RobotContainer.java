@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Commands.AimRobotDrive;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
@@ -45,7 +45,7 @@ public class RobotContainer {
   private static final Drivetrain drivetrain = new Drivetrain();
   private static final VisionSystem visionSystem = new VisionSystem();
   private static final Pivot pivot = new Pivot();
-  private static final Shooter shooter = new Shooter(controller);
+  private static final Shooter shooter = new Shooter();
   private static final Intake intake = new Intake();
   private static Autonomous autonomous;
   private static final LED led = new LED();
@@ -53,6 +53,7 @@ public class RobotContainer {
    private static final PIDDisplay pid = new PIDDisplay();
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+  private static final ShuffleboardTab simTab = Shuffleboard.getTab("Simulation");
   private static final GenericEntry angleSetpoint = armTab.add("Angle Setpoint", 110).withPosition(4, 2).getEntry();
 
   public RobotContainer() {
@@ -60,10 +61,12 @@ public class RobotContainer {
     configureBindings();
     drivetrain.setDefaultCommand(new JoystickDrive(drivetrain, controller, controller2));
     pivot.setDefaultCommand(new PivotHold(pivot, controller2));
-    // shooter.setDefaultCommand(intakeShooterControl);
+
     drivetrain.calibrateGyro();
 
     autonomous =  new Autonomous(pivot,shooter,intake, drivetrain);
+    simTab.add(new StartEndCommand(() -> pivot.setPivotVoltage(5),() -> pivot.setPivotVoltage(0), pivot));
+
   }
 
   private void configureBindings() {
@@ -128,11 +131,18 @@ public class RobotContainer {
       new PrimeShootSequenceCommand()
     ));
 
-    new JoystickButton(controller2, 3).onTrue(new SequentialCommandGroup(
-      new SetPivotStateCommand(PivotState.SPEAKER),
-      new InstantCommand(() -> drivetrain.resetTurnController()),
-      new PrimeShootSequenceCommand()
-    )).whileTrue(new AimRobotDrive(drivetrain,controller));
+    new JoystickButton(controller2, 3)
+      .whileTrue(new AimRobotDrive(drivetrain,controller))
+      .whileTrue(new PrimeShootSequenceCommand())
+      .onFalse(new SequentialCommandGroup(
+        new ShooterStopCommand(),
+        new ParallelRaceGroup(
+          new WaitUntilCommand(() -> !Intake.noteLoaded),
+          new IntakeCommand(),
+          new WaitCommand(0.5)
+        ),
+        new IntakeStopCommand()
+      ));
 
     new JoystickButton(controller2, 4).onTrue(new SequentialCommandGroup(
       new SetPivotStateCommand(PivotState.AMP),
@@ -141,12 +151,14 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(
-      new HomeCommand(drivetrain),
-      new ParallelCommandGroup(
-        new RunCommand(() -> pivot.approachCurrentState()),
-        autonomous.getSelectedAuto()
-      )
-    );
+    // return new SequentialCommandGroup(
+    //   new HomeCommand(drivetrain),
+    //   new ParallelCommandGroup(
+    //     new RunCommand(() -> pivot.approachCurrentState()),
+    //     autonomous.getSelectedAuto()
+    //   )
+    // );
+
+    return new WaitCommand(15);
   }
 }

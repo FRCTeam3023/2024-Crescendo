@@ -19,7 +19,6 @@ import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Pivot.PivotState;
 import frc.robot.Commands.CommandList.*;
-import frc.robot.Constants.ArmConstants;
 
 /** Add your docs here. */
 public class Autonomous {
@@ -29,7 +28,7 @@ public class Autonomous {
     public Autonomous(Pivot pivot, Shooter shooter, Intake intake, Drivetrain drivetrain){
         NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Intake Stop", new IntakeStopCommand());
-        NamedCommands.registerCommand("Prep Shooter", new PrepShooterCommand());
+        NamedCommands.registerCommand("Prime Shoot Sequence", new PrimeShootSequenceCommand());
         NamedCommands.registerCommand("Shoot", new SpinShooterCommand());
         NamedCommands.registerCommand("Shoot Sequence", new ShootSequenceCommand());
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
@@ -43,20 +42,21 @@ public class Autonomous {
             new FaceSpeakerStationaryCommand(),
             new ShootSequenceCommand()
         ));
+        NamedCommands.registerCommand("Start Aim", new FaceSpeakerMovingCommand());
+        NamedCommands.registerCommand("Stop Aim", new StopAimCommand());
 
-        new PathPlannerAuto("Test Auto");
-        new PathPlannerAuto("2 Note Center");
-        new PathPlannerAuto("3 Note Top");
-        new PathPlannerAuto("3 Note Bottom");
-        new PathPlannerAuto("Leave");
-        new PathPlannerAuto("Amp");
-        new PathPlannerAuto("2 Note Top");
-        new PathPlannerAuto("2 Note Bottom");
-        new PathPlannerAuto("2 Note Amp");
-        new PathPlannerAuto("Amp Hide");
-        new PathPlannerAuto("Leave Speaker");
-        new PathPlannerAuto("Inner Speaker 2 Note");
-        new PathPlannerAuto("Nothing");
+        // new PathPlannerAuto("2 Note Center");
+        // new PathPlannerAuto("3 Note Top");
+        // new PathPlannerAuto("3 Note Bottom");
+        // new PathPlannerAuto("Leave");
+        // new PathPlannerAuto("Amp");
+        // new PathPlannerAuto("2 Note Top");
+        // new PathPlannerAuto("2 Note Bottom");
+        // new PathPlannerAuto("2 Note Amp");
+        // new PathPlannerAuto("Amp Hide");
+        // new PathPlannerAuto("Leave Speaker");
+        // new PathPlannerAuto("Inner Speaker 2 Note");
+        // new PathPlannerAuto("Nothing");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add("Auto Chooser", autoChooser).withPosition(0, 0).withSize(5, 1);
