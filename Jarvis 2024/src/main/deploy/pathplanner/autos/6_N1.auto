@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2788871226815193,
-      "y": 6.956236908194216
+      "x": 1.4055808813372015,
+      "y": 4.1046482092964185
     },
-    "rotation": 0.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -20,25 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top Speaker Wide"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Aim and Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top Speaker Long"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top Speaker Long Return"
+            "pathName": "6_N1"
           }
         },
         {

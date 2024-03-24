@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
+        "x": 1.4055808813372015,
+        "y": 6.952083026973072
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.349152141956208,
-        "y": 5.539225686154654
+        "x": 2.0848094009925306,
+        "y": 6.8818180076983815
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.3328624118018553,
-        "y": 4.098792791023527
+        "x": 3.0472234410945274,
+        "y": 7.06163443710625
       },
       "prevControl": {
-        "x": 1.2788871226815193,
-        "y": 4.051949444840401
-      },
-      "nextControl": {
-        "x": 2.982102678577413,
-        "y": 4.127647913991329
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
-      },
-      "prevControl": {
-        "x": 2.1689107001609145,
-        "y": 5.468960666879965
+        "x": 2.2852024651417726,
+        "y": 6.816059070714633
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prep Intake",
-      "waypointRelativePos": 0.15,
+      "name": "Pivot Pickup",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -59,7 +43,18 @@
               "data": {
                 "name": "Pivot Pickup"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.4,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
@@ -69,47 +64,24 @@
           ]
         }
       }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.25,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake Stop"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Pivot Speaker"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 8.36588612403258,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Old",
+  "folder": "Speaker",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 38.50065372034546,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

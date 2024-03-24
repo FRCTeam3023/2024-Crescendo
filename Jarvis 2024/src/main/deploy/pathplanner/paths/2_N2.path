@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.930642280685416,
-        "y": 7.436381206571257
+        "x": 1.3602395625843886,
+        "y": 5.546502145635871
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.017197030114457,
-        "y": 7.249007821838753
+        "x": 2.3602395625843755,
+        "y": 5.546502145635871
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.3282835181932833,
-        "y": 6.8157068696448375
+        "x": 2.7476839164204647,
+        "y": 5.546502145635871
       },
       "prevControl": {
-        "x": 4.054355384031739,
-        "y": 7.120188619835158
+        "x": 1.7476839164204647,
+        "y": 5.546502145635871
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
+      "name": "Intake",
       "waypointRelativePos": 0.3,
       "command": {
         "type": "parallel",
@@ -41,13 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Start Aim"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Prime Shoot Sequence"
+                "name": "Intake"
               }
             }
           ]
@@ -55,7 +49,7 @@
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "Pivot Pickup",
       "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
@@ -64,7 +58,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake Stop"
+                "name": "Pivot Pickup"
               }
             }
           ]
@@ -73,14 +67,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 19.440034828176184,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
@@ -89,5 +83,5 @@
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

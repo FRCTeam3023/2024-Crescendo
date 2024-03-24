@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Aproach Amp"
+            "pathName": "4_A"
           }
         },
         {
@@ -51,7 +51,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Hide"
+            "pathName": "A_HIDE"
           }
         }
       ]

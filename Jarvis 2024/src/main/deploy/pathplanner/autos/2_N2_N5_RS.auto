@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3602395625843886,
+      "y": 5.546502145635871
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2_N2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N2_N5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Check Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N5_RS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "3 Note Speaker",
+  "choreoAuto": false
+}

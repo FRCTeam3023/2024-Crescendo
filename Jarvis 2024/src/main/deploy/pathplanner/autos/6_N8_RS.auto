@@ -2,42 +2,48 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.442332115433463,
-      "y": 7.301537679998438
+      "x": 1.4055808813372015,
+      "y": 4.077443418044731
     },
-    "rotation": -91.1790516741527
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "4_A"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "pathName": "6_N8"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot Sequence"
+            "name": "Check Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N8_RS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Pivot Pickup"
+            "name": "Aim and Shoot"
           }
         }
       ]
     }
   },
-  "folder": "Amp",
+  "folder": "2 Note Speaker",
   "choreoAuto": false
 }

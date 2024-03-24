@@ -3,25 +3,57 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.023801768002964,
-        "y": 6.956236908194216
+        "x": 2.6570012789148385,
+        "y": 4.240672165554857
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.023801768002963,
-        "y": 6.956236908194216
+        "x": 2.4484312126518994,
+        "y": 3.8416685605301044
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.930642280685416,
-        "y": 7.448092043117039
+        "x": 3.627305500225036,
+        "y": 2.336336777936714
       },
       "prevControl": {
-        "x": 6.607317751012105,
-        "y": 7.483224552754384
+        "x": 2.602591696411463,
+        "y": 2.943910449224408
+      },
+      "nextControl": {
+        "x": 5.107068772581774,
+        "y": 1.4589550146809547
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.873743922926442,
+        "y": 0.7675271490893864
+      },
+      "prevControl": {
+        "x": 5.924285426442625,
+        "y": 0.8106843534750157
+      },
+      "nextControl": {
+        "x": 7.272747527951196,
+        "y": 0.7493906215882606
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.961935572993954,
+        "y": 0.7675271490893864
+      },
+      "prevControl": {
+        "x": 7.680819396726513,
+        "y": 0.7765954128399487
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,8 +62,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.85,
-      "rotationDegrees": 0.0,
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
@@ -39,7 +71,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.1,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -56,7 +88,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 2.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,8 +105,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -86,8 +118,8 @@
   "reversed": false,
   "folder": "Speaker",
   "previewStartingState": {
-    "rotation": 50.01311375503562,
+    "rotation": -26.565051177077855,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

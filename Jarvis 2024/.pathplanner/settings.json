@@ -5,7 +5,8 @@
   "pathFolders": [
     "Amp",
     "Leave",
-    "Util",
+    "Old",
+    "Positions",
     "Speaker"
   ],
   "autoFolders": [
@@ -13,6 +14,7 @@
     "3 Note Speaker",
     "Amp",
     "Leave",
+    "Old",
     "Various"
   ],
   "defaultMaxVel": 3.0,

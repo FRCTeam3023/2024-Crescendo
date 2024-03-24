@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5276958246224197,
-        "y": 4.09478126648561
+        "x": 0.7417791758660457,
+        "y": 4.410523436431489
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8863445419256017,
-        "y": 4.1046482092932495
+        "x": 1.5212676579199327,
+        "y": 4.055313495242375
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.771380004304219,
-        "y": 4.430257322049937
+        "x": 2.5276958246224197,
+        "y": 4.09478126648561
       },
       "prevControl": {
-        "x": 0.9193841464663495,
-        "y": 3.996111838374354
+        "x": 1.5276958246224197,
+        "y": 4.09478126648561
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,8 +38,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.2,
+      "name": "Intake",
+      "waypointRelativePos": 0.65,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,13 +47,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Pivot Speaker"
+                "name": "Intake"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Pivot Pickup",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Intake Stop"
+                "name": "Pivot Pickup"
               }
             }
           ]
@@ -69,13 +80,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -56.30993247402022,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Speaker",
   "previewStartingState": {
-    "rotation": 0.0,
+    "rotation": -59.47029410006591,
     "velocity": 0
   },
   "useDefaultConstraints": true

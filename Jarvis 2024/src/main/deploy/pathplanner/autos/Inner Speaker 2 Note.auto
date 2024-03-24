@@ -39,13 +39,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Inner Speaker to Inner Note"
+            "pathName": "1_N1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Inner Note to Inner Speaker"
+            "pathName": "N1_1"
           }
         },
         {
@@ -57,6 +57,6 @@
       ]
     }
   },
-  "folder": "2 Note Speaker",
+  "folder": "Old",
   "choreoAuto": false
 }

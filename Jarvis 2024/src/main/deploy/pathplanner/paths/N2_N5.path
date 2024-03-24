@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
+        "x": 2.684206070166527,
+        "y": 5.5555704093864335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.349152141956208,
-        "y": 5.539225686154654
+        "x": 4.55226840278242,
+        "y": 6.335441091934815
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.3328624118018553,
-        "y": 4.098792791023527
+        "x": 5.613255261598242,
+        "y": 6.271963245680878
       },
       "prevControl": {
-        "x": 1.2788871226815193,
-        "y": 4.051949444840401
+        "x": 5.070270580732143,
+        "y": 6.305899788235009
       },
       "nextControl": {
-        "x": 2.982102678577413,
-        "y": 4.127647913991329
+        "x": 6.193624141634249,
+        "y": 6.2356901906786275
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
+        "x": 7.934730781742266,
+        "y": 5.764140475649373
       },
       "prevControl": {
-        "x": 2.1689107001609145,
-        "y": 5.468960666879965
+        "x": 6.783061285420817,
+        "y": 5.818550058152748
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,8 +48,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prep Intake",
-      "waypointRelativePos": 0.15,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -59,12 +59,6 @@
               "data": {
                 "name": "Pivot Pickup"
               }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
             }
           ]
         }
@@ -72,7 +66,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.25,
+      "waypointRelativePos": 1.8,
       "command": {
         "type": "parallel",
         "data": {
@@ -80,13 +74,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake Stop"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Pivot Speaker"
+                "name": "Intake"
               }
             }
           ]
@@ -106,7 +94,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Old",
+  "folder": "Speaker",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

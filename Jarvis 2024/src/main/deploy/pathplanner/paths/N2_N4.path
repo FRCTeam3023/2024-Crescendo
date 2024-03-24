@@ -3,53 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
+        "x": 2.910912663930591,
+        "y": 5.546502145635871
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.349152141956208,
-        "y": 5.539225686154654
+        "x": 3.9109126639305902,
+        "y": 5.546502145635871
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.3328624118018553,
-        "y": 4.098792791023527
+        "x": 7.930642280685416,
+        "y": 7.448092043117039
       },
       "prevControl": {
-        "x": 1.2788871226815193,
-        "y": 4.051949444840401
-      },
-      "nextControl": {
-        "x": 2.982102678577413,
-        "y": 4.127647913991329
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.3491521419562087,
-        "y": 5.539225686154654
-      },
-      "prevControl": {
-        "x": 2.1689107001609145,
-        "y": 5.468960666879965
+        "x": 6.607317751012105,
+        "y": 7.483224552754384
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.85,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prep Intake",
-      "waypointRelativePos": 0.15,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -59,7 +49,18 @@
               "data": {
                 "name": "Pivot Pickup"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.7,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
@@ -69,34 +70,11 @@
           ]
         }
       }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.25,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake Stop"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Pivot Speaker"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -106,10 +84,10 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Old",
+  "folder": "Speaker",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 1.432096184164678,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
