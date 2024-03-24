@@ -4,6 +4,8 @@
 
 package frc.robot.Commands;
 
+import javax.swing.GroupLayout.ParallelGroup;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Intake;
@@ -30,33 +33,35 @@ public class Autonomous {
         NamedCommands.registerCommand("Intake Stop", new IntakeStopCommand());
         NamedCommands.registerCommand("Prime Shoot Sequence", new PrimeShootSequenceCommand());
         NamedCommands.registerCommand("Shoot", new SpinShooterCommand());
-        NamedCommands.registerCommand("Shoot Sequence", new ShootSequenceCommand());
+        NamedCommands.registerCommand("Shoot Sequence", new ShootSequenceAutoCommand());
         // NamedCommands.registerCommand("Amp Shoot Sequence", shootAmpSequenceCommand);
-        NamedCommands.registerCommand("Shooter Stop", new ShooterStopCommand());
+        NamedCommands.registerCommand("Shooter Stop", new ShooterStopAutoCommand());
 
         NamedCommands.registerCommand("Pivot Pickup", new SetPivotStateCommand(PivotState.PICKUP));
         NamedCommands.registerCommand("Pivot Speaker", new SetPivotStateCommand(PivotState.SPEAKER));
         NamedCommands.registerCommand("Pivot Amp", new SetPivotStateCommand(PivotState.AMP));
         NamedCommands.registerCommand("Pivot Aim", new SetPivotStateCommand(PivotState.AUTOAIM));
-        NamedCommands.registerCommand("Aim and Shoot", new SequentialCommandGroup(
+        NamedCommands.registerCommand("Aim and Shoot", new ParallelCommandGroup(
             new FaceSpeakerStationaryCommand(),
             new ShootSequenceCommand()
         ));
         NamedCommands.registerCommand("Start Aim", new FaceSpeakerMovingCommand());
         NamedCommands.registerCommand("Stop Aim", new StopAimCommand());
 
-        // new PathPlannerAuto("2 Note Center");
-        // new PathPlannerAuto("3 Note Top");
-        // new PathPlannerAuto("3 Note Bottom");
-        // new PathPlannerAuto("Leave");
-        // new PathPlannerAuto("Amp");
-        // new PathPlannerAuto("2 Note Top");
-        // new PathPlannerAuto("2 Note Bottom");
-        // new PathPlannerAuto("2 Note Amp");
-        // new PathPlannerAuto("Amp Hide");
-        // new PathPlannerAuto("Leave Speaker");
-        // new PathPlannerAuto("Inner Speaker 2 Note");
-        // new PathPlannerAuto("Nothing");
+        new PathPlannerAuto("2 Note Center");
+        new PathPlannerAuto("3 Note Top");
+        new PathPlannerAuto("3 Note Bottom");
+        new PathPlannerAuto("Leave");
+        new PathPlannerAuto("Amp");
+        new PathPlannerAuto("2 Note Top");
+        new PathPlannerAuto("2 Note Bottom");
+        new PathPlannerAuto("2 Note Amp");
+        new PathPlannerAuto("Amp Hide");
+        new PathPlannerAuto("Leave Speaker");
+        new PathPlannerAuto("Inner Speaker 2 Note");
+        new PathPlannerAuto("Nothing");
+        new PathPlannerAuto("Top Speaker Outer");
+        new PathPlannerAuto("Top Speaker Long");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add("Auto Chooser", autoChooser).withPosition(0, 0).withSize(5, 1);

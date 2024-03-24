@@ -61,12 +61,6 @@ public class CommandList {
         }
     }
 
-    public static final class OutakeTillSensed extends FunctionalCommand{
-        public OutakeTillSensed(){
-            super(() -> {}, () -> intake.setIntakeSpeed(-0.5), interrupted -> intake.setIntakeSpeed(0), () -> !intake.senseNote(), intake);
-        }
-    }
-
     public static final class PrepShooterCommand extends SequentialCommandGroup {
         /**Prep intake for shooting, bypassed if the note is not sensed by the sensor */
         public PrepShooterCommand() {
@@ -101,6 +95,14 @@ public class CommandList {
             super(() -> {}, () -> shooter.setShooterRPM(0), interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
+
+    public static final class ShooterStopAutoCommand extends FunctionalCommand {
+        /**Set shooter rpm to 0 */
+        public ShooterStopAutoCommand() {
+            super(() -> {}, () -> shooter.setShooterRPM(0), interrupted -> {}, () -> true, shooter);
+        }
+    }
+
     public static final class ShootSequenceCommand extends SequentialCommandGroup {
         /**Prep shooter and shoot sequence, will skip to shooting if previously intaked and spun up */
         public ShootSequenceCommand() {
@@ -112,9 +114,28 @@ public class CommandList {
                 ),
                 new InstantCommand(() -> Intake.noteLoaded = false),
                 new IntakeNoSensorCommand(),
-                new WaitCommand(1),
+                new WaitCommand(0.5),
                 new IntakeStopCommand(),
                 new ShooterStopCommand()
+            );
+        }
+    }
+
+    public static final class ShootSequenceAutoCommand extends SequentialCommandGroup {
+        /**Prep shooter and shoot sequence, will skip to shooting if previously intaked and spun up */
+        public ShootSequenceAutoCommand() {
+            addCommands(
+                new PrepShooterCommand(),
+                new ParallelRaceGroup(
+                    new SpinShooterCommand(),
+                    new WaitUntilCommand(() -> drivetrain.atHeadingTarget()),
+                    new WaitCommand(2)
+                ),
+                new InstantCommand(() -> Intake.noteLoaded = false),
+                new IntakeNoSensorCommand(),
+                new WaitCommand(0.4),
+                new IntakeStopCommand(),
+                new ShooterStopAutoCommand()
             );
         }
     }
@@ -141,7 +162,7 @@ public class CommandList {
     public static final class FaceSpeakerDrivetrainCommand extends FunctionalCommand{
         /**Command to rotate the drivetrain towards the target, use setDrivetrainAimStateCommand() for heading auto aim during autonomous*/
         public FaceSpeakerDrivetrainCommand(){
-            super(() -> drivetrain.resetTurnController(), () -> drivetrain.driveFacingTarget(new ChassisSpeeds(), false), interrupted -> {}, () -> drivetrain.atHeadingTarget(), drivetrain);
+            super(() -> {drivetrain.resetTurnController();}, () -> drivetrain.driveFacingTarget(new ChassisSpeeds(), false), interrupted -> {drivetrain.stop();}, () -> drivetrain.atHeadingTarget(), drivetrain);
         }
     }
 

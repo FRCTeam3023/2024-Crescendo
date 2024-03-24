@@ -20,6 +20,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -82,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
     MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    MatBuilder.fill(Nat.N3(), Nat.N1(),0.6,0.6,0.6) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.3,0.3,0.3) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -119,7 +120,7 @@ public class Drivetrain extends SubsystemBase {
       this::driveRobotAuto, 
       new HolonomicPathFollowerConfig(
         new PIDConstants(4), 
-        new PIDConstants(4),
+        new PIDConstants(1.5),
         ModuleConstants.MAX_SPEED, 
         Units.inchesToMeters(16.5), 
         new ReplanningConfig()),
@@ -187,14 +188,12 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative) {
-    // Pose3d targetPose = AutoAimCalculator.translatedPose;
-    // Pose3d targetPose = Constants.redSpeakerPose;
     Translation2d relativeTargetTranslation = AutoAimCalculator.translatedPose.toPose2d().getTranslation();//getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
     Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX())).plus(Rotation2d.fromDegrees(180));
     double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
     drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
 
-    // targetPositionEntry.setString(targetPose.toString());
+    targetPositionEntry.setString(getPose().plus(new Transform2d(relativeTargetTranslation.getX(), relativeTargetTranslation.getY(), new Rotation2d())).toString());
     targetRotationEntry.setDouble(targetRotation.getDegrees());
     relativePositionEntry.setString(relativeTargetTranslation.toString());
     robotPoseEntry.setString(getPose().toString());

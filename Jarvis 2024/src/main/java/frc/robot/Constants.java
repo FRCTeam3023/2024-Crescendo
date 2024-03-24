@@ -72,7 +72,7 @@ public class Constants {
         public final static Transform3d ROBOT_TO_CAMERA = 
             new Transform3d(
                 new Translation3d(-Units.inchesToMeters(15.0), 0, Units.inchesToMeters(14.5)), 
-                new Rotation3d(0, -CAM_PITCH, Math.PI)
+                new Rotation3d(Units.degreesToRadians(180), -CAM_PITCH, Math.PI)
             );
 
         public static final Transform3d CAMERA_TO_ROBOT = ROBOT_TO_CAMERA.inverse();
@@ -104,7 +104,7 @@ public class Constants {
     public static class ArmConstants{
 
         /**Angle for floor pickup */
-        public static final Rotation2d PICKUP_POSITION = new Rotation2d();
+        public static final Rotation2d PICKUP_POSITION = Rotation2d.fromDegrees(0);
         /**Angle for speaker shot from the subwoofer */
         public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(17);
         /**Angle for shooting down into the Amp */
@@ -117,7 +117,7 @@ public class Constants {
         public static final double PIVOT_GEAR_RATIO = 30.0 * (72.0/24.0) * (36.0/12.0);
 
         /**Relative to horizontal in global angle where is 0 degrees local*/
-        public static final Rotation2d PIVOT_INITIALIZE_POSITION = Rotation2d.fromDegrees(-15);
+        public static final Rotation2d PIVOT_INITIALIZE_POSITION = Rotation2d.fromDegrees(-11);
 
         
         public static final double PIVOT_FEED_FORWARD = 0;
@@ -145,7 +145,7 @@ public class Constants {
         /**Max allowable pivot angle relative to local origin */
         public static final Rotation2d PIVOT_MAX = Rotation2d.fromDegrees(115);
         /**Cancoder Magnet offset in rotations relative to local origin */
-        public static final double PIVOT_SENSOR_OFFSET = .181;
+        public static final double PIVOT_SENSOR_OFFSET = .1865;
 
         public static final double NOTE_LAUNCH_SPEED = 30; //m/s
         

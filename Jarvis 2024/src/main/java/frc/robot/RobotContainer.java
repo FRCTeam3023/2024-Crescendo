@@ -151,14 +151,20 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    return new SequentialCommandGroup(
+      new HomeCommand(drivetrain),
+      new ParallelCommandGroup(
+        new RunCommand(() -> pivot.approachCurrentState()),
+        autonomous.getSelectedAuto()
+      )
+    );
     // return new SequentialCommandGroup(
     //   new HomeCommand(drivetrain),
     //   new ParallelCommandGroup(
-    //     new RunCommand(() -> pivot.approachCurrentState()),
-    //     autonomous.getSelectedAuto()
+    //     new FaceSpeakerStationaryCommand(),
+    //     new SetPivotStateCommand(PivotState.AUTOAIM),
+    //     new RunCommand(() -> pivot.approachCurrentState(), pivot)
     //   )
-    // );
-
-    return new WaitCommand(15);
+    // ) ;
   }
 }

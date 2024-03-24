@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -40,6 +41,9 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     leftPID = leftShooterMotor.getPIDController();
     leftEncoder = leftShooterMotor.getEncoder();
+
+    leftShooterMotor.setIdleMode(IdleMode.kBrake);
+    rightShooterMotor.setIdleMode(IdleMode.kBrake);
 
     rightPID = rightShooterMotor.getPIDController();
     rightEncoder = rightShooterMotor.getEncoder();
@@ -75,8 +79,13 @@ public class Shooter extends SubsystemBase {
    * @param rpm target rpm
    */
   public void setShooterRPM(double rpm){
-    leftPID.setReference(rpm, ControlType.kVelocity);
-    rightPID.setReference(rpm, ControlType.kVelocity);
+    if(rpm == 0){
+      leftShooterMotor.set(0);
+      rightShooterMotor.set(0);
+    }else{
+      leftPID.setReference(rpm, ControlType.kVelocity);
+      rightPID.setReference(rpm, ControlType.kVelocity);
+    }
     targetRPM = rpm;
   }
 
