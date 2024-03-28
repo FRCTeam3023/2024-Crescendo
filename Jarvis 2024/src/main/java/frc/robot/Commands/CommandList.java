@@ -45,7 +45,7 @@ public class CommandList {
     public static final class IntakeCommand extends FunctionalCommand {
         /**Intake command until intake sensor triggered */
         public IntakeCommand() {
-            super(() -> {}, () -> intake.intakeTillSensed(1), interrupted -> {}, intake::senseNote, intake);
+            super(() -> {}, () -> intake.intakeTillSensed(1), interrupted -> {intake.setIntakeSpeed(0);}, intake::senseNote, intake);
         }
     }
     public static final class IntakeNoSensorCommand extends FunctionalCommand {
@@ -79,12 +79,12 @@ public class CommandList {
         /**Spins shooter up to target RPM - Changes if at AMP position */
         public SpinShooterCommand() {
             super(() -> {
-                    // if(Pivot.getPivotState() == PivotState.AMP){
-                    //     shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM_AMP);
-                    // }else{
-                    //     shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
-                    // }
-                    shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
+                    if(Pivot.getPivotState() == PivotState.AMP){
+                        shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM_AMP);
+                    }else{
+                        shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
+                    }
+                    // shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
                 }, () -> {}, interrupted -> {}, () -> shooter.isFlywheelReady(), shooter);
         }
     }
@@ -125,12 +125,13 @@ public class CommandList {
         /**Prep shooter and shoot sequence, will skip to shooting if previously intaked and spun up */
         public ShootSequenceAutoCommand() {
             addCommands(
+                new WaitUntilCommand(() -> Intake.noteLoaded),
                 new PrepShooterCommand(),
                 new ParallelRaceGroup(
                     new SpinShooterCommand(),
-                    new WaitUntilCommand(() -> drivetrain.atHeadingTarget()),
                     new WaitCommand(2)
                 ),
+                new WaitUntilCommand(() -> {if(Pivot.getPivotState() == PivotState.AUTOAIM){return drivetrain.atHeadingTarget();}else{return true;}}),
                 new InstantCommand(() -> Intake.noteLoaded = false),
                 new IntakeNoSensorCommand(),
                 new WaitCommand(0.4),
@@ -182,7 +183,6 @@ public class CommandList {
                 new SetPivotStateCommand(PivotState.AUTOAIM),
                 new SetDrivetrainAimStateCommand(true)
             );
-
         }
     }
 
@@ -205,7 +205,7 @@ public class CommandList {
                     new WaitUntilCommand(() -> pivot.noteClearsGround()),
                     new PrepShooterCommand(),
                     // new SpinShooterCommand()
-                    new InstantCommand(() -> shooter.setShooterRPM(ArmConstants.SHOOTER_RPM))
+                    new InstantCommand(() -> shooter.setShooterRPM((Pivot.getPivotState() == PivotState.AMP) ? ArmConstants.SHOOTER_RPM_AMP : ArmConstants.SHOOTER_RPM))
                 )
             );
         }

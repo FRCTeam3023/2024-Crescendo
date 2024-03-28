@@ -4,33 +4,42 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Pivot;
+import frc.robot.Subsystems.Pivot.PivotState;
 
-public class JoystickDrive extends Command {
+public class AimHeadingDrive extends Command {
+  /** Creates a new AimRobot. */
+
   Drivetrain drivetrain;
   Joystick controller;
-  Joystick rightJoystick;
+  Rotation2d heading;
 
-  public static boolean fieldRelativeDrive = true;
-
-  /** Creates a new JoystickDrive. */
-  public JoystickDrive(Drivetrain drivetrain, Joystick controller, Joystick rightJoystick) {
+   ProfiledPIDController thetaController = new ProfiledPIDController(6, 0, 0, new Constraints(4, 8));
+  
+  public AimHeadingDrive(Drivetrain drivetrain, Joystick controller, Rotation2d heading) {
+    // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.controller = controller;
-    this.rightJoystick = rightJoystick;
+    this.heading = heading;
     addRequirements(drivetrain);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    Pivot.climbMode = false;
+    thetaController.reset(drivetrain.getPose().getRotation().getRadians());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -61,17 +70,19 @@ public class JoystickDrive extends Command {
     double ySpeed = -Math.cos(theta) * processedMagnitude;
     //------------------------------------------------------------------------------------
     //rotation input -closed loop and open loop toggle
-    double rotationSpeed = 0;
+    Alliance currentColor = null;
+    if (DriverStation.getAlliance().isPresent())
+      currentColor = DriverStation.getAlliance().get();
 
     //flip Direction if alliance is red, field-centric based on blue alliance
-    if(Robot.alliance == Alliance.Red){
+    if(currentColor == Alliance.Red){
       xSpeed = -xSpeed;
       ySpeed = -ySpeed;
     }
 
-      double xInputLeft = applyDeadband(controller.getRawAxis(0), Constants.DRIVE_TOLERANCE_PERCENT);
-      rotationSpeed = -Math.signum(xInputLeft) * Math.pow(xInputLeft, 2) * Constants.MAX_ANGULAR_SPEED;
-      drivetrain.drive(new ChassisSpeeds(xSpeed,ySpeed,rotationSpeed), fieldRelativeDrive);
+    double thetaSpeed = thetaController.calculate(drivetrain.getPose().getRotation().getRadians(), heading.getRadians());
+
+    drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed), true);
   }
 
   // Called once the command ends or is interrupted.
@@ -85,6 +96,7 @@ public class JoystickDrive extends Command {
   public boolean isFinished() {
     return false;
   }
+
 
   private double applyDeadband(double joystickValue, double tolerance){
     if(Math.abs(joystickValue) > tolerance){

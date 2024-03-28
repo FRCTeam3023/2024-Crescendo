@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3602395625843886,
-      "y": 5.546502145635871
+      "x": 1.4028643441902284,
+      "y": 6.9660616244309415
     },
     "rotation": 0
   },
@@ -12,26 +12,26 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Aim and Shoot"
+            "pathName": "5_N4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2_N2"
+            "pathName": "N4_JS_N8_RS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Aim and Shoot"
+            "name": "Shoot Sequence"
           }
         }
       ]
     }
   },
-  "folder": "2 Note Speaker",
+  "folder": "Devious",
   "choreoAuto": false
 }

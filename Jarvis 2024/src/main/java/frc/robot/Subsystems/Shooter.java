@@ -64,6 +64,9 @@ public class Shooter extends SubsystemBase {
 
     leftShooterMotor.enableVoltageCompensation(11.5);
     rightShooterMotor.enableVoltageCompensation(11.5);
+
+    leftShooterMotor.setSmartCurrentLimit(40);
+    rightShooterMotor.setSmartCurrentLimit(40);
   }
 
   @Override

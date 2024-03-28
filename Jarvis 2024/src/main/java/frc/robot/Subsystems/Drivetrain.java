@@ -83,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
     MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    MatBuilder.fill(Nat.N3(), Nat.N1(),0.3,0.3,0.3) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.3,0.3,0.1) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -105,7 +105,7 @@ public class Drivetrain extends SubsystemBase {
     poseY.setDouble(0);
     poseH.setDouble(0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
-    turnController.setTolerance(Units.degreesToRadians(5));
+    turnController.setTolerance(Units.degreesToRadians(1));
     PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
 
     // gyro.configCalTime(CalibrationTime._32ms);
@@ -120,7 +120,7 @@ public class Drivetrain extends SubsystemBase {
       this::driveRobotAuto, 
       new HolonomicPathFollowerConfig(
         new PIDConstants(4), 
-        new PIDConstants(1.5),
+        new PIDConstants(4),
         ModuleConstants.MAX_SPEED, 
         Units.inchesToMeters(16.5), 
         new ReplanningConfig()),

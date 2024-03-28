@@ -79,7 +79,7 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 5;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 7;
     pivotConfiguration.MotionMagic.MotionMagicAcceleration = 15;
     pivotConfiguration.MotionMagic.MotionMagicJerk = 200;
 

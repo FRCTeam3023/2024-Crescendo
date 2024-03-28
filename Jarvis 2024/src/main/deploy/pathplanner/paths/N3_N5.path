@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.025413419247892,
-        "y": 0.7765954128399487
+        "x": 3.1295793360817505,
+        "y": 7.015396338484985
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.336225374205135,
-        "y": 0.7675271490893864
+        "x": 5.369375354135324,
+        "y": 6.561516969187785
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.5209773226564,
-        "y": 3.5333475930109763
+        "x": 7.934730781742266,
+        "y": 5.764140475649373
       },
       "prevControl": {
-        "x": 2.947185718932842,
-        "y": 3.143412251736785
+        "x": 6.783061285420817,
+        "y": 5.818550058152748
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,13 +41,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Start Aim"
+                "name": "Pivot Pickup"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.9,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Prime Shoot Sequence"
+                "name": "Intake"
               }
             }
           ]
@@ -63,7 +74,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -36.11934084947979,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,

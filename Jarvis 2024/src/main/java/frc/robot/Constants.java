@@ -33,12 +33,12 @@ public class Constants {
     public static final double SIMULATION_SUPPLY_VOLTAGE = 12.0;
 
     //target pose for the opening of the speakers
-    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(87), new Rotation3d());
-    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(87), new Rotation3d());
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(85), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(85), new Rotation3d());
 
     //target positions for auto alignment into the amps
-    public static final Pose2d blueAmpPose = new Pose2d(1.83,7.65, Rotation2d.fromDegrees(90));
-    public static final Pose2d redAmpPose = new Pose2d(14.7,7.65,Rotation2d.fromDegrees(90));
+    public static final Pose2d blueAmpPose = new Pose2d(1.84,7.6, Rotation2d.fromDegrees(-90));
+    public static final Pose2d redAmpPose = new Pose2d(14.7,7.6,Rotation2d.fromDegrees(-90));
     // public static final Pose3d speakerPose = new Pose3d(Units.inchesToMeters(-54), 0, Units.inchesToMeters(83), new Rotation3d());
 
     public class ModuleConstants{
@@ -85,17 +85,17 @@ public class Constants {
         public static final Pose3d TARGET_2_POSE = new Pose3d(16.19 , .88, 1.36, new Rotation3d(0,0,2*Math.PI/3));
         public static final Pose3d TARGET_3_POSE = new Pose3d(16.58 , 4.98, 1.45, new Rotation3d(0,0,Math.PI));
         public static final Pose3d TARGET_4_POSE = new Pose3d(16.58, 5.55, 1.45, new Rotation3d(0,0,Math.PI));
-        public static final Pose3d TARGET_5_POSE = new Pose3d(14.7,8.2,1.36, new Rotation3d(0,0,-Math.PI/4));
-        public static final Pose3d TARGET_6_POSE = new Pose3d(1.84 , 8.2, 1.36, new Rotation3d(0,0,-Math.PI/4));
+        public static final Pose3d TARGET_5_POSE = new Pose3d(14.7,8.2,1.36, new Rotation3d(0,0,-Math.PI/2.0));
+        public static final Pose3d TARGET_6_POSE = new Pose3d(1.84 , 8.2, 1.36, new Rotation3d(0,0,-Math.PI/2.0));
         public static final Pose3d TARGET_7_POSE = new Pose3d(-.04,5.55, 1.45, new Rotation3d());
         public static final Pose3d TARGET_8_POSE = new Pose3d(-.04 , 4.98, 1.45, new Rotation3d());
-        public static final Pose3d TARGET_9_POSE = new Pose3d(.36,0.88,1.36, new Rotation3d(0,0,Math.PI/3));
-        public static final Pose3d TARGET_10_POSE = new Pose3d(1.46 , 0.25,1.36, new Rotation3d(0,0,Math.PI/3));
-        public static final Pose3d TARGET_11_POSE = new Pose3d(11.9,3.71,1.32, new Rotation3d(0,0,-Math.PI/3));
-        public static final Pose3d TARGET_12_POSE = new Pose3d(11.9,4.5,1.32, new Rotation3d(0,0,Math.PI/3));
+        public static final Pose3d TARGET_9_POSE = new Pose3d(.36,0.88,1.36, new Rotation3d(0,0,Math.PI/3.0));
+        public static final Pose3d TARGET_10_POSE = new Pose3d(1.46 , 0.25,1.36, new Rotation3d(0,0,Math.PI/3.0));
+        public static final Pose3d TARGET_11_POSE = new Pose3d(11.9,3.71,1.32, new Rotation3d(0,0,-Math.PI/3.0));
+        public static final Pose3d TARGET_12_POSE = new Pose3d(11.9,4.5,1.32, new Rotation3d(0,0,Math.PI/3.0));
         public static final Pose3d TARGET_13_POSE = new Pose3d(11.22,4.11,1.32, new Rotation3d(0,0,Math.PI));
         public static final Pose3d TARGET_14_POSE = new Pose3d(5.32,4.11,1.32, new Rotation3d(0,0,0));
-        public static final Pose3d TARGET_15_POSE = new Pose3d(4.64,4.5,1.32, new Rotation3d(0,0,2*Math.PI/3));
+        public static final Pose3d TARGET_15_POSE = new Pose3d(4.64,4.5,1.32, new Rotation3d(0,0,2*Math.PI/3.0));
         public static final Pose3d TARGET_16_POSE = new Pose3d(4.64,3.71,1.32, new Rotation3d(0,0,-Math.PI/1.5));
         
 
@@ -108,7 +108,7 @@ public class Constants {
         /**Angle for speaker shot from the subwoofer */
         public static final Rotation2d SPEAKER_POSITION = Rotation2d.fromDegrees(17);
         /**Angle for shooting down into the Amp */
-        public static final Rotation2d AMP_POSITION = Rotation2d.fromDegrees(111);
+        public static final Rotation2d AMP_POSITION = Rotation2d.fromDegrees(100);
 
         /**Which way the pivot direction is positive*/
         public static final InvertedValue PIVOT_INVERTED = InvertedValue.CounterClockwise_Positive;
@@ -132,7 +132,7 @@ public class Constants {
         /**What speed the shooter flywheels should spin at*/
         public static final double SHOOTER_RPM = 2000;
 
-        public static final double SHOOTER_RPM_AMP = 1000;
+        public static final double SHOOTER_RPM_AMP = 1500;
         /**The maximum difference between the shooter's RPM and the target RPM*/
         public static final double MAX_SHOOTER_RPM_ERROR = 100;
 
@@ -147,7 +147,7 @@ public class Constants {
         /**Cancoder Magnet offset in rotations relative to local origin */
         public static final double PIVOT_SENSOR_OFFSET = .1865;
 
-        public static final double NOTE_LAUNCH_SPEED = 30; //m/s
+        public static final double NOTE_LAUNCH_SPEED = 18.5; //m/s
         
         /**True if set to using remote CANCoder, false if rotor sensor */
         public static final boolean USE_REMOTE_PIVOT_SENSOR = true;

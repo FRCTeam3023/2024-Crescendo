@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Commands.AimHeadingDrive;
 import frc.robot.Commands.AimRobotDrive;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
@@ -105,13 +106,48 @@ public class RobotContainer {
         new IntakeStopCommand(),
         new ShooterStopCommand()
       ));
+
     new JoystickButton(controller, 5).whileTrue(new IntakeCommand()).whileFalse(new IntakeStopCommand());
     new JoystickButton(controller, 7).onTrue(new InstantCommand(
         () -> drivetrain.setPose(new Pose2d(drivetrain.getPose().getX(),drivetrain.getPose().getY(),new Rotation2d()))
       ));
 
-    new JoystickButton(controller, 1).onTrue(new InstantCommand(() -> drivetrain.calibrateGyro()));
-    new JoystickButton(controller, 2).whileTrue(new AmpOrient(drivetrain));
+    //new JoystickButton(controller, 1).onTrue(new InstantCommand(() -> drivetrain.calibrateGyro()));
+
+    new JoystickButton(controller, 1)
+    .whileTrue(new AimRobotDrive(drivetrain,controller))
+      .whileTrue(new PrimeShootSequenceCommand())
+      .onFalse(new SequentialCommandGroup(
+        new ShooterStopCommand(),
+        new ParallelRaceGroup(
+          new WaitUntilCommand(() -> !Intake.noteLoaded),
+          new IntakeCommand(),
+          new WaitCommand(0.5)
+        ),
+        new IntakeStopCommand()
+      ));
+
+    new JoystickButton(controller, 2)
+      .whileTrue(new ParallelCommandGroup(
+        new AmpOrient(drivetrain),
+        new SequentialCommandGroup(
+          new WaitUntilCommand(() -> AmpOrient.atTarget),
+          new SetPivotStateCommand(PivotState.AMP),
+          new PrimeShootSequenceCommand()
+        )
+      ))
+      .onFalse(new SequentialCommandGroup(
+        new ShooterStopCommand(),
+        new ParallelRaceGroup(
+          new WaitUntilCommand(() -> !Intake.noteLoaded),
+          new IntakeCommand(),
+          new WaitCommand(0.5)
+        ),
+        new IntakeStopCommand(),
+        new SetPivotStateCommand(PivotState.PICKUP)
+      ));
+      
+
     new JoystickButton(controller, 3).onTrue(new InstantCommand(() -> VisionSystem.disabled = !VisionSystem.disabled));
     new JoystickButton(controller, 4).onTrue(new InstantCommand(() -> JoystickDrive.fieldRelativeDrive = !JoystickDrive.fieldRelativeDrive));
 
@@ -148,6 +184,10 @@ public class RobotContainer {
       new SetPivotStateCommand(PivotState.AMP),
       new PrimeShootSequenceCommand()
     ));
+
+
+    new JoystickButton(controller2, 5).whileTrue(new AimHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(-60)));
+    new JoystickButton(controller2, 6).whileTrue(new AimHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(60)));
   }
 
   public Command getAutonomousCommand() {

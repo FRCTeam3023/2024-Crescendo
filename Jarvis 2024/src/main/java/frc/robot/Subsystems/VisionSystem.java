@@ -45,6 +45,7 @@ public class VisionSystem extends SubsystemBase {
     // stream: " + e.getMessage());}
     // intakeCameraInitialized = true;
     // telemTab.add(CameraServer.getVideo("IntakeView").getSource());
+    photonCamera.getLatestResult();
     PhotonTab.add(field);
   }
 
@@ -61,7 +62,7 @@ public class VisionSystem extends SubsystemBase {
       previousPipelineTimestamp = resultTimestamp;
       var target = pipelineResult.getBestTarget();
 
-      if (target.getPoseAmbiguity() <= .1) {
+      if (target.getPoseAmbiguity() <= .02) {
         Transform3d camToTarget = target.getBestCameraToTarget();
         Transform3d targetToCamera = camToTarget.inverse();
 

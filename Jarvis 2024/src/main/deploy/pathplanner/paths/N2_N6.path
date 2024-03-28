@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.025413419247892,
-        "y": 0.7765954128399487
+        "x": 2.684206070166527,
+        "y": 5.5555704093864335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.336225374205135,
-        "y": 0.7675271490893864
+        "x": 4.593053865137686,
+        "y": 5.141057243598081
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.5209773226564,
-        "y": 3.5333475930109763
+        "x": 5.70558333698693,
+        "y": 4.133925300660873
       },
       "prevControl": {
-        "x": 2.947185718932842,
-        "y": 3.143412251736785
+        "x": 4.604764701683467,
+        "y": 4.180768646843998
+      },
+      "nextControl": {
+        "x": 6.286558875357162,
+        "y": 4.1092029373259695
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.04775064614323,
+        "y": 4.133925300660873
+      },
+      "prevControl": {
+        "x": 6.896081149821781,
+        "y": 4.188334883164248
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,13 +57,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Start Aim"
+                "name": "Pivot Pickup"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 1.8,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Prime Shoot Sequence"
+                "name": "Intake"
               }
             }
           ]
@@ -63,7 +90,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -36.11934084947979,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
