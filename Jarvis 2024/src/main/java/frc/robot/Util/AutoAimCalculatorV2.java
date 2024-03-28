@@ -21,6 +21,8 @@ public class AutoAimCalculatorV2 {
     public static Rotation2d alpha;
     //*Time until note reaches target */
     public static double time;
+    //**Distance from zero - a measure of how close the approximation is to the solution */
+    public static double error;
 
     //#region symbols
     private static final double beta = Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians();
@@ -28,19 +30,26 @@ public class AutoAimCalculatorV2 {
     private static final double h = Constants.ArmConstants.PIVOT_HEIGHT;
     private static final double v_s = Constants.ArmConstants.NOTE_LAUNCH_SPEED;
     private static final double g = 9.8;
-    ////#endregion
+    //#endregion
 
     /**
      * Calculate theta, alpha, and time
      */
     public static void compute(Pose2d robotPose, ChassisSpeeds velocity) {
         Pose3d target = Constants.blueSpeakerPose;
-        if (Robot.alliance == Alliance.Red)
+        SolutionEntry guess = new SolutionEntry(0.7, 0, 0.5);
+
+        if (Robot.alliance == Alliance.Red) {
             target = Constants.redSpeakerPose;
-
+            guess = new SolutionEntry(0.7, Math.PI, 0.5);
+        }
+        
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
-
-        getNextEntry(null, relativeTarget.getX(), relativeTarget.getY(), relativeTarget.getZ(), velocity.vxMetersPerSecond, velocity.vyMetersPerSecond);
+        for (int i = 0; i < Constants.ArmConstants.PIVOT_APPROXIMATION_PRECISION; i++)
+            guess = getNextEntry(guess, relativeTarget.getX(), relativeTarget.getY(), relativeTarget.getZ(), velocity.vxMetersPerSecond, velocity.vyMetersPerSecond);
+        theta = Rotation2d.fromRadians(guess.x);
+        alpha = Rotation2d.fromRadians(guess.y);
+        time = guess.z;
     }
 
     private static double[][] computeJacobian(SolutionEntry p, double v_x, double v_y) {
@@ -81,7 +90,7 @@ public class AutoAimCalculatorV2 {
         return m_result;
     }
 
-    private static double[] transform_linear(SolutionEntry p, double[][] inv, double t_x, double t_y, double t_z, double v_x, double v_y) {
+    private static double[] transformLinear(SolutionEntry p, double[][] inv, double t_x, double t_y, double t_z, double v_x, double v_y) {
         double x = v_x * p.z + v_s * p.z * p.cosB * p.sinY - t_x - l * p.cosX * p.sinY;
         double y = v_y * p.z + v_s * p.z * p.cosB * p.cosY - t_y - l * p.cosX * p.cosY;
         double z = v_s * p.z * p.sinB - 0.5 * g * p.z * p.z - t_z + l * p.sinX + h;
@@ -92,6 +101,7 @@ public class AutoAimCalculatorV2 {
             x * inv[2][0] + y * inv[2][1] + z * inv[2][2],
         };
 
+        error = x * x + y * y + z * z;
         return new double[] {p.x - prod[0], p.y - prod[1], p.z - prod[2]};
     }
 
@@ -99,7 +109,7 @@ public class AutoAimCalculatorV2 {
         p.compute();
         double[][] j = computeJacobian(p, v_x, v_y);
         double[][] inv = invert(j);
-        double[] next = transform_linear(p, inv, t_x, t_y, t_z, v_x, v_y);
+        double[] next = transformLinear(p, inv, t_x, t_y, t_z, v_x, v_y);
         return new SolutionEntry(next[0], next[1], next[2]);
     }
 
