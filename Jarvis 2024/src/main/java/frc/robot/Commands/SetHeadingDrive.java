@@ -18,29 +18,26 @@ import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Pivot.PivotState;
 
-public class AimHeadingDrive extends Command {
+public class SetHeadingDrive extends Command {
   /** Creates a new AimRobot. */
 
   Drivetrain drivetrain;
   Joystick controller;
   Rotation2d heading;
-
-   ProfiledPIDController thetaController = new ProfiledPIDController(6, 0, 0, new Constraints(4, 8));
   
-  public AimHeadingDrive(Drivetrain drivetrain, Joystick controller, Rotation2d heading) {
+  public SetHeadingDrive(Drivetrain drivetrain, Joystick controller, Rotation2d heading) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.controller = controller;
     this.heading = heading;
     addRequirements(drivetrain);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     Pivot.climbMode = false;
-    thetaController.reset(drivetrain.getPose().getRotation().getRadians());
+    drivetrain.resetTurnController();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -78,9 +75,7 @@ public class AimHeadingDrive extends Command {
       ySpeed = -ySpeed;
     }
 
-    double thetaSpeed = thetaController.calculate(drivetrain.getPose().getRotation().getRadians(), heading.getRadians());
-
-    drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed), true);
+    drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed,0), true, heading);
   }
 
   // Called once the command ends or is interrupted.

@@ -44,7 +44,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    Intake.noteLoaded = true;
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 

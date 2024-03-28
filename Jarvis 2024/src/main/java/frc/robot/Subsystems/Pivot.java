@@ -159,6 +159,8 @@ public class Pivot extends SubsystemBase {
   public void approachCurrentState(){
     if(pivotState == PivotState.AUTOAIM){
       setPivotAngle(AutoAimCalculator.theta, true);
+    } else if(pivotState == PivotState.LOB){
+      setPivotAngle(AutoAimCalculator.theta, true);
     } else if(pivotState == PivotState.HOLD){
       if(pivotState != previousState){
         pivotState.angle = Rotation2d.fromRadians(getLocalAngle().getRadians() + getPivotMotorVelocity() / pivotConfiguration.MotionMagic.MotionMagicAcceleration);
@@ -339,6 +341,7 @@ public class Pivot extends SubsystemBase {
     AMP(ArmConstants.AMP_POSITION),
     HOLD(new Rotation2d()),
     NOTHING(new Rotation2d()),
+    LOB(new Rotation2d()),
     AUTOAIM(new Rotation2d());
 
     public Rotation2d angle;

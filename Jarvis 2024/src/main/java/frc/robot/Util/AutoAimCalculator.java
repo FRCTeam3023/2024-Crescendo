@@ -25,14 +25,10 @@ public class AutoAimCalculator {
         if (Robot.alliance == Alliance.Red) {
             target = Constants.redSpeakerPose;
         }
-        // Pose3d target = Constants.redSpeakerPose;
 
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
 
         newtonApproximation(relativeTarget, velocity);
-        // if (relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()
-        //         > Constants.ArmConstants.MAX_AIM_DISTANCE * Constants.ArmConstants.MAX_AIM_DISTANCE)
-        //     theta = Rotation2d.fromDegrees(45);
     }
 
     private static void newtonApproximation(Pose3d relativeTarget, ChassisSpeeds relativeVelocity) {

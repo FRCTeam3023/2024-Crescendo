@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Commands.AimHeadingDrive;
+import frc.robot.Commands.SetHeadingDrive;
 import frc.robot.Commands.AimRobotDrive;
 import frc.robot.Commands.AmpOrient;
 import frc.robot.Commands.Autonomous;
@@ -115,7 +115,7 @@ public class RobotContainer {
     //new JoystickButton(controller, 1).onTrue(new InstantCommand(() -> drivetrain.calibrateGyro()));
 
     new JoystickButton(controller, 1)
-    .whileTrue(new AimRobotDrive(drivetrain,controller))
+    .whileTrue(new AimRobotDrive(drivetrain,controller,controller2))
       .whileTrue(new PrimeShootSequenceCommand())
       .onFalse(new SequentialCommandGroup(
         new ShooterStopCommand(),
@@ -168,7 +168,7 @@ public class RobotContainer {
     ));
 
     new JoystickButton(controller2, 3)
-      .whileTrue(new AimRobotDrive(drivetrain,controller))
+      .whileTrue(new AimRobotDrive(drivetrain,controller,controller2))
       .whileTrue(new PrimeShootSequenceCommand())
       .onFalse(new SequentialCommandGroup(
         new ShooterStopCommand(),
@@ -186,12 +186,13 @@ public class RobotContainer {
     ));
 
 
-    new JoystickButton(controller2, 5).whileTrue(new AimHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(-60)));
-    new JoystickButton(controller2, 6).whileTrue(new AimHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(60)));
+    new JoystickButton(controller2, 5).whileTrue(new SetHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(-60)));
+    new JoystickButton(controller2, 6).whileTrue(new SetHeadingDrive(drivetrain, controller, Rotation2d.fromDegrees(60)));
   }
 
   public Command getAutonomousCommand() {
     return new SequentialCommandGroup(
+      new InstantCommand(() -> Intake.noteLoaded = true),
       new HomeCommand(drivetrain),
       new ParallelCommandGroup(
         new RunCommand(() -> pivot.approachCurrentState()),

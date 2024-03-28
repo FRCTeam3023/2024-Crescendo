@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,11 +21,13 @@ public class AimRobotDrive extends Command {
 
   Drivetrain drivetrain;
   Joystick controller;
+  Joystick controller2;
   
-  public AimRobotDrive(Drivetrain drivetrain, Joystick controller) {
+  public AimRobotDrive(Drivetrain drivetrain, Joystick controller, Joystick controller2) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.controller = controller;
+    this.controller2 = controller2;
     addRequirements(drivetrain);
   }
 
@@ -70,8 +73,14 @@ public class AimRobotDrive extends Command {
       ySpeed = -ySpeed;
     }
 
-    Pivot.setPivotState(PivotState.AUTOAIM);
-    drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
+    if(controller2.getPOV() == 90){
+      Pivot.setPivotState(PivotState.LOB);
+      drivetrain.driveFacingHeading(new ChassisSpeeds(), true, new Rotation2d());
+    }else{
+      Pivot.setPivotState(PivotState.AUTOAIM);
+      drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
+    }
+   
   }
 
   // Called once the command ends or is interrupted.

@@ -70,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
-  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(5, 12));
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(5, 10));
 
   ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
   GenericEntry targetPositionEntry = armTab.add("Aiming Target Position", "placeholder").withPosition(1, 0).withSize(2, 1).getEntry();
@@ -191,15 +191,26 @@ public class Drivetrain extends SubsystemBase {
     double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
     drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
 
-    targetPositionEntry.setString(getPose().plus(new Transform2d(relativeTargetTranslation.getX(), relativeTargetTranslation.getY(), new Rotation2d())).toString());
-    targetRotationEntry.setDouble(targetRotation.getDegrees());
-    relativePositionEntry.setString(relativeTargetTranslation.toString());
-    robotPoseEntry.setString(getPose().toString());
+    //targetPositionEntry.setString(getPose().plus(new Transform2d(relativeTargetTranslation.getX(), relativeTargetTranslation.getY(), new Rotation2d())).toString());
+    //targetRotationEntry.setDouble(targetRotation.getDegrees());
+    //relativePositionEntry.setString(relativeTargetTranslation.toString());
+    //robotPoseEntry.setString(getPose().toString());
 
           // double horizontalSpeed = Constants.ArmConstants.NOTE_LAUNCH_SPEED * Math.cos(Pivot.holdPosition.getRadians() - Constants.ArmConstants.launcherAngleWithPivot.getRadians());
       // double airTime = (Math.pow(relativeTargetTranslation.getY(),2) + Math.pow(relativeTargetTranslation.getX(),2)) / horizontalSpeed;
       // relativeTargetTranslation = new Translation2d(relativeTargetTranslation.getX() - drivetrain.getChassisSpeeds().vxMetersPerSecond * airTime,
       //   relativeTargetTranslation.getY() - drivetrain.getChassisSpeeds().vyMetersPerSecond * airTime); 
+  }
+
+  /**
+   * Drives the robot at a set heading, can be used for auto aim or alignment. 
+   * Will override the rotational speed in the chassis speeds with PID output
+   * @param speeds  Drivetrain speeds
+   * @param heading heading to aim towards
+   */
+  public void driveFacingHeading(ChassisSpeeds speeds, boolean isFieldRelative, Rotation2d heading){
+    double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), heading.getRadians());
+    drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds){
