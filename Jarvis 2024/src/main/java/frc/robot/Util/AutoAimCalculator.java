@@ -16,7 +16,8 @@ import frc.robot.Robot;
 
 /** Add your docs here. */
 public class AutoAimCalculator {
-    public static Rotation2d theta;
+    public static Rotation2d theta;//Pivot
+    public static Rotation2d alpha;//Heading
     public static double translationTime;
     public static Pose3d translatedPose;
 
@@ -30,6 +31,7 @@ public class AutoAimCalculator {
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
 
         newtonApproximation(relativeTarget, velocity);
+        alpha = Rotation2d.fromRadians(Math.atan2(translatedPose.getY(), translatedPose.getX())).plus(Rotation2d.fromDegrees(180));
         // if (relativeTarget.getX() * relativeTarget.getX() + relativeTarget.getY() * relativeTarget.getY()
         //         > Constants.ArmConstants.MAX_AIM_DISTANCE * Constants.ArmConstants.MAX_AIM_DISTANCE)
         //     theta = Rotation2d.fromDegrees(45);
