@@ -31,10 +31,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Util.AutoAimCalculator;
@@ -125,11 +127,7 @@ public class Drivetrain extends SubsystemBase {
         Units.inchesToMeters(16.5), 
         new ReplanningConfig()),
       () -> {
-          var alliance = DriverStation.getAlliance();
-          if(alliance.isPresent()){
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
+          return Robot.alliance == Alliance.Red;
         },
       this
     );

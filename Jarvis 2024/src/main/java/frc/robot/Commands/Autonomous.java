@@ -50,31 +50,6 @@ public class Autonomous {
 
         NamedCommands.registerCommand("Check Intake", new WaitUntilCommand(() -> Intake.noteSensed));
 
-        // new PathPlannerAuto("2 Note Center");
-        // new PathPlannerAuto("3 Note Top");
-        // new PathPlannerAuto("3 Note Bottom");
-        // new PathPlannerAuto("Leave");
-        // new PathPlannerAuto("Amp");
-        // new PathPlannerAuto("2 Note Top");
-        // new PathPlannerAuto("2 Note Bottom");
-        // new PathPlannerAuto("2 Note Amp");
-        // new PathPlannerAuto("Amp Hide");
-        // new PathPlannerAuto("Leave Speaker");
-        // new PathPlannerAuto("Inner Speaker 2 Note");
-        // new PathPlannerAuto("Nothing");
-        // new PathPlannerAuto("Top Speaker Outer");
-        // new PathPlannerAuto("Top Speaker Long");
-
-        // new PathPlannerAuto("2_N2");
-        // new PathPlannerAuto("5_N3");
-        // new PathPlannerAuto("6_N1");
-        // new PathPlannerAuto("5_N3_N4");
-        // new PathPlannerAuto("5_N3_N4_RS");
-        // new PathPlannerAuto("Nothing");
-        // new PathPlannerAuto("2_N2_N5_RS");
-        // new PathPlannerAuto("5_N3_N5_RS");
-        // new PathPlannerAuto("2 Note Amp");
-
         autoChooser = AutoBuilder.buildAutoChooser();
         autoTab.add("Auto Chooser", autoChooser).withPosition(0, 0).withSize(5, 1);
     }

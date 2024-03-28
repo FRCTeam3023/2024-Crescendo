@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 /** Add your docs here. */
 public class AutoAimCalculator {
@@ -21,7 +22,7 @@ public class AutoAimCalculator {
 
     public static void computeAngle(Pose2d robotPose, ChassisSpeeds velocity) {
         Pose3d target = Constants.blueSpeakerPose;
-        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+        if (Robot.alliance == Alliance.Red) {
             target = Constants.redSpeakerPose;
         }
         // Pose3d target = Constants.redSpeakerPose;
