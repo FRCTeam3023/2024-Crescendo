@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Util.AutoAimCalculator;
+import frc.robot.Util.AutoAimCalculatorV2;
 import frc.robot.Util.Gains;
 import frc.robot.Util.PIDDisplay;
 import frc.robot.Util.TalonFXSimModel;
@@ -162,9 +163,9 @@ public class Pivot extends SubsystemBase {
 
   public void approachCurrentState(){
     if(pivotState == PivotState.AUTOAIM){
-      setPivotAngle(AutoAimCalculator.theta, true);
+      setPivotAngle(AutoAimCalculatorV2.theta, true);
     } else if(pivotState == PivotState.LOB){
-      setPivotAngle(AutoAimCalculator.theta, true);
+      setPivotAngle(pivotState.angle, true);
     } else if(pivotState == PivotState.HOLD){
       if(pivotState != previousState){
         pivotState.angle = Rotation2d.fromRadians(getLocalAngle().getRadians() + getPivotMotorVelocity() / pivotConfiguration.MotionMagic.MotionMagicAcceleration);
@@ -334,7 +335,7 @@ public class Pivot extends SubsystemBase {
       angleError.setDouble(getLocalAngle().getDegrees() - pivotState.angle.getDegrees());
       targetAngle.setDouble(pivotState.angle.getDegrees());
       climberModeEntry.setBoolean(climbMode);
-      aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
+      aimAngleEntry.setDouble(AutoAimCalculatorV2.theta.getDegrees());
       noteLoadedEntry.setBoolean(Intake.noteLoaded);
     }
   }

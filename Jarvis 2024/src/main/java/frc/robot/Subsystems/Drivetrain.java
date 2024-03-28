@@ -40,6 +40,7 @@ import frc.robot.Robot;
 import frc.robot.Commands.JoystickDrive;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Util.AutoAimCalculator;
+import frc.robot.Util.AutoAimCalculatorV2;
 import frc.robot.Util.PIDDisplay;
 import frc.robot.Util.ProfiledWPILibSetter;
 import frc.robot.Util.SparkMaxSetter;
@@ -144,9 +145,8 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     //computes the auto aim positions periodically
-    AutoAimCalculator.computeAngle(getPose(), getFieldRelativeSpeeds());
-
-
+    //AutoAimCalculator.computeAngle(getPose(), getFieldRelativeSpeeds());
+    AutoAimCalculatorV2.compute(getPose(), getFieldRelativeSpeeds());
 
     //field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
     headingEntry.setDouble(getPose().getRotation().getDegrees());

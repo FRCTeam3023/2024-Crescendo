@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
 
   private final Gains shooterGains = new Gains(0.001,1.0/2500,1);  
   private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
+  public static double lobRPM = 0;
 
   public Shooter() {
     leftPID = leftShooterMotor.getPIDController();

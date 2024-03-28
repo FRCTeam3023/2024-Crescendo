@@ -36,6 +36,9 @@ public class Constants {
     public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(85), new Rotation3d());
     public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(85), new Rotation3d());
 
+    public static final Pose2d redLandingZone = new Pose2d(14.2, 6.76, new Rotation2d());
+    public static final Pose2d blueLandingZone = new Pose2d(2.34, 6.76, new Rotation2d());
+
     //target positions for auto alignment into the amps
     public static final Pose2d blueAmpPose = new Pose2d(1.84,7.6, Rotation2d.fromDegrees(-90));
     public static final Pose2d redAmpPose = new Pose2d(14.7,7.6,Rotation2d.fromDegrees(-90));
@@ -147,6 +150,7 @@ public class Constants {
         /**Cancoder Magnet offset in rotations relative to local origin */
         public static final double PIVOT_SENSOR_OFFSET = .1865;
 
+        //**Exit velocity at SHOOTER_RPM */
         public static final double NOTE_LAUNCH_SPEED = 18.5; //m/s
         
         /**True if set to using remote CANCoder, false if rotor sensor */
@@ -159,5 +163,8 @@ public class Constants {
         public static final double MAX_PIVOT_SENSOR_DEVIATION = 0.1; //rad
         /**The maximum difference between the pivot and target angle*/
         public static final double MAX_PIVOT_DEVIATION = 0.1; //rad
+
+        //**Maximum height obtained by a note lobbed into the amp zone*/
+        public static final double MAX_LOB_HEIGHT = 5;
     }
 }

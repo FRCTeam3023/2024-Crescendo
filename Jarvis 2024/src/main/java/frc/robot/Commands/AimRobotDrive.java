@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,10 +13,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Pivot.PivotState;
 import frc.robot.Util.AutoAimCalculator;
+import frc.robot.Util.AutoAimCalculatorV2;
 
 public class AimRobotDrive extends Command {
   /** Creates a new AimRobot. */
@@ -75,12 +79,23 @@ public class AimRobotDrive extends Command {
     }
 
     if(controller2.getRawButton(7)){
+      Pose2d targetPose = Robot.alliance == Alliance.Red ? Constants.redLandingZone : Constants.blueLandingZone;
+      double deltaX = targetPose.getX() - drivetrain.getPose().getX();
+      double deltaY = targetPose.getY() - drivetrain.getPose().getY();
+      double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      double angle = Math.atan2(4 * ArmConstants.MAX_LOB_HEIGHT, distance);
+      double launchVelocity = Math.sqrt(9.8 * (2 * ArmConstants.MAX_LOB_HEIGHT + distance * distance / (8 * ArmConstants.MAX_LOB_HEIGHT)));
+
+      Shooter.lobRPM = launchVelocity / ArmConstants.NOTE_LAUNCH_SPEED * ArmConstants.SHOOTER_RPM;
+      PivotState.LOB.angle = Rotation2d.fromRadians(angle);
       Pivot.setPivotState(PivotState.LOB);
-      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.alpha);
+
+      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed, ySpeed, 0), true, 
+        Rotation2d.fromRadians(Math.atan2(deltaY, deltaX)).plus(Rotation2d.fromDegrees(180)));
     }else{
       Pivot.setPivotState(PivotState.AUTOAIM);
       // drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
-      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed, 0), true, AutoAimCalculator.alpha);
+      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed, 0), true, AutoAimCalculatorV2.alpha);
     }
    
   }

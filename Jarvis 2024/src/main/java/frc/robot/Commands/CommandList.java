@@ -81,7 +81,9 @@ public class CommandList {
             super(() -> {
                     if(Pivot.getPivotState() == PivotState.AMP){
                         shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM_AMP);
-                    }else{
+                    } else if (Pivot.getPivotState() == PivotState.LOB) {
+                        shooter.setShooterRPM(Shooter.lobRPM);
+                    } else{
                         shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
                     }
                     // shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
