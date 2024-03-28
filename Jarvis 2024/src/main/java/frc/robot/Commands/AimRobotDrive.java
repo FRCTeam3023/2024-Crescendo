@@ -74,7 +74,7 @@ public class AimRobotDrive extends Command {
       ySpeed = -ySpeed;
     }
 
-    if(controller2.getPOV() == 90){
+    if(controller2.getRawButton(7)){
       Pivot.setPivotState(PivotState.LOB);
       drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.alpha);
     }else{

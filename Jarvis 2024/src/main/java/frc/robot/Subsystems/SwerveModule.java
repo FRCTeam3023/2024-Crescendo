@@ -46,8 +46,6 @@ public class SwerveModule {
     private Gains driveGains = new Gains(5, 0, 0.15, 3, 12);
 
 
-    // private Gains driveGains = new Gains(0 /*0.05*/,0,0,0.05,0,1);
-
     public boolean homeStatus = false;
     private boolean lastState = false;
 
