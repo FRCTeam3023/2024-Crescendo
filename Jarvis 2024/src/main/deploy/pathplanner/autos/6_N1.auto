@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4055808813372015,
+      "y": 4.1046482092964185
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6_N1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "2 Note Speaker",
+  "choreoAuto": false
+}

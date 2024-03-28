@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3633965729469937,
-      "y": 5.555088802485298
+      "x": 1.4055808813372015,
+      "y": 6.952083026973072
     },
     "rotation": 0
   },
@@ -12,28 +12,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot Sequence"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Pivot Speaker"
-                }
-              }
-            ]
+            "name": "Shoot Sequence"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Middle Note"
+            "pathName": "5_N3"
           }
         },
         {
@@ -45,7 +32,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Bottom Note"
+            "pathName": "N3_N5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Check Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N5_RS"
           }
         },
         {
@@ -57,6 +56,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "3 Note Speaker",
   "choreoAuto": false
 }

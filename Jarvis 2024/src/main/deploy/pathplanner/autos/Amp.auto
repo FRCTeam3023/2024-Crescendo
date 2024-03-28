@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Aproach Amp"
+            "pathName": "4_A"
           }
         },
         {
@@ -38,6 +38,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "Amp",
   "choreoAuto": false
 }

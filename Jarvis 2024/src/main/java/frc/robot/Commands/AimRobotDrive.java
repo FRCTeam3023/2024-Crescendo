@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
-import frc.robot.Util.AutoAimCalculator;
+import frc.robot.Subsystems.Pivot.PivotState;
 
 public class AimRobotDrive extends Command {
   /** Creates a new AimRobot. */
@@ -72,13 +72,14 @@ public class AimRobotDrive extends Command {
       ySpeed = -ySpeed;
     }
 
-    Pivot.targetPosition = Pivot.globalToLocalAngle(AutoAimCalculator.theta);
-    drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.translatedPose);
+    Pivot.setPivotState(PivotState.AUTOAIM);
+    drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    Pivot.setPivotState(PivotState.HOLD);
     drivetrain.drive(new ChassisSpeeds(), false);
   }
 

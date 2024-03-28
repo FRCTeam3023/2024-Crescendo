@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4225982298118458,
-        "y": 7.222602137511967
+        "x": 8.118015665417921,
+        "y": 7.424670370025476
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7383382420033848,
-        "y": 7.192978302052918
+        "x": 7.2045704148469625,
+        "y": 7.237296985292972
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.7590314210585614,
-        "y": 7.834549649127829
+        "x": 3.642660362243803,
+        "y": 6.374045055782419
       },
       "prevControl": {
-        "x": 1.7842385404954055,
-        "y": 7.321472574837351
+        "x": 4.36873222808225,
+        "y": 6.67852680597274
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Lift Arm",
-      "waypointRelativePos": 0,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "Pivot Amp"
+                "name": "Start Aim"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Prime Shoot Sequence"
               }
             }
           ]
@@ -50,20 +56,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0,
+    "rotation": 12.65255650055788,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Speaker",
   "previewStartingState": {
-    "rotation": -90.0,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

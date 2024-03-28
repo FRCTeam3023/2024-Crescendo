@@ -14,13 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Aproach Amp"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "4_A"
           }
         },
         {
@@ -38,12 +32,6 @@
                 "data": {
                   "name": "Pivot Pickup"
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.0
-                }
               }
             ]
           }
@@ -51,13 +39,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp to top note approach"
+            "pathName": "A_N3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "top note to Amp"
+            "pathName": "N3_A"
           }
         },
         {
@@ -69,6 +57,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "Amp",
   "choreoAuto": false
 }

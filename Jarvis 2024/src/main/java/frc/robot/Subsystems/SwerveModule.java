@@ -232,7 +232,7 @@ public class SwerveModule {
             turnPIDController.setReference(moduleOffset, CANSparkMax.ControlType.kPosition);
         } else {
             //or keep rotating
-            turnMotor.set(0.25);
+            turnMotor.set(0.5);
         }
 
         lastState = getSwitch();

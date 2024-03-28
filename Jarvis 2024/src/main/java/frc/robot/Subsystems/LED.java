@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
 
   private static SerialPort serialPort = new SerialPort(115200, Port.kMXP);
   private static COLORS currentColor = null;
-  private static boolean isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
   private static boolean interupted = false;
 
   public LED() {
@@ -27,7 +27,6 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    isRed = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
     if (!interupted)
       setLEDColor(0, Constants.LED_LENGTH, getColorState());
   }
@@ -36,7 +35,7 @@ public class LED extends SubsystemBase {
   public COLORS getColorState() {
     if (Pivot.climbMode) return COLORS.YELLOW;
     if (Intake.noteSensed) return COLORS.GREEN;
-    return isRed ? COLORS.RED : COLORS.BLUE;
+    return Robot.alliance == Alliance.Red ? COLORS.RED : COLORS.BLUE;
   }
 
   public static void interuptSignal(Command sequence) {

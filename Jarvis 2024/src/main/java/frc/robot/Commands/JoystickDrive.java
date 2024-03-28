@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Subsystems.Drivetrain;
 
 public class JoystickDrive extends Command {
@@ -60,13 +61,10 @@ public class JoystickDrive extends Command {
     double ySpeed = -Math.cos(theta) * processedMagnitude;
     //------------------------------------------------------------------------------------
     //rotation input -closed loop and open loop toggle
-    Alliance currentColor = null;
-    if (DriverStation.getAlliance().isPresent())
-      currentColor = DriverStation.getAlliance().get();
     double rotationSpeed = 0;
 
     //flip Direction if alliance is red, field-centric based on blue alliance
-    if(currentColor == Alliance.Red){
+    if(Robot.alliance == Alliance.Red){
       xSpeed = -xSpeed;
       ySpeed = -ySpeed;
     }

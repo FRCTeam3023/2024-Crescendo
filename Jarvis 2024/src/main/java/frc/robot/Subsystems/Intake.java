@@ -26,7 +26,9 @@ public class Intake extends SubsystemBase {
   public static boolean noteLoaded;
   //int iterations = 0;
 
-  public Intake() {}
+  public Intake() {
+    intakeMotor.setInverted(true);
+  }
 
   @Override
   public void periodic() {

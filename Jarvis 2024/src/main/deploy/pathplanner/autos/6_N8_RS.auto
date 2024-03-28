@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4055808813372015,
+      "y": 4.077443418044731
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6_N8"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Check Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N8_RS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "2 Note Speaker",
+  "choreoAuto": false
+}

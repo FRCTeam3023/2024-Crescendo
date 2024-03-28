@@ -3,43 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.85,
-        "y": 6.97
+        "x": 1.4055808813372015,
+        "y": 4.1046482092964185
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0540825697036027,
-        "y": 6.887126081944472
+        "x": 1.922471915119269,
+        "y": 4.295081748058233
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.837009827865811,
-        "y": 7.863953420214533
+        "x": 2.611659960162026,
+        "y": 4.276945220557108
       },
       "prevControl": {
-        "x": 1.8764775991090457,
-        "y": 6.896993024755281
+        "x": 1.813652750112518,
+        "y": 4.412969176815547
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -90.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.15,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,13 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "Pivot Amp"
+                "name": "Pivot Pickup"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "Intake Stop"
+                "name": "Intake"
               }
             }
           ]
@@ -62,20 +56,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -88.66778014613037,
+    "rotation": -23.962488974578253,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Speaker",
   "previewStartingState": {
-    "rotation": -0.40594945799572074,
+    "rotation": -41.34777721969358,
     "velocity": 0
   },
   "useDefaultConstraints": true

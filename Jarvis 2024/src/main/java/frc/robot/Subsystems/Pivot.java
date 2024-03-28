@@ -10,15 +10,16 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -28,10 +29,13 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Util.AutoAimCalculator;
 import frc.robot.Util.Gains;
 import frc.robot.Util.PIDDisplay;
+import frc.robot.Util.TalonFXSimModel;
 import frc.robot.Util.TalonFXsetter;
 
 public class Pivot extends SubsystemBase {
   private final TalonFX pivotMotor = new TalonFX(10);
+  // private final TalonFXSimState pivotSimState = pivotMotor.getSimState();
+  // private final TalonFXSimModel pivotSimModel;
   private TalonFXConfiguration pivotConfiguration;
   private final CANcoder pivotSensor = new CANcoder(9);
   private double lastPivotPosition = 0;
@@ -42,9 +46,13 @@ public class Pivot extends SubsystemBase {
   private final TalonFX climberMotor = new TalonFX(14);
   private TalonFXConfiguration climberConfig;
 
-  public static Rotation2d targetPosition = new Rotation2d();
+  // public static Rotation2d targetPosition = new Rotation2d();
   public static boolean climbMode = false;
   public static boolean previousClimbMode = false;
+
+  private static PivotState pivotState = PivotState.NOTHING;
+  private static PivotState previousState = PivotState.NOTHING;
+  private double count = 0;
 
   private static final ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
@@ -55,9 +63,12 @@ public class Pivot extends SubsystemBase {
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(0, 3).getEntry();
   private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(3, 1).getEntry();
   private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",false).withPosition(3, 2).getEntry();
-
+  private static final GenericEntry noteLoadedEntry = armTab.add("Note Loaded", true).getEntry();
+  // private static final ShuffleboardTab simTab = Shuffleboard.getTab("Simulation");
+  // private static final GenericEntry voltageInput = simTab.add("Input", 0).getEntry();
 
   public Pivot() {
+
 
     //basic configuration for the pivot motor
     pivotConfiguration = new TalonFXConfiguration();
@@ -68,8 +79,8 @@ public class Pivot extends SubsystemBase {
     pivotConfiguration.Voltage.PeakForwardVoltage = pivotGains.peakOutput;
     pivotConfiguration.Voltage.PeakReverseVoltage = pivotGains.peakOutput;
 
-    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 5;
-    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 14;
+    pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity = 7;
+    pivotConfiguration.MotionMagic.MotionMagicAcceleration = 15;
     pivotConfiguration.MotionMagic.MotionMagicJerk = 200;
 
     pivotConfiguration.Slot0.kP = pivotGains.P;
@@ -103,7 +114,7 @@ public class Pivot extends SubsystemBase {
 
     PIDDisplay.PIDList.addOption("Pivot", new TalonFXsetter(List.of(pivotMotor.getConfigurator()), pivotConfiguration));
 
-    targetPosition = getLocalAngle();
+    // targetPosition = getLocalAngle();
 
 
     climberConfig = new TalonFXConfiguration();
@@ -111,15 +122,54 @@ public class Pivot extends SubsystemBase {
 
     climberMotor.getConfigurator().apply(climberConfig);
 
+    // pivotSimState.setSupplyVoltage(Constants.SIMULATION_SUPPLY_VOLTAGE);
+    // pivotSimModel = new TalonFXSimModel(pivotConfiguration.MotionMagic.MotionMagicCruiseVelocity, pivotConfiguration.MotionMagic.MotionMagicAcceleration);
+
     pivotMotor.setPosition(getPivotEncoderPosition().getRadians());
+    PivotState.HOLD.angle = getLocalAngle();
   }
 
   @Override
   public void periodic() {
     telemUpdate();
     checkClimbStatus();
-    // checkHoldPositionDisabled();
     //if (!Constants.ArmConstants.USE_REMOTE_PIVOT_SENSOR) checkRotorEncoder();
+  }
+
+  @Override
+  public void simulationPeriodic(){
+    // pivotSimModel.setMotorVoltage(pivotSimState.getMotorVoltage());
+    // pivotSimModel.update(.02);
+    // pivotSimState.setRawRotorPosition(pivotSimModel.getPosition());
+    // pivotSimState.setRotorVelocity(pivotSimModel.getVelocity());
+
+    // voltageInput.setDouble(pivotSimState.getMotorVoltage());
+
+  }
+
+
+  public static void setPivotState(PivotState state){
+    pivotState = state;
+  }
+
+  public static PivotState getPivotState(){
+    return pivotState;
+  }
+
+  public void approachCurrentState(){
+    if(pivotState == PivotState.AUTOAIM){
+      setPivotAngle(AutoAimCalculator.theta, true);
+    } else if(pivotState == PivotState.HOLD){
+      if(pivotState != previousState){
+        pivotState.angle = Rotation2d.fromRadians(getLocalAngle().getRadians() + getPivotMotorVelocity() / pivotConfiguration.MotionMagic.MotionMagicAcceleration);
+      }
+      setPivotAngle(pivotState.angle, false);
+    }else if(pivotState == PivotState.NOTHING){
+      setPivotDutyCycle(0);
+    } else {
+      setPivotAngle(pivotState.angle, false);
+    }
+    previousState = pivotState;
   }
 
 
@@ -176,6 +226,10 @@ public class Pivot extends SubsystemBase {
     return Rotation2d.fromRadians(pivotMotor.getPosition().getValue());
   }
 
+  public double getPivotMotorVelocity(){
+    return pivotMotor.getVelocity().getValue();
+  }
+
   /**
    * Set the closed loop motion magic control target of the pivot joint, adjustable between global and local control.
    * @param angle target angle to move to
@@ -184,7 +238,6 @@ public class Pivot extends SubsystemBase {
   public void setPivotAngle(Rotation2d angle, boolean isGlobal) {
     climbMode = false;
     if (isGlobal) angle = globalToLocalAngle(angle);
-    targetPosition = angle;
     angle = Rotation2d.fromRadians(Math.min(Math.max(angle.getRadians(), 0), Constants.ArmConstants.PIVOT_MAX.getRadians()));
     pivotMotor.setControl(new MotionMagicVoltage(angle.getRadians()));
   }
@@ -195,7 +248,7 @@ public class Pivot extends SubsystemBase {
    * @return True if the difference is small enough
    */
   public boolean isAtTargetAngle() {
-    return Math.abs(targetPosition.getRadians() - pivotMotor.getPosition().getValueAsDouble()) < Constants.ArmConstants.MAX_PIVOT_DEVIATION;
+    return Math.abs(pivotState.angle.getRadians() - pivotMotor.getPosition().getValueAsDouble()) < Constants.ArmConstants.MAX_PIVOT_DEVIATION;
   }
 
   /**
@@ -208,7 +261,10 @@ public class Pivot extends SubsystemBase {
   
   public void setPivotDutyCycle(double speed){
     pivotMotor.setControl(new DutyCycleOut(speed));
-    targetPosition = getLocalAngle();
+  }
+
+  public void setPivotVoltage(double voltage){
+    pivotMotor.setControl(new VoltageOut(voltage));
   }
 
   /**
@@ -262,23 +318,32 @@ public class Pivot extends SubsystemBase {
   public void setClimberOutput(double speed){
     climberMotor.set(speed);
   }
-
-  public void checkHoldPositionDisabled(){
-    if(DriverStation.isDisabled()){
-      targetPosition = getPivotMotorPosition();
-    }
-
-  }
   
   public void telemUpdate(){
-    angleEntry.setDouble(getPivotMotorPosition().getDegrees());
-    sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
-    angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
-    angleError.setDouble(getLocalAngle().getDegrees() - targetPosition.getDegrees());
-    targetAngle.setDouble(targetPosition.getDegrees());
-    climberModeEntry.setBoolean(climbMode);
-    aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
+    if(++count > 50){
+      count = 0;
+      angleEntry.setDouble(getPivotMotorPosition().getDegrees());
+      sensorAngleEntry.setDouble(getPivotEncoderPosition().getDegrees());
+      angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
+      angleError.setDouble(getLocalAngle().getDegrees() - pivotState.angle.getDegrees());
+      targetAngle.setDouble(pivotState.angle.getDegrees());
+      climberModeEntry.setBoolean(climbMode);
+      aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
+      noteLoadedEntry.setBoolean(Intake.noteLoaded);
+    }
   }
 
+  public enum PivotState{
+    PICKUP(ArmConstants.PICKUP_POSITION),
+    SPEAKER(ArmConstants.SPEAKER_POSITION),
+    AMP(ArmConstants.AMP_POSITION),
+    HOLD(new Rotation2d()),
+    NOTHING(new Rotation2d()),
+    AUTOAIM(new Rotation2d());
 
+    public Rotation2d angle;
+    private PivotState(Rotation2d angle){
+      this.angle = angle;
+    }
+  }
 }

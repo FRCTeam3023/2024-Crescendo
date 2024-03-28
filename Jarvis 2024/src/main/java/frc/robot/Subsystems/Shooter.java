@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -34,14 +35,15 @@ public class Shooter extends SubsystemBase {
   private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 2).getEntry();
 
 
-  private final Gains shooterGains = new Gains(0,1.0/Constants.ArmConstants.SHOOTER_RPM,1);  
+  private final Gains shooterGains = new Gains(0.001,1.0/2500,1);  
   private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
 
-  Joystick tempJoystick;
-  public Shooter(Joystick joystick) {
-    tempJoystick = joystick;
+  public Shooter() {
     leftPID = leftShooterMotor.getPIDController();
     leftEncoder = leftShooterMotor.getEncoder();
+
+    leftShooterMotor.setIdleMode(IdleMode.kBrake);
+    rightShooterMotor.setIdleMode(IdleMode.kBrake);
 
     rightPID = rightShooterMotor.getPIDController();
     rightEncoder = rightShooterMotor.getEncoder();
@@ -62,6 +64,9 @@ public class Shooter extends SubsystemBase {
 
     leftShooterMotor.enableVoltageCompensation(11.5);
     rightShooterMotor.enableVoltageCompensation(11.5);
+
+    leftShooterMotor.setSmartCurrentLimit(40);
+    rightShooterMotor.setSmartCurrentLimit(40);
   }
 
   @Override
@@ -69,9 +74,6 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     leftSpeedEntry.setDouble(leftEncoder.getVelocity());
     rightSpeedEntry.setDouble(rightEncoder.getVelocity());
-
-    leftShooterMotor.set(tempJoystick.getRawAxis(3));
-    rightShooterMotor.set(tempJoystick.getRawAxis(3));
   }
 
 
@@ -80,8 +82,13 @@ public class Shooter extends SubsystemBase {
    * @param rpm target rpm
    */
   public void setShooterRPM(double rpm){
-    leftPID.setReference(rpm, ControlType.kVelocity);
-    rightPID.setReference(rpm, ControlType.kVelocity);
+    if(rpm == 0){
+      leftShooterMotor.set(0);
+      rightShooterMotor.set(0);
+    }else{
+      leftPID.setReference(rpm, ControlType.kVelocity);
+      rightPID.setReference(rpm, ControlType.kVelocity);
+    }
     targetRPM = rpm;
   }
 
@@ -94,6 +101,7 @@ public class Shooter extends SubsystemBase {
     double rightError = Math.abs(rightShooterMotor.getEncoder().getVelocity() - targetRPM);
 
     return leftError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR && rightError < Constants.ArmConstants.MAX_SHOOTER_RPM_ERROR;
+    // return leftEncoder.getVelocity() > 1900 && rightEncoder.getVelocity() > 1900;
   }
 
   public void setShooterDutyCycle(double speed){

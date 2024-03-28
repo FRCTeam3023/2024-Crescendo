@@ -20,6 +20,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -45,6 +46,8 @@ import frc.robot.Util.TalonFXsetter;
 public class Drivetrain extends SubsystemBase {
 
   public static boolean allModuleHomeStatus = false;
+
+  public static boolean autoAimDrivetrain = false;
   
   //ADIS16470_IMU gyro = new ADIS16470_IMU();
   Pigeon2 pigeonGyro = new Pigeon2(20);
@@ -65,7 +68,7 @@ public class Drivetrain extends SubsystemBase {
 
   //kinimatics object for swerve drive storing module positions
   private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
-  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(4, 8));
+  ProfiledPIDController turnController = new ProfiledPIDController(4, 0, 0, new Constraints(5, 12));
 
   ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
   GenericEntry targetPositionEntry = armTab.add("Aiming Target Position", "placeholder").withPosition(1, 0).withSize(2, 1).getEntry();
@@ -80,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
     new SwerveModulePosition[] {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},
     new Pose2d(0,0, new Rotation2d()),
     MatBuilder.fill(Nat.N3(), Nat.N1(),0.05,0.05,0.05), //Standard deviations for state estimate, (m,m,rad). Increase to trust less
-    MatBuilder.fill(Nat.N3(), Nat.N1(),0.6,0.6,0.6) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
+    MatBuilder.fill(Nat.N3(), Nat.N1(),0.3,0.3,0.1) //Standard deviations for vision estimate, (m,m,rad). Increase to trust less
     );
 
   /** Shuffelboard tab to display telemetry such as heading, homing status, gyro drift, etc*/
@@ -102,6 +105,7 @@ public class Drivetrain extends SubsystemBase {
     poseY.setDouble(0);
     poseH.setDouble(0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
+    turnController.setTolerance(Units.degreesToRadians(1));
     PIDDisplay.PIDList.addOption("Aim Turn PID", new ProfiledWPILibSetter(List.of(turnController)));
 
     // gyro.configCalTime(CalibrationTime._32ms);
@@ -113,7 +117,7 @@ public class Drivetrain extends SubsystemBase {
       this::getPose,
       this::setPose, 
       this::getChassisSpeeds , 
-      this::driveRobotRelative, 
+      this::driveRobotAuto, 
       new HolonomicPathFollowerConfig(
         new PIDConstants(4), 
         new PIDConstants(4),
@@ -152,9 +156,9 @@ public class Drivetrain extends SubsystemBase {
     gyroDifferenceEntry.setDouble(getChassisAngle().getDegrees() - getPose().getRotation().getDegrees());
     isFieldRelative.setBoolean(JoystickDrive.fieldRelativeDrive);
     
-    if (poseX.getDouble(0) != 0 || poseY.getDouble(0) != 0 || poseH.getDouble(0) != 0)
-      setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
-    else
+    // if (poseX.getDouble(0) != 0 || poseY.getDouble(0) != 0 || poseH.getDouble(0) != 0)
+    //   setPose(new Pose2d(poseX.getDouble(0), poseY.getDouble(0), Rotation2d.fromDegrees(poseH.getDouble(0))));
+    // else
       poseEstimator.update(getChassisAngle(), getModulePositions());
 
     poseEntry.setString(getPose().toString());    
@@ -183,13 +187,13 @@ public class Drivetrain extends SubsystemBase {
     turnController.reset(getPose().getRotation().getRadians());
   }
 
-  public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative, Pose3d targetPose) {
-    Translation2d relativeTargetTranslation = getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
-    Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX()));
+  public void driveFacingTarget(ChassisSpeeds speeds, boolean isFieldRelative) {
+    Translation2d relativeTargetTranslation = AutoAimCalculator.translatedPose.toPose2d().getTranslation();//getPose().getTranslation().minus(targetPose.toPose2d().getTranslation());
+    Rotation2d targetRotation = Rotation2d.fromRadians(Math.atan2(relativeTargetTranslation.getY(), relativeTargetTranslation.getX())).plus(Rotation2d.fromDegrees(180));
     double rotationSpeed = turnController.calculate(getPose().getRotation().getRadians(), targetRotation.getRadians());
     drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed), isFieldRelative);
 
-    targetPositionEntry.setString(targetPose.toString());
+    targetPositionEntry.setString(getPose().plus(new Transform2d(relativeTargetTranslation.getX(), relativeTargetTranslation.getY(), new Rotation2d())).toString());
     targetRotationEntry.setDouble(targetRotation.getDegrees());
     relativePositionEntry.setString(relativeTargetTranslation.toString());
     robotPoseEntry.setString(getPose().toString());
@@ -203,6 +207,15 @@ public class Drivetrain extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds){
     drive(chassisSpeeds, false);
   }
+
+
+  public void driveRobotAuto(ChassisSpeeds chassisSpeeds){
+    if(autoAimDrivetrain){
+      driveFacingTarget(chassisSpeeds, false);
+    } else {
+      drive(chassisSpeeds, false);
+    }
+  }
 //#endregion
 
   /** Sets drivetrain to 0 speeds */
@@ -210,7 +223,10 @@ public class Drivetrain extends SubsystemBase {
     drive(new ChassisSpeeds(), false);
   }
 
+  public boolean atHeadingTarget(){
+    return turnController.atGoal();
 
+  }
 
   /**
    * Sets the desired module states for all of the modules - desaturates the max speeds first

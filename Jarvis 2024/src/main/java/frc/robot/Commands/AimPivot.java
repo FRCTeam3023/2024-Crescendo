@@ -7,14 +7,13 @@ package frc.robot.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
-import frc.robot.Util.AutoAimCalculator;
+import frc.robot.Subsystems.Pivot.PivotState;
 
 public class AimPivot extends Command {
   /** Creates a new AimPivot. */
   Drivetrain drivetrain;
 
-  public AimPivot(Drivetrain drivetrain) {
-    this.drivetrain = drivetrain;
+  public AimPivot() {
   }
 
   @Override
@@ -24,7 +23,7 @@ public class AimPivot extends Command {
 
   @Override
   public void execute() {
-    Pivot.targetPosition = Pivot.globalToLocalAngle(AutoAimCalculator.theta);
+    Pivot.setPivotState(PivotState.AUTOAIM);
   }
 
   @Override

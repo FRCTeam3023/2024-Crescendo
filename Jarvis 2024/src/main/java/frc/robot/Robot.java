@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.Pivot;
+import frc.robot.Subsystems.Pivot.PivotState;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -36,6 +39,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    Intake.noteLoaded = true;
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
   if (m_autonomousCommand != null) {
@@ -57,13 +62,16 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    Pivot.setPivotState(PivotState.HOLD);
   }
 
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    Pivot.setPivotState(PivotState.NOTHING);
+  }
 
   @Override
   public void testInit() {

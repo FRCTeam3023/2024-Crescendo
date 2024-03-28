@@ -24,6 +24,7 @@ public class AutoAimCalculator {
         if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
             target = Constants.redSpeakerPose;
         }
+        // Pose3d target = Constants.redSpeakerPose;
 
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
 
