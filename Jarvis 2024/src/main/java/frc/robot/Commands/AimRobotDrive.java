@@ -15,6 +15,7 @@ import frc.robot.Robot;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Pivot;
 import frc.robot.Subsystems.Pivot.PivotState;
+import frc.robot.Util.AutoAimCalculator;
 
 public class AimRobotDrive extends Command {
   /** Creates a new AimRobot. */
@@ -75,10 +76,11 @@ public class AimRobotDrive extends Command {
 
     if(controller2.getPOV() == 90){
       Pivot.setPivotState(PivotState.LOB);
-      drivetrain.driveFacingHeading(new ChassisSpeeds(), true, new Rotation2d());
+      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed, ySpeed, 0), true, AutoAimCalculator.alpha);
     }else{
       Pivot.setPivotState(PivotState.AUTOAIM);
-      drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
+      // drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
+      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed, 0), true, AutoAimCalculator.alpha);
     }
    
   }
