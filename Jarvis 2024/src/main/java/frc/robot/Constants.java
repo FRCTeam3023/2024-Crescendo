@@ -33,8 +33,8 @@ public class Constants {
     public static final double SIMULATION_SUPPLY_VOLTAGE = 12.0;
 
     //target pose for the opening of the speakers
-    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(85), new Rotation3d());
-    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(85), new Rotation3d());
+    public static final Pose3d redSpeakerPose = new Pose3d(16.58, 5.55, Units.inchesToMeters(83), new Rotation3d());
+    public static final Pose3d blueSpeakerPose = new Pose3d(0 , 5.55, Units.inchesToMeters(83), new Rotation3d());
 
     public static final Pose2d redLandingZone = new Pose2d(14.2, 6.76, new Rotation2d());
     public static final Pose2d blueLandingZone = new Pose2d(2.34, 6.76, new Rotation2d());
@@ -79,6 +79,7 @@ public class Constants {
             );
 
         public static final Transform3d CAMERA_TO_ROBOT = ROBOT_TO_CAMERA.inverse();
+        public static final double MAX_VISION_DISTANCE = 5;
 
 
 
@@ -100,8 +101,6 @@ public class Constants {
         public static final Pose3d TARGET_14_POSE = new Pose3d(5.32,4.11,1.32, new Rotation3d(0,0,0));
         public static final Pose3d TARGET_15_POSE = new Pose3d(4.64,4.5,1.32, new Rotation3d(0,0,2*Math.PI/3.0));
         public static final Pose3d TARGET_16_POSE = new Pose3d(4.64,3.71,1.32, new Rotation3d(0,0,-Math.PI/1.5));
-        
-
     } 
     
     public static class ArmConstants{
@@ -135,7 +134,7 @@ public class Constants {
         /**What speed the shooter flywheels should spin at*/
         public static final double SHOOTER_RPM = 2000;
 
-        public static final double SHOOTER_RPM_AMP = 1500;
+        public static final double SHOOTER_RPM_AMP = 500;
         /**The maximum difference between the shooter's RPM and the target RPM*/
         public static final double MAX_SHOOTER_RPM_ERROR = 100;
 

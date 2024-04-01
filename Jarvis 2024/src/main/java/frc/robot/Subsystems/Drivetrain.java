@@ -145,8 +145,8 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     //computes the auto aim positions periodically
-    //AutoAimCalculator.computeAngle(getPose(), getFieldRelativeSpeeds());
-    AutoAimCalculatorV2.compute(getPose(), getFieldRelativeSpeeds());
+    AutoAimCalculator.computeAngle(getPose(), getFieldRelativeSpeeds());
+    //AutoAimCalculatorV2.compute(getPose(), getFieldRelativeSpeeds());
 
     //field.setRobotPose(new Pose2d(3, 3, new Rotation2d(Math.PI / 4)));
     headingEntry.setDouble(getPose().getRotation().getDegrees());

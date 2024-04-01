@@ -16,10 +16,11 @@
     "Amp",
     "Devious",
     "Leave",
+    "4 Note Speaker",
     "Various"
   ],
-  "defaultMaxVel": 2.0,
-  "defaultMaxAccel": 1.0,
+  "defaultMaxVel": 3.5,
+  "defaultMaxAccel": 2.5,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "maxModuleSpeed": 4.5

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.PhotonConstants;
 
 public class VisionSystem extends SubsystemBase {
@@ -62,7 +63,7 @@ public class VisionSystem extends SubsystemBase {
       previousPipelineTimestamp = resultTimestamp;
       var target = pipelineResult.getBestTarget();
 
-      if (target.getPoseAmbiguity() <= .02) {
+      if (target.getPoseAmbiguity() <= .1) {
         Transform3d camToTarget = target.getBestCameraToTarget();
         Transform3d targetToCamera = camToTarget.inverse();
 
@@ -71,12 +72,15 @@ public class VisionSystem extends SubsystemBase {
 
         Pose2d visionMeasurement = camPose.transformBy(PhotonConstants.CAMERA_TO_ROBOT).toPose2d();
 
-        Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
-        visionPoseEntry.setString(visionMeasurement.toString());
-        field.setRobotPose(visionMeasurement);
+        if (Math.pow(targetPose.getX() - visionMeasurement.getX(), 2) + 
+          Math.pow(targetPose.getY() - visionMeasurement.getY(), 2) < 
+          Constants.PhotonConstants.MAX_VISION_DISTANCE * Constants.PhotonConstants.MAX_VISION_DISTANCE) {
+            Drivetrain.addVisionMeasurement(visionMeasurement, resultTimestamp);
+            visionPoseEntry.setString(visionMeasurement.toString());
+            field.setRobotPose(visionMeasurement);
+        }
       }
     }
-
   }
 
   public Pose3d getSelectedTargetPose(int ID) {

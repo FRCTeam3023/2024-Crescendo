@@ -91,6 +91,22 @@ public class CommandList {
         }
     }
 
+     public static final class SpinShooterInstantCommand extends FunctionalCommand {
+        /**Spins shooter up to target RPM - Changes if at AMP position */
+        public SpinShooterInstantCommand() {
+            super(() -> {
+                    if(Pivot.getPivotState() == PivotState.AMP){
+                        shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM_AMP);
+                    } else if (Pivot.getPivotState() == PivotState.LOB) {
+                        shooter.setShooterRPM(Shooter.lobRPM);
+                    } else{
+                        shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
+                    }
+                    // shooter.setShooterRPM(Constants.ArmConstants.SHOOTER_RPM);
+                }, () -> {}, interrupted -> {}, () -> true, shooter);
+        }
+    }
+
     public static final class ShooterStopCommand extends FunctionalCommand {
         /**Set shooter rpm to 0 */
         public ShooterStopCommand() {
@@ -206,8 +222,9 @@ public class CommandList {
                 new SequentialCommandGroup(
                     new WaitUntilCommand(() -> pivot.noteClearsGround()),
                     new PrepShooterCommand(),
+                    new SpinShooterInstantCommand()
                     // new SpinShooterCommand()
-                    new InstantCommand(() -> shooter.setShooterRPM((Pivot.getPivotState() == PivotState.AMP) ? ArmConstants.SHOOTER_RPM_AMP : ArmConstants.SHOOTER_RPM))
+                    // new InstantCommand(() -> shooter.setShooterRPM((Pivot.getPivotState() == PivotState.AMP) ? ArmConstants.SHOOTER_RPM_AMP : ArmConstants.SHOOTER_RPM))
                 )
             );
         }

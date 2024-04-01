@@ -83,7 +83,7 @@ public class AimRobotDrive extends Command {
       double deltaX = targetPose.getX() - drivetrain.getPose().getX();
       double deltaY = targetPose.getY() - drivetrain.getPose().getY();
       double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      double angle = Math.atan2(4 * ArmConstants.MAX_LOB_HEIGHT, distance);
+      double angle =  Math.atan2(4 * ArmConstants.MAX_LOB_HEIGHT, distance) - Constants.ArmConstants.LAUNCHER_ANGLE_WITH_PIVOT.getRadians();
       double launchVelocity = Math.sqrt(9.8 * (2 * ArmConstants.MAX_LOB_HEIGHT + distance * distance / (8 * ArmConstants.MAX_LOB_HEIGHT)));
 
       Shooter.lobRPM = launchVelocity / ArmConstants.NOTE_LAUNCH_SPEED * ArmConstants.SHOOTER_RPM;
@@ -91,11 +91,11 @@ public class AimRobotDrive extends Command {
       Pivot.setPivotState(PivotState.LOB);
 
       drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed, ySpeed, 0), true, 
-        Rotation2d.fromRadians(Math.atan2(deltaY, deltaX)).plus(Rotation2d.fromDegrees(180)));
+      Rotation2d.fromRadians(Math.atan2(deltaY, deltaX)).plus(Rotation2d.fromDegrees(180)));
     }else{
       Pivot.setPivotState(PivotState.AUTOAIM);
       // drivetrain.driveFacingTarget(new ChassisSpeeds(xSpeed, ySpeed, 0), true);
-      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed, 0), true, AutoAimCalculatorV2.alpha);
+      drivetrain.driveFacingHeading(new ChassisSpeeds(xSpeed,ySpeed, 0), true, AutoAimCalculator.alpha);
     }
    
   }

@@ -3,7 +3,7 @@
   "startingPose": {
     "position": {
       "x": 1.4055808813372015,
-      "y": 6.952083026973072
+      "y": 4.1046482092964185
     },
     "rotation": 0
   },
@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "5_N3"
+            "pathName": "6_N1"
           }
         },
         {
@@ -32,19 +32,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N3_N5"
+            "pathName": "N1_N2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Check Intake"
+            "name": "Aim and Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "N5_RS"
+            "pathName": "N2_N3"
           }
         },
         {
@@ -56,6 +56,6 @@
       ]
     }
   },
-  "folder": "3 Note Speaker",
+  "folder": "4 Note Speaker",
   "choreoAuto": false
 }

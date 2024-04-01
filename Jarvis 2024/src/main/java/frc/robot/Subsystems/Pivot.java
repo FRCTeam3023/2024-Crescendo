@@ -64,11 +64,13 @@ public class Pivot extends SubsystemBase {
   private static final GenericEntry angleOffsetEntry = armTab.add("Angle Offset", 0).withPosition(0, 3).getEntry();
   private static final GenericEntry targetAngle = armTab.add("Target Angle",0).withPosition(0, 2).getEntry();
   private static final GenericEntry angleError = armTab.add("Angle Error",0).withPosition(0, 3).getEntry();
+  private static final GenericEntry approximationErrorEntry = armTab.add("Approximator Error", 0).withPosition(1, 3).getEntry();
   private static final GenericEntry aimAngleEntry = armTab.add("Aim Angle",0).withPosition(3, 1).getEntry();
-  private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",false).withPosition(3, 2).getEntry();
+  private static final GenericEntry climberModeEntry = armTab.add("Climb Mode",false).withPosition(3, 3).getEntry();
   private static final GenericEntry noteLoadedEntry = armTab.add("Note Loaded", true).getEntry();
   private static final ShuffleboardTab simTab = Shuffleboard.getTab("Simulation");
   private static final GenericEntry voltageInput = simTab.add("Input", 0).getEntry();
+  private static final GenericEntry pivotStateEntry = armTab.add("Pivot State", "Placeholder").getEntry();
 
   public Pivot() {
 
@@ -163,7 +165,7 @@ public class Pivot extends SubsystemBase {
 
   public void approachCurrentState(){
     if(pivotState == PivotState.AUTOAIM){
-      setPivotAngle(AutoAimCalculatorV2.theta, true);
+      setPivotAngle(AutoAimCalculator.theta, true);
     } else if(pivotState == PivotState.LOB){
       setPivotAngle(pivotState.angle, true);
     } else if(pivotState == PivotState.HOLD){
@@ -334,9 +336,11 @@ public class Pivot extends SubsystemBase {
       angleOffsetEntry.setDouble(pivotEncoderConfig.MagnetSensor.MagnetOffset);
       angleError.setDouble(getLocalAngle().getDegrees() - pivotState.angle.getDegrees());
       targetAngle.setDouble(pivotState.angle.getDegrees());
+      //approximationErrorEntry.setDouble(AutoAimCalculator.error);
       climberModeEntry.setBoolean(climbMode);
-      aimAngleEntry.setDouble(AutoAimCalculatorV2.theta.getDegrees());
+      aimAngleEntry.setDouble(AutoAimCalculator.theta.getDegrees());
       noteLoadedEntry.setBoolean(Intake.noteLoaded);
+      pivotStateEntry.setString(pivotState.name());
     }
   }
 

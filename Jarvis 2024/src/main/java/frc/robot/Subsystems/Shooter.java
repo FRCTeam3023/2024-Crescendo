@@ -35,9 +35,10 @@ public class Shooter extends SubsystemBase {
   private static final GenericEntry leftSpeedEntry = armTab.add("Left RPM", 0).withPosition(2, 2).getEntry();
 
 
+
   private final Gains shooterGains = new Gains(0.001,1.0/2500,1);  
   private double targetRPM = Constants.ArmConstants.SHOOTER_RPM;
-  public static double lobRPM = 0;
+  public static double lobRPM = Constants.ArmConstants.SHOOTER_RPM;
 
   public Shooter() {
     leftPID = leftShooterMotor.getPIDController();

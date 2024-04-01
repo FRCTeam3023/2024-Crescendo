@@ -37,11 +37,11 @@ public class AutoAimCalculatorV2 {
      */
     public static void compute(Pose2d robotPose, ChassisSpeeds velocity) {
         Pose3d target = Constants.blueSpeakerPose;
-        SolutionEntry guess = new SolutionEntry(0.7, 0, 0.5);
+        SolutionEntry guess = new SolutionEntry(0.7, Math.PI, 0.5);
 
         if (Robot.alliance == Alliance.Red) {
             target = Constants.redSpeakerPose;
-            guess = new SolutionEntry(0.7, Math.PI, 0.5);
+            guess = new SolutionEntry(0.7, 0, 0.5);
         }
         
         Pose3d relativeTarget = new Pose3d(target.getX() - robotPose.getX(), target.getY() - robotPose.getY(), target.getZ(), new Rotation3d());
